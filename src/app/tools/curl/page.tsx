@@ -5,7 +5,7 @@ import { Terminal, Copy, Trash2, FileText } from 'lucide-react'
 
 export default function CurlGeneratorPage() {
   const [url, setUrl] = useState('https://api.example.com/users')
-  const [method, setMethod] = useState<'GET' | 'POST' | 'PUT' | 'DELETE'>('GET')
+  const [method, setMethod] = useState<'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'>('GET')
   const [headers, setHeaders] = useState([{ key: 'Content-Type', value: 'application/json' }])
   const [body, setBody] = useState('')
   const [curlCommand, setCurlCommand] = useState('')
