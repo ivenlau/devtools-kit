@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { RefreshCw, Copy, Trash2, FileCode } from 'lucide-react'
 import yaml from 'js-yaml'
-import { format as xmlFormat } from 'xml-formatter'
+import xmlFormat from 'xml-formatter'
 // @ts-ignore
 const TOML = require('toml')
 
