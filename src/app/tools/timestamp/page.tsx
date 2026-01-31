@@ -84,7 +84,7 @@ export default function TimestampToolPage() {
               <h2 className="text-sm font-medium opacity-90 mb-2">当前时间戳</h2>
               <div className="flex items-baseline gap-4">
                 <button
-                  onClick={() => copyToClipboard(currentTimestamp)}
+                  onClick={() => copyToClipboard(currentTimestamp.toString())}
                   className="text-4xl font-bold cursor-pointer hover:opacity-80 transition-opacity"
                 >
                   {currentTimestamp}

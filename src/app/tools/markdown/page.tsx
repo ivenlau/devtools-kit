@@ -64,8 +64,11 @@ function hello() {
 
   // 实时转换Markdown到HTML
   useEffect(() => {
-    const convertedHtml = marked(markdown)
-    setHtml(convertedHtml)
+    const convert = async () => {
+      const convertedHtml = await marked(markdown)
+      setHtml(convertedHtml)
+    }
+    convert()
 
     // 保存到本地存储
     localStorage.setItem('markdown-editor-content', markdown)

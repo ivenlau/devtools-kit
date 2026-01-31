@@ -31,7 +31,7 @@ export default function SQLFormatterPage() {
         language: language as any,
         indent: indent,
         linesBetweenQueries: 2,
-      })
+      } as any)
 
       // Apply uppercase if enabled
       let result = formatted
