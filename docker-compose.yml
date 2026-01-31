@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  devtools:
+    container_name: devtools-kit
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: devtools-kit:latest
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+    # 如果需要配置环境变量，可以在这里添加
+    # environment:
+    #   - NEXT_PUBLIC_APP_NAME=DevToolsKit
+    networks:
+      - devtools-network
+
+networks:
+  devtools-network:
+    driver: bridge
