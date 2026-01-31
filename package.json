@@ -56,5 +56,9 @@
     "uuid": "^13.0.0",
     "xml-formatter": "^3.6.7",
     "zustand": "^5.0.10"
+  },
+  "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
+    "@types/js-yaml": "^4.0.9"
   }
 }
