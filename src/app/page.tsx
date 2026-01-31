@@ -23,7 +23,7 @@ export default function HomePage() {
               开始使用
             </Link>
             <a
-              href="https://github.com"
+              href="https://github.com/ivenlau/devtools-kit"
               target="_blank"
               rel="noopener noreferrer"
               className="px-8 py-3 border border-gray-300 dark:border-gray-600 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
