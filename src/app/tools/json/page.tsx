@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Braces, Copy, Download, Trash2, Upload } from 'lucide-react'
+import { Braces, Copy, Trash2 } from 'lucide-react'
 import { formatJson, minifyJson } from '@/lib/parsers/json'
+import Editor from '@monaco-editor/react'
 
 export default function JsonToolPage() {
   const [input, setInput] = useState('')
@@ -10,6 +11,30 @@ export default function JsonToolPage() {
   const [error, setError] = useState<string | null>(null)
   const [indent, setIndent] = useState(2)
   const [sortKeys, setSortKeys] = useState(false)
+  const [editorTheme, setEditorTheme] = useState<'light' | 'vs-dark'>('light')
+
+  useEffect(() => {
+    // Check initial theme
+    const isDark = document.documentElement.classList.contains('dark')
+    setEditorTheme(isDark ? 'vs-dark' : 'light')
+
+    // Observe theme changes
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          const isDark = document.documentElement.classList.contains('dark')
+          setEditorTheme(isDark ? 'vs-dark' : 'light')
+        }
+      })
+    })
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    })
+
+    return () => observer.disconnect()
+  }, [])
 
   // 自动格式化
   useEffect(() => {
@@ -23,6 +48,10 @@ export default function JsonToolPage() {
 
     if (err) {
       setError(`行 ${err.line}, 列 ${err.column}: ${err.message}`)
+      // Keep the previous output or clear it?
+      // If we clear it, the user loses the formatted view while typing.
+      // But if we don't, it might be confusing.
+      // Let's clear it for now as per original logic.
       setOutput('')
     } else {
       setOutput(result)
@@ -139,37 +168,55 @@ export default function JsonToolPage() {
       <div className="container mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Input */}
-          <div className="flex flex-col">
+          <div className="flex flex-col h-[600px]">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">输入 JSON</h3>
               {error && (
                 <span className="text-sm text-red-500">❌ {error}</span>
               )}
             </div>
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder='{"name": "John", "age": 30}'
-              className="flex-1 min-h-[500px] p-4 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-              spellCheck={false}
-            />
+            <div className="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
+              <Editor
+                height="100%"
+                defaultLanguage="json"
+                value={input}
+                theme={editorTheme}
+                onChange={(value) => setInput(value || '')}
+                options={{
+                  minimap: { enabled: false },
+                  fontSize: 14,
+                  wordWrap: 'on',
+                  formatOnPaste: true,
+                  automaticLayout: true,
+                }}
+              />
+            </div>
           </div>
 
           {/* Output */}
-          <div className="flex flex-col">
+          <div className="flex flex-col h-[600px]">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">输出</h3>
               {output && !error && (
                 <span className="text-sm text-green-500">✓ 格式化成功</span>
               )}
             </div>
-            <textarea
-              value={output}
-              readOnly
-              placeholder="格式化结果将显示在这里..."
-              className="flex-1 min-h-[500px] p-4 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 resize-none"
-              spellCheck={false}
-            />
+            <div className="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
+              <Editor
+                height="100%"
+                defaultLanguage="json"
+                value={output}
+                theme={editorTheme}
+                options={{
+                  readOnly: true,
+                  minimap: { enabled: false },
+                  fontSize: 14,
+                  wordWrap: 'on',
+                  automaticLayout: true,
+                  folding: true,
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -186,8 +233,8 @@ export default function JsonToolPage() {
             <div className="flex items-center gap-3">
               <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs">Ctrl</kbd>
               <span>+</span>
-              <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs">Enter</kbd>
-              <span className="ml-2">格式化</span>
+              <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs">F</kbd>
+              <span className="ml-2">查找</span>
             </div>
           </div>
         </div>
