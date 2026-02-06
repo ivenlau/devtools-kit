@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { FileText, Copy, Trash2, Upload, ArrowLeft } from 'lucide-react'
+import { FileText, Copy, Trash2, Upload, ArrowLeft, Eye, ChevronUp } from 'lucide-react'
 import { marked } from 'marked'
 
 // 配置marked选项
@@ -65,6 +65,8 @@ function hello() {
   const [copySuccess, setCopySuccess] = useState(false)
   const [dragActive, setDragActive] = useState(false)
   const [localFileName, setLocalFileName] = useState('')
+  const [isPreviewMode, setIsPreviewMode] = useState(false)
+  const [showBackToTop, setShowBackToTop] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   // 加载保存的内容
@@ -134,6 +136,7 @@ function hello() {
       const text = await file.text()
       setMarkdown(text)
       setLocalFileName(file.name)
+      setIsPreviewMode(true)
     } else {
       alert('请选择 Markdown 文件 (.md)')
     }
@@ -146,9 +149,30 @@ function hello() {
     }
   }
 
+  // 切换预览模式
+  const handleTogglePreview = () => {
+    setIsPreviewMode(!isPreviewMode)
+  }
+
   // 返回编辑模式
   const handleBackToEdit = () => {
+    setIsPreviewMode(false)
     setLocalFileName('')
+  }
+
+  // 监听滚动显示返回顶部按钮
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 400)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // 返回顶部
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   return (
@@ -179,7 +203,7 @@ function hello() {
       {/* Toolbar */}
       <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
         <div className="container mx-auto px-4 py-3 flex flex-wrap items-center gap-3">
-          {!localFileName ? (
+          {!isPreviewMode ? (
             <>
               <button
                 onClick={handleCopyMarkdown}
@@ -216,6 +240,13 @@ function hello() {
                 onChange={handleFileSelect}
                 className="hidden"
               />
+              <button
+                onClick={handleTogglePreview}
+                className="px-4 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition-all text-sm flex items-center gap-2"
+              >
+                <Eye className="h-4 w-4" />
+                预览模式
+              </button>
 
               <div className="ml-auto text-sm text-gray-500 dark:text-gray-400">
                 自动保存已启用
@@ -231,7 +262,7 @@ function hello() {
                 返回编辑模式
               </button>
               <div className="ml-auto text-sm text-gray-500 dark:text-gray-400">
-                正在预览: {localFileName}
+                {localFileName ? `正在预览: ${localFileName}` : '预览模式'}
               </div>
             </>
           )}
@@ -252,7 +283,7 @@ function hello() {
 
       {/* Editor Area */}
       <div className="container mx-auto px-4 py-6">
-        {!localFileName ? (
+        {!isPreviewMode ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Markdown Input */}
             <div className="flex flex-col">
@@ -291,10 +322,10 @@ function hello() {
           </div>
         ) : (
           /* Preview Mode - Full Width */
-          <div className="max-w-4xl mx-auto">
+          <div className="w-full">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300">
-                文件预览
+                {localFileName ? '文件预览' : '预览模式'}
               </h3>
               <span className="text-sm text-gray-500">{markdown.length} 字符</span>
             </div>
@@ -351,6 +382,17 @@ function hello() {
           </div>
         </div>
       </div>
+
+      {/* Back to Top Button */}
+      {showBackToTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 w-12 h-12 bg-pink-500 hover:bg-pink-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 z-50"
+          aria-label="返回顶部"
+        >
+          <ChevronUp className="h-6 w-6" />
+        </button>
+      )}
     </div>
   )
 }
