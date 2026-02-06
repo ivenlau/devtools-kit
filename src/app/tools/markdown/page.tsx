@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { FileText, Copy, Trash2 } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { FileText, Copy, Trash2, Upload, ArrowLeft } from 'lucide-react'
 import { marked } from 'marked'
+import { useSearchParams } from 'next/navigation'
 
 // 配置marked选项
 marked.setOptions({
@@ -11,6 +12,10 @@ marked.setOptions({
 })
 
 export default function MarkdownEditorPage() {
+  const searchParams = useSearchParams()
+  const isPreviewMode = searchParams.get('mode') === 'preview'
+  const fileContent = searchParams.get('content')
+
   const [markdown, setMarkdown] = useState(`# 欢迎使用 Markdown 编辑器
 
 这是一个**实时预览**的Markdown编辑器。
@@ -21,6 +26,7 @@ export default function MarkdownEditorPage() {
 - 支持 GitHub 风格 Markdown (GFM)
 - 代码高亮
 - 自动保存到本地
+- 支持拖拽本地文件预览
 
 ## 代码示例
 
@@ -61,6 +67,17 @@ function hello() {
 `)
   const [html, setHtml] = useState('')
   const [copySuccess, setCopySuccess] = useState(false)
+  const [dragActive, setDragActive] = useState(false)
+  const [localFileName, setLocalFileName] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  // 加载保存的内容
+  useEffect(() => {
+    const saved = localStorage.getItem('markdown-editor-content')
+    if (saved) {
+      setMarkdown(saved)
+    }
+  }, [])
 
   // 实时转换Markdown到HTML
   useEffect(() => {
@@ -70,17 +87,11 @@ function hello() {
     }
     convert()
 
-    // 保存到本地存储
-    localStorage.setItem('markdown-editor-content', markdown)
-  }, [markdown])
-
-  // 加载保存的内容
-  useEffect(() => {
-    const saved = localStorage.getItem('markdown-editor-content')
-    if (saved) {
-      setMarkdown(saved)
+    // 只在编辑模式下保存到本地存储
+    if (!localFileName) {
+      localStorage.setItem('markdown-editor-content', markdown)
     }
-  }, [])
+  }, [markdown, localFileName])
 
   // 清空内容
   const handleClear = () => {
@@ -99,8 +110,59 @@ function hello() {
     navigator.clipboard.writeText(markdown)
   }
 
+  // 处理文件拖拽
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true)
+    } else if (e.type === 'dragleave') {
+      setDragActive(false)
+    }
+  }
+
+  // 处理文件拖放
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setDragActive(false)
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFile(e.dataTransfer.files[0])
+    }
+  }
+
+  // 处理文件选择
+  const handleFile = async (file: File) => {
+    if (file.type === 'text/markdown' || file.name.endsWith('.md') || file.type === 'text/plain') {
+      const text = await file.text()
+      setMarkdown(text)
+      setLocalFileName(file.name)
+    } else {
+      alert('请选择 Markdown 文件 (.md)')
+    }
+  }
+
+  // 处理文件选择按钮
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      handleFile(e.target.files[0])
+    }
+  }
+
+  // 返回编辑模式
+  const handleBackToEdit = () => {
+    setLocalFileName('')
+  }
+
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
+    <div
+      className="min-h-screen bg-white dark:bg-gray-900"
+      onDragEnter={handleDrag}
+      onDragLeave={handleDrag}
+      onDragOver={handleDrag}
+      onDrop={handleDrop}
+    >
       {/* Header */}
       <header className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
         <div className="container mx-auto px-4 py-4">
@@ -121,72 +183,133 @@ function hello() {
       {/* Toolbar */}
       <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
         <div className="container mx-auto px-4 py-3 flex flex-wrap items-center gap-3">
-          <button
-            onClick={handleCopyMarkdown}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all text-sm flex items-center gap-2"
-          >
-            <Copy className="h-4 w-4" />
-            复制 Markdown
-          </button>
-          <button
-            onClick={handleCopyHtml}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all text-sm flex items-center gap-2"
-          >
-            <Copy className="h-4 w-4" />
-            {copySuccess ? '✓ 已复制 HTML' : '复制 HTML'}
-          </button>
-          <button
-            onClick={handleClear}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-all text-sm flex items-center gap-2"
-          >
-            <Trash2 className="h-4 w-4" />
-            清空
-          </button>
+          {!localFileName ? (
+            <>
+              <button
+                onClick={handleCopyMarkdown}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all text-sm flex items-center gap-2"
+              >
+                <Copy className="h-4 w-4" />
+                复制 Markdown
+              </button>
+              <button
+                onClick={handleCopyHtml}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all text-sm flex items-center gap-2"
+              >
+                <Copy className="h-4 w-4" />
+                {copySuccess ? '✓ 已复制 HTML' : '复制 HTML'}
+              </button>
+              <button
+                onClick={handleClear}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-all text-sm flex items-center gap-2"
+              >
+                <Trash2 className="h-4 w-4" />
+                清空
+              </button>
+              <button
+                onClick={() => inputRef.current?.click()}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all text-sm flex items-center gap-2"
+              >
+                <Upload className="h-4 w-4" />
+                打开本地文件
+              </button>
+              <input
+                ref={inputRef}
+                type="file"
+                accept=".md,.markdown,.txt"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
 
-          <div className="ml-auto text-sm text-gray-500 dark:text-gray-400">
-            自动保存已启用
-          </div>
+              <div className="ml-auto text-sm text-gray-500 dark:text-gray-400">
+                自动保存已启用
+              </div>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={handleBackToEdit}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all text-sm flex items-center gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                返回编辑模式
+              </button>
+              <div className="ml-auto text-sm text-gray-500 dark:text-gray-400">
+                正在预览: {localFileName}
+              </div>
+            </>
+          )}
         </div>
       </div>
 
+      {/* Drag Overlay */}
+      {dragActive && (
+        <div className="fixed inset-0 bg-pink-500/20 backdrop-blur-sm z-50 flex items-center justify-center border-4 border-dashed border-pink-500 m-8 rounded-2xl">
+          <div className="text-center">
+            <Upload className="h-16 w-16 text-pink-500 mx-auto mb-4" />
+            <p className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
+              拖放 Markdown 文件到这里预览
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Editor Area */}
       <div className="container mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Markdown Input */}
-          <div className="flex flex-col">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Markdown 输入
-              </h3>
-              <span className="text-xs text-gray-500">
-                {markdown.length} 字符
-              </span>
+        {!localFileName ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Markdown Input */}
+            <div className="flex flex-col">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Markdown 输入 | 文件拖放
+                </h3>
+                <span className="text-xs text-gray-500">
+                  {markdown.length} 字符
+                </span>
+              </div>
+              <textarea
+                value={markdown}
+                onChange={(e) => setMarkdown(e.target.value)}
+                placeholder="输入 Markdown 内容..."
+                className="flex-1 min-h-[600px] p-4 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 resize-none focus:outline-none focus:ring-2 focus:ring-pink-500"
+                spellCheck={false}
+              />
             </div>
-            <textarea
-              value={markdown}
-              onChange={(e) => setMarkdown(e.target.value)}
-              placeholder="输入 Markdown 内容..."
-              className="flex-1 min-h-[600px] p-4 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 resize-none focus:outline-none focus:ring-2 focus:ring-pink-500"
-              spellCheck={false}
-            />
-          </div>
 
-          {/* Preview */}
-          <div className="flex flex-col">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                实时预览
-              </h3>
+            {/* Preview */}
+            <div className="flex flex-col">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  实时预览
+                </h3>
+              </div>
+              <div className="flex-1 min-h-[600px] p-6 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 overflow-auto">
+                {/* Preview Content */}
+                <div
+                  className="markdown-preview"
+                  dangerouslySetInnerHTML={{ __html: html }}
+                />
+              </div>
             </div>
-            <div className="flex-1 min-h-[600px] p-6 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 overflow-auto">
-              {/* Preview Content */}
+          </div>
+        ) : (
+          /* Preview Mode - Full Width */
+          <div className="max-w-4xl mx-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300">
+                文件预览
+              </h3>
+              <span className="text-sm text-gray-500">{markdown.length} 字符</span>
+            </div>
+            <div className="min-h-[700px] p-8 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 overflow-auto shadow-lg">
               <div
-                className="markdown-preview"
+                className="markdown-preview prose dark:prose-invert max-w-none"
                 dangerouslySetInnerHTML={{ __html: html }}
               />
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Syntax Help */}
