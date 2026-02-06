@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { FileText, Copy, Trash2, Upload, ArrowLeft } from 'lucide-react'
 import { marked } from 'marked'
-import { useSearchParams } from 'next/navigation'
 
 // 配置marked选项
 marked.setOptions({
@@ -12,9 +11,6 @@ marked.setOptions({
 })
 
 export default function MarkdownEditorPage() {
-  const searchParams = useSearchParams()
-  const isPreviewMode = searchParams.get('mode') === 'preview'
-  const fileContent = searchParams.get('content')
 
   const [markdown, setMarkdown] = useState(`# 欢迎使用 Markdown 编辑器
 
