@@ -21,6 +21,7 @@
   "license": "MIT",
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
+    "@types/html2pdf.js": "^0.10.0",
     "@types/node": "^25.1.0",
     "@types/react": "^19.2.10",
     "@types/react-dom": "^19.2.3",
@@ -35,6 +36,7 @@
     "diff": "^8.0.3",
     "diff2": "^0.1.7",
     "html-minifier": "^4.0.0",
+    "html2pdf.js": "^0.14.0",
     "ipaddr.js": "^2.3.0",
     "js-yaml": "^4.1.1",
     "jwt-decode": "^4.0.0",

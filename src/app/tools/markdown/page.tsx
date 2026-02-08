@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { FileText, Copy, Trash2, Upload, ArrowLeft, Eye, ChevronUp } from 'lucide-react'
+import { FileText, Copy, Trash2, Upload, ArrowLeft, Eye, ChevronUp, Download } from 'lucide-react'
 import { marked } from 'marked'
 
 // 配置marked选项
@@ -175,6 +175,104 @@ function hello() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  // 导出为 Markdown 文件
+  const exportAsMarkdown = () => {
+    const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = localFileName || 'document.md'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  }
+
+  // 导出为 PDF 文件
+  const exportAsPDF = async () => {
+    const html2pdfModule = await import('html2pdf.js')
+    const html2pdf = html2pdfModule.default || html2pdfModule
+
+    const element = document.createElement('div')
+    element.innerHTML = html
+    element.className = 'markdown-preview prose max-w-none p-8'
+    element.style.width = '210mm'
+    element.style.padding = '20mm'
+    element.style.background = 'white'
+    element.style.color = '#000000'
+
+    // 强制所有文本为黑色，确保高对比度
+    const style = document.createElement('style')
+    style.textContent = `
+      .markdown-preview * {
+        color: #000000 !important;
+      }
+      .markdown-preview h1,
+      .markdown-preview h2,
+      .markdown-preview h3,
+      .markdown-preview h4,
+      .markdown-preview h5,
+      .markdown-preview h6 {
+        color: #000000 !important;
+        font-weight: bold !important;
+      }
+      .markdown-preview strong {
+        color: #000000 !important;
+        font-weight: bold !important;
+      }
+      .markdown-preview a {
+        color: #0066cc !important;
+        text-decoration: underline;
+      }
+      .markdown-preview code {
+        background: #f5f5f5 !important;
+        color: #000000 !important;
+        border: 1px solid #ddd !important;
+      }
+      .markdown-preview pre {
+        background: #f5f5f5 !important;
+        border: 1px solid #ddd !important;
+      }
+      .markdown-preview pre code {
+        background: transparent !important;
+        border: none !important;
+      }
+      .markdown-preview blockquote {
+        color: #333333 !important;
+        border-left-color: #666666 !important;
+      }
+      .markdown-preview table {
+        border-color: #000000 !important;
+      }
+      .markdown-preview th,
+      .markdown-preview td {
+        border-color: #cccccc !important;
+        color: #000000 !important;
+      }
+      .markdown-preview img {
+        max-width: 100% !important;
+      }
+    `
+    document.head.appendChild(style)
+
+    const opt = {
+      margin: 10,
+      filename: localFileName?.replace('.md', '.pdf') || 'document.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    }
+
+    try {
+      await html2pdf().set(opt).from(element).save()
+    } catch (error) {
+      console.error('PDF export failed:', error)
+      alert('PDF 导出失败，请重试')
+    } finally {
+      document.head.removeChild(style)
+    }
+  }
+
   return (
     <div
       className="min-h-screen bg-white dark:bg-gray-900"
@@ -247,6 +345,20 @@ function hello() {
                 <Eye className="h-4 w-4" />
                 预览模式
               </button>
+              <button
+                onClick={exportAsMarkdown}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all text-sm flex items-center gap-2"
+              >
+                <Download className="h-4 w-4" />
+                导出 MD
+              </button>
+              <button
+                onClick={exportAsPDF}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all text-sm flex items-center gap-2"
+              >
+                <Download className="h-4 w-4" />
+                导出 PDF
+              </button>
 
               <div className="ml-auto text-sm text-gray-500 dark:text-gray-400">
                 自动保存已启用
@@ -260,6 +372,20 @@ function hello() {
               >
                 <ArrowLeft className="h-4 w-4" />
                 返回编辑模式
+              </button>
+              <button
+                onClick={exportAsMarkdown}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all text-sm flex items-center gap-2"
+              >
+                <Download className="h-4 w-4" />
+                导出 MD
+              </button>
+              <button
+                onClick={exportAsPDF}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all text-sm flex items-center gap-2"
+              >
+                <Download className="h-4 w-4" />
+                导出 PDF
               </button>
               <div className="ml-auto text-sm text-gray-500 dark:text-gray-400">
                 {localFileName ? `正在预览: ${localFileName}` : '预览模式'}
