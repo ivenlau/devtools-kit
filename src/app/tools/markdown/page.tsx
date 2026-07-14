@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { FileText, Copy, Trash2, Upload, ArrowLeft, Eye, ChevronUp, Download } from 'lucide-react'
 import { marked } from 'marked'
+import { useTransferStore } from '@/stores/transferStore'
 
 // 配置marked选项
 marked.setOptions({
@@ -11,7 +12,6 @@ marked.setOptions({
 })
 
 export default function MarkdownEditorPage() {
-
   const [markdown, setMarkdown] = useState(`# 欢迎使用 Markdown 编辑器
 
 这是一个**实时预览**的Markdown编辑器。
@@ -69,8 +69,21 @@ function hello() {
   const [showBackToTop, setShowBackToTop] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // 加载保存的内容
+  // 接收传输数据（优先于 localStorage）
+  const transferredRef = useRef(false)
   useEffect(() => {
+    const { pendingData, clearPendingData } = useTransferStore.getState()
+    if (pendingData?.content) {
+      setMarkdown(pendingData.content)
+      clearPendingData()
+      transferredRef.current = true
+      setIsPreviewMode(true)
+    }
+  }, [])
+
+  // 加载保存的内容（有传输数据时跳过）
+  useEffect(() => {
+    if (transferredRef.current) return
     const saved = localStorage.getItem('markdown-editor-content')
     if (saved) {
       setMarkdown(saved)

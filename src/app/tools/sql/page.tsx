@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Database, Copy, Trash2, CheckCircle } from 'lucide-react'
 import { format } from 'sql-formatter'
+import { useTransferData } from '@/lib/useTransferData'
 
 export default function SQLFormatterPage() {
   const [input, setInput] = useState('')
@@ -10,6 +11,8 @@ export default function SQLFormatterPage() {
   const [language, setLanguage] = useState('sql')
   const [indent, setIndent] = useState('  ')
   const [uppercase, setUppercase] = useState(true)
+
+  useTransferData(setInput)
 
   // SQL Languages
   const languages = [

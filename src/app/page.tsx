@@ -1,19 +1,133 @@
+'use client'
+
 import Link from 'next/link'
-import { Braces, FileCode, Hash, Clock, Settings, Link2, Regex, FileText, Palette } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useState, useCallback, useEffect } from 'react'
+import { Braces, FileCode, Hash, Clock, Link2, Regex, FileText, Palette } from 'lucide-react'
+import { useTransferStore } from '@/stores/transferStore'
+import { detectByFile, detectByContent, DetectedTool } from '@/lib/detectTool'
+import { DropZone } from '@/components/DropZone'
+import { PasteHint } from '@/components/PasteHint'
 
 export default function HomePage() {
+  const router = useRouter()
+  const setPendingData = useTransferStore((s) => s.setPendingData)
+  const [pasteCandidates, setPasteCandidates] = useState<DetectedTool[] | null>(null)
+  const [pendingContent, setPendingContent] = useState<string>('')
+
+  // --- File drop handler ---
+  const handleFileDrop = useCallback((file: File) => {
+    const detected = detectByFile(file.name, file.type)
+
+    if (detected?.path === '/tools/image-compress') {
+      // Images: pass as data URL
+      const reader = new FileReader()
+      reader.onload = () => {
+        setPendingData({
+          content: reader.result as string,
+          fileName: file.name,
+          mimeType: file.type,
+        })
+        router.push(detected.path)
+      }
+      reader.readAsDataURL(file)
+      return
+    }
+
+    if (detected) {
+      // Text files: read content then navigate
+      const reader = new FileReader()
+      reader.onload = () => {
+        setPendingData({
+          content: reader.result as string,
+          fileName: file.name,
+          mimeType: file.type,
+        })
+        router.push(detected.path)
+      }
+      reader.readAsText(file)
+    } else {
+      // Unknown file type — read as text, fallback to markdown
+      const reader = new FileReader()
+      reader.onload = () => {
+        setPendingData({
+          content: reader.result as string,
+          fileName: file.name,
+        })
+        router.push('/tools/markdown')
+      }
+      reader.readAsText(file)
+    }
+  }, [router, setPendingData])
+
+  // --- Paste handler ---
+  const handlePaste = useCallback((e: ClipboardEvent) => {
+    const text = e.clipboardData?.getData('text/plain')
+    if (!text || !text.trim()) return
+
+    // Don't intercept paste inside input/textarea/contentEditable
+    const target = e.target as HTMLElement
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+      return
+    }
+
+    const result = detectByContent(text)
+
+    if (Array.isArray(result)) {
+      // Ambiguous — show selection modal
+      e.preventDefault()
+      setPendingContent(text)
+      setPasteCandidates(result)
+    } else {
+      // High confidence — navigate directly
+      e.preventDefault()
+      setPendingData({ content: text })
+      router.push(result.path)
+    }
+  }, [router, setPendingData])
+
+  useEffect(() => {
+    document.addEventListener('paste', handlePaste)
+    return () => document.removeEventListener('paste', handlePaste)
+  }, [handlePaste])
+
+  // --- PasteHint callbacks ---
+  const handlePasteSelect = useCallback((tool: DetectedTool) => {
+    setPendingData({ content: pendingContent })
+    setPasteCandidates(null)
+    setPendingContent('')
+    router.push(tool.path)
+  }, [router, setPendingData, pendingContent])
+
+  const handlePasteClose = useCallback(() => {
+    setPasteCandidates(null)
+    setPendingContent('')
+  }, [])
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+      <DropZone onFileDrop={handleFileDrop} />
+      {pasteCandidates && (
+        <PasteHint
+          candidates={pasteCandidates}
+          onSelect={handlePasteSelect}
+          onClose={handlePasteClose}
+        />
+      )}
+
       {/* Hero Section */}
       <section className="py-24 px-4">
         <div className="container mx-auto text-center">
           <h1 className="text-6xl font-bold font-display mb-6 bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
             开发工具箱
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-gray-400 mb-4 max-w-2xl mx-auto">
             20+ 实用工具，无需安装，打开浏览器即用。
             <br />
             JSON格式化、Base64编解码、正则表达式测试、时间戳转换等
+          </p>
+          <p className="text-sm text-gray-400 dark:text-gray-500 mb-8">
+            💡 支持拖放文件或粘贴内容，自动识别并跳转到对应工具
           </p>
           <div className="flex justify-center gap-4">
             <Link
@@ -78,7 +192,7 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                   <Hash className="h-6 w-6 text-orange-500" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">哈希 & UUID</h3>
+                <h3 className="text-xl font-semibold mb-2">哈希 &amp; UUID</h3>
                 <p className="text-gray-600 dark:text-gray-400 text-sm">MD5/SHA 哈希生成、UUID v4 生成</p>
               </div>
             </Link>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Braces, Copy, Trash2 } from 'lucide-react'
 import { formatJson, minifyJson } from '@/lib/parsers/json'
+import { useTransferData } from '@/lib/useTransferData'
 import Editor from '@monaco-editor/react'
 
 export default function JsonToolPage() {
@@ -12,6 +13,8 @@ export default function JsonToolPage() {
   const [indent, setIndent] = useState(2)
   const [sortKeys, setSortKeys] = useState(false)
   const [editorTheme, setEditorTheme] = useState<'light' | 'vs-dark'>('light')
+
+  useTransferData(setInput)
 
   useEffect(() => {
     // Check initial theme

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Shield, Copy, Trash2, Eye, EyeOff } from 'lucide-react'
 import { jwtDecode } from 'jwt-decode'
+import { useTransferData } from '@/lib/useTransferData'
 
 interface JWTPayload {
   [key: string]: any
@@ -28,6 +29,8 @@ export default function JWTDecoderPage() {
   const [decoded, setDecoded] = useState<DecodedToken | null>(null)
   const [showHeader, setShowHeader] = useState(true)
   const [showPayload, setShowPayload] = useState(true)
+
+  useTransferData(setInput)
 
   // Decode JWT
   useEffect(() => {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Palette, Copy } from 'lucide-react'
+import { useTransferData } from '@/lib/useTransferData'
 
 /**
  * HEX转RGB
@@ -112,6 +113,8 @@ export default function ColorConverterPage() {
   const [rgb, setRgb] = useState({ r: 30, g: 132, b: 255 })
   const [hsl, setHsl] = useState({ h: 217, s: 100, l: 56 })
   const [rgba, setRgba] = useState('rgba(30, 132, 255, 1)')
+
+  useTransferData(setHex)
 
   // HEX变化时更新其他格式
   useEffect(() => {

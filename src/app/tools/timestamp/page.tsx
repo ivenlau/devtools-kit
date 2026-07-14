@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Clock, Copy } from 'lucide-react'
 import dayjs from 'dayjs'
+import { useTransferData } from '@/lib/useTransferData'
 
 export default function TimestampToolPage() {
   const [currentTimestamp, setCurrentTimestamp] = useState(0)
@@ -10,6 +11,8 @@ export default function TimestampToolPage() {
   const [outputDate, setOutputDate] = useState('')
   const [inputDate, setInputDate] = useState('')
   const [outputTimestamp, setOutputTimestamp] = useState('')
+
+  useTransferData(setInputTimestamp)
 
   // 更新当前时间
   useEffect(() => {

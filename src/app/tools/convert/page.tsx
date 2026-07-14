@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { RefreshCw, Copy, Trash2, FileCode } from 'lucide-react'
 import yaml from 'js-yaml'
 import xmlFormat from 'xml-formatter'
+import { useTransferData } from '@/lib/useTransferData'
 // @ts-ignore
 const TOML = require('toml')
 
@@ -15,6 +16,8 @@ export default function DataConverterPage() {
   const [outputFormat, setOutputFormat] = useState<FormatType>('yaml')
   const [output, setOutput] = useState('')
   const [error, setError] = useState('')
+
+  useTransferData(setInput)
 
   // Convert data
   useEffect(() => {

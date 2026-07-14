@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Hash, Copy, RefreshCw } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 import CryptoJS from 'crypto-js'
+import { useTransferStore } from '@/stores/transferStore'
 
 /**
  * 生成UUID v4
@@ -46,6 +47,16 @@ export default function HashGeneratorPage() {
   const [hashInput, setHashInput] = useState('')
   const [hashOutput, setHashOutput] = useState<Record<string, string>>({})
   const [hashAlgorithm, setHashAlgorithm] = useState('md5')
+
+  // 从 transferStore 接收数据
+  useEffect(() => {
+    const { pendingData, clearPendingData } = useTransferStore.getState()
+    if (pendingData?.content) {
+      setHashInput(pendingData.content)
+      setActiveTab('hash')
+      clearPendingData()
+    }
+  }, [])
 
   // 初始化UUID
   useEffect(() => {

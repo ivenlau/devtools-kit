@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Terminal, Copy, Trash2, FileText } from 'lucide-react'
+import { useTransferData } from '@/lib/useTransferData'
 
 export default function CurlGeneratorPage() {
   const [url, setUrl] = useState('https://api.example.com/users')
@@ -9,6 +10,8 @@ export default function CurlGeneratorPage() {
   const [headers, setHeaders] = useState([{ key: 'Content-Type', value: 'application/json' }])
   const [body, setBody] = useState('')
   const [curlCommand, setCurlCommand] = useState('')
+
+  useTransferData(setUrl)
 
   // HTTP Methods
   const methods: ('GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH')[] = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']

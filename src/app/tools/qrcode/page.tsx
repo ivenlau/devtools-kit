@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { QrCode, Copy, Download, Image as ImageIcon } from 'lucide-react'
 import { QRCodeSVG } from 'qrcode.react'
+import { useTransferData } from '@/lib/useTransferData'
 
 export default function QRCodeGeneratorPage() {
   const [text, setText] = useState('https://github.com')
@@ -10,6 +11,8 @@ export default function QRCodeGeneratorPage() {
   const [color, setColor] = useState('#000000')
   const [bgColor, setBgColor] = useState('#FFFFFF')
   const [errorCorrection, setErrorCorrection] = useState<'L' | 'M' | 'Q' | 'H'>('M')
+
+  useTransferData(setText)
 
   // 下载QR码
   const downloadQRCode = () => {

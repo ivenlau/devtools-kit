@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Clock, Copy, Calendar } from 'lucide-react'
 import cronstrue from 'cronstrue/i18n'
+import { useTransferData } from '@/lib/useTransferData'
 
 import { CronExpressionParser } from 'cron-parser'
 
@@ -20,6 +21,8 @@ export default function CronGeneratorPage() {
   const [day, setDay] = useState('*')
   const [month, setMonth] = useState('*')
   const [weekday, setWeekday] = useState('*')
+
+  useTransferData(setCron)
 
   // Parse and explain cron
   useEffect(() => {

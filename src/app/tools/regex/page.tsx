@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Regex, Copy, Trash2 } from 'lucide-react'
+import { useTransferData } from '@/lib/useTransferData'
 
 // 常用正则表达式库
 const commonRegex = [
@@ -22,6 +23,8 @@ export default function RegexTesterPage() {
   const [matches, setMatches] = useState<RegExpMatchArray[]>([])
   const [error, setError] = useState<string | null>(null)
   const [selectedPreset, setSelectedPreset] = useState<number | null>(null)
+
+  useTransferData(setTestString)
 
   // 测试正则表达式
   useEffect(() => {

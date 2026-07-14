@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { ArrowLeftRight, Copy, Trash2 } from 'lucide-react'
 import { diffLines } from 'diff'
+import { useTransferData } from '@/lib/useTransferData'
 
 interface DiffResult {
   type: 'unchanged' | 'added' | 'removed'
@@ -17,6 +18,8 @@ export default function DiffToolPage() {
   const [newText, setNewText] = useState('')
   const [diff, setDiff] = useState<DiffResult[]>([])
   const [lineMode, setLineMode] = useState(false)
+
+  useTransferData(setOldText)
 
   // 计算差异
   useEffect(() => {

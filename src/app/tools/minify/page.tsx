@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Minimize2, Copy, Trash2, FileCode } from 'lucide-react'
+import { useTransferData } from '@/lib/useTransferData'
 
 type CodeType = 'javascript' | 'css' | 'html'
 
@@ -10,6 +11,8 @@ export default function CodeMinifyPage() {
   const [output, setOutput] = useState('')
   const [codeType, setCodeType] = useState<CodeType>('javascript')
   const [error, setError] = useState('')
+
+  useTransferData(setInput)
 
   // Minify code
   useEffect(() => {

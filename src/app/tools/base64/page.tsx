@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { FileCode, Copy, Trash2 } from 'lucide-react'
+import { useTransferData } from '@/lib/useTransferData'
 
 /**
  * Base64 编码
@@ -39,6 +40,8 @@ export default function Base64ToolPage() {
   const [input, setInput] = useState('')
   const [output, setOutput] = useState('')
   const [error, setError] = useState<string | null>(null)
+
+  useTransferData(setInput)
 
   useEffect(() => {
     if (!input.trim()) {

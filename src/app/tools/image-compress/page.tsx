@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Image as ImageIcon, Upload, Download, X } from 'lucide-react'
 import imageCompression from 'browser-image-compression'
+import { useTransferStore } from '@/stores/transferStore'
 
 export default function ImageCompressPage() {
   const [originalImage, setOriginalImage] = useState<string | null>(null)
@@ -14,6 +15,29 @@ export default function ImageCompressPage() {
   const [maxWidth, setMaxWidth] = useState(1920)
   const [file, setFile] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // 从 transferStore 接收文件数据（直接读取避免时序问题）
+  useEffect(() => {
+    const { pendingData, clearPendingData } = useTransferStore.getState()
+    if (pendingData?.content && pendingData.mimeType?.startsWith('image/')) {
+      const dataUrl = pendingData.content
+      const byteString = atob(dataUrl.split(',')[1])
+      const ab = new ArrayBuffer(byteString.length)
+      const ia = new Uint8Array(ab)
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i)
+      }
+      const fileName = pendingData.fileName || 'image.png'
+      const mimeType = pendingData.mimeType || 'image/png'
+      const reconstructedFile = new File([ab], fileName, { type: mimeType })
+
+      setFile(reconstructedFile)
+      setOriginalSize(reconstructedFile.size)
+      setOriginalImage(dataUrl)
+      compressImage(reconstructedFile)
+      clearPendingData()
+    }
+  }, [])
 
   // Handle file select
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {

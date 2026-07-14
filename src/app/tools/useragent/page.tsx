@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Monitor, Copy, Smartphone, Tablet, Globe } from 'lucide-react'
 import { UAParser } from 'ua-parser-js'
+import { useTransferData } from '@/lib/useTransferData'
 
 interface ParsedUA {
   browser: { name: string; version: string }
@@ -15,6 +16,8 @@ export default function UserAgentPage() {
   const [input, setInput] = useState('')
   const [parsed, setParsed] = useState<ParsedUA | null>(null)
   const [myUA, setMyUA] = useState('')
+
+  useTransferData(setInput)
 
   // Get user's own UA
   useEffect(() => {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Link2, Copy, Trash2 } from 'lucide-react'
+import { useTransferData } from '@/lib/useTransferData'
 
 /**
  * URL 编码
@@ -51,6 +52,8 @@ export default function UrlEncoderPage() {
   const [output, setOutput] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [urlData, setUrlData] = useState<any>(null)
+
+  useTransferData(setInput)
 
   useEffect(() => {
     if (!input.trim()) {

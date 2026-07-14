@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Globe, MapPin, Copy, Info, Search } from 'lucide-react'
 import ipaddr from 'ipaddr.js'
+import { useTransferData } from '@/lib/useTransferData'
 
 interface IPInfo {
   version: 'IPv4' | 'IPv6' | null
@@ -35,6 +36,8 @@ export default function IPQueryPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [myIP, setMyIP] = useState('')
+
+  useTransferData(setInput)
 
   // Get user's own IP
   useEffect(() => {

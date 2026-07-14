@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Hash, Copy } from 'lucide-react'
+import { useTransferData } from '@/lib/useTransferData'
 
 /**
  * 十进制转二进制
@@ -85,6 +86,8 @@ export default function BinaryConverterPage() {
     hex: '',
   })
   const [textResult, setTextResult] = useState('')
+
+  useTransferData(setInput)
 
   // 数字转换
   useEffect(() => {

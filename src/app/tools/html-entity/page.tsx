@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Code2, Copy, Trash2, ArrowLeftRight } from 'lucide-react'
+import { useTransferData } from '@/lib/useTransferData'
 
 type ModeType = 'encode' | 'decode'
 
@@ -9,6 +10,8 @@ export default function HTMLEntityPage() {
   const [input, setInput] = useState('')
   const [output, setOutput] = useState('')
   const [mode, setMode] = useState<ModeType>('encode')
+
+  useTransferData(setInput)
 
   // HTML Entity conversion
   useEffect(() => {
