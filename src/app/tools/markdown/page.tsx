@@ -410,10 +410,12 @@ function hello() {
 
       {/* Drag Overlay */}
       {dragActive && (
-        <div className="fixed inset-0 bg-pink-500/20 backdrop-blur-sm z-50 flex items-center justify-center border-4 border-dashed border-pink-500 m-8 rounded-2xl">
-          <div className="text-center">
-            <Upload className="h-16 w-16 text-pink-500 mx-auto mb-4" />
-            <p className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
+        <div className="fixed inset-0 z-[101] bg-blue-500/10 dark:bg-blue-400/10 backdrop-blur-sm flex items-center justify-center pointer-events-none">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-12 border-2 border-dashed border-blue-400 dark:border-blue-500 flex flex-col items-center gap-4 animate-pulse">
+            <div className="w-20 h-20 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
+              <Upload className="h-10 w-10 text-blue-500" />
+            </div>
+            <p className="text-xl font-semibold text-gray-800 dark:text-gray-200">
               拖放 Markdown 文件到这里预览
             </p>
           </div>
