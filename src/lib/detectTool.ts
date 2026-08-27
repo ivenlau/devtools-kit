@@ -1,4 +1,4 @@
-import { parseTimestampOrDate } from '@/lib/timestamp'
+import { isLikelyTimestampInput, parseDateInput } from '@/lib/timestamp'
 
 export interface DetectedTool {
   path: string
@@ -55,7 +55,7 @@ export function detectByContent(text: string): DetectedTool | DetectedTool[] {
   if (!trimmed) return []
 
   // Timestamp or date — go straight to the timestamp converter.
-  if (parseTimestampOrDate(trimmed)) {
+  if (isLikelyTimestampInput(trimmed) || parseDateInput(trimmed)) {
     return { path: '/tools/timestamp', name: '时间戳转换', confidence: 'high' }
   }
 

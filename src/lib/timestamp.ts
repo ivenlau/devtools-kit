@@ -35,6 +35,10 @@ const DATE_FORMATS = [
   'YYYY.M.D',
 ]
 
+const ISO_DATE_PATTERN = /^\d{4}-\d{1,2}-\d{1,2}T\d{1,2}:\d{2}(?::\d{2}(?:\.\d{1,9})?)?(?:Z|[+-]\d{2}:?\d{2})?$/i
+const SPACE_SEPARATED_DATE_PATTERN = /^\d{4}-\d{1,2}-\d{1,2}\s+\d{1,2}:\d{2}(?::\d{2}(?:\.\d{1,9})?)?\s+(?:Z|UTC|GMT|[+-]\d{2}:?\d{2})$/i
+const RFC_DATE_PATTERN = /^(?:(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun),?\s+)?(?:\d{1,2}\s+)?(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b/i
+
 function normalizeDateInput(value: string) {
   return value
     .trim()
@@ -43,7 +47,8 @@ function normalizeDateInput(value: string) {
     .replace(/月/g, '-')
     .replace(/日/g, '')
     .replace(/时/g, ':')
-    .replace(/分/g, ':')
+    .replace(/分(?=\s*\d)/g, ':')
+    .replace(/分/g, '')
     .replace(/秒/g, '')
 }
 
@@ -59,8 +64,8 @@ export function parseTimestampInput(value: string): ParsedTimestamp | null {
   if (!Number.isFinite(numericValue)) return null
 
   const isMilliseconds = Math.abs(numericValue) >= 100_000_000_000
-  const milliseconds = isMilliseconds ? numericValue : numericValue * 1000
-  if (!Number.isSafeInteger(Math.round(milliseconds))) return null
+  const milliseconds = Math.trunc(isMilliseconds ? numericValue : numericValue * 1000)
+  if (!Number.isSafeInteger(milliseconds)) return null
 
   const date = dayjs(milliseconds)
   if (!isValidDate(date)) return null
@@ -71,12 +76,22 @@ export function parseTimestampInput(value: string): ParsedTimestamp | null {
   }
 }
 
+export function isLikelyTimestampInput(value: string) {
+  const trimmed = value.trim()
+  if (!/^-?\d+(?:\.\d+)?$/.test(trimmed)) return false
+  return trimmed.replace('-', '').split('.')[0].length >= 8
+}
+
 export function parseDateInput(value: string): Dayjs | null {
   const normalized = normalizeDateInput(value)
   if (!normalized) return null
 
   const explicitDate = dayjs(normalized, DATE_FORMATS, true)
   if (isValidDate(explicitDate)) return explicitDate
+
+  if (!ISO_DATE_PATTERN.test(normalized) &&
+      !SPACE_SEPARATED_DATE_PATTERN.test(normalized) &&
+      !RFC_DATE_PATTERN.test(normalized)) return null
 
   const nativeDate = dayjs(normalized)
   return isValidDate(nativeDate) ? nativeDate : null
@@ -95,5 +110,5 @@ export function formatTimestampSeconds(milliseconds: number) {
 }
 
 export function formatTimestampMilliseconds(milliseconds: number) {
-  return Math.round(milliseconds).toString()
+  return Math.trunc(milliseconds).toString()
 }
