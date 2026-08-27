@@ -1,3 +1,5 @@
+import { parseTimestampOrDate } from '@/lib/timestamp'
+
 export interface DetectedTool {
   path: string
   name: string
@@ -51,6 +53,11 @@ export function detectByFile(fileName: string, mimeType?: string): DetectedTool 
 export function detectByContent(text: string): DetectedTool | DetectedTool[] {
   const trimmed = text.trim()
   if (!trimmed) return []
+
+  // Timestamp or date — go straight to the timestamp converter.
+  if (parseTimestampOrDate(trimmed)) {
+    return { path: '/tools/timestamp', name: '时间戳转换', confidence: 'high' }
+  }
 
   // 1. JWT — three base64url segments separated by dots
   if (/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(trimmed)) {
