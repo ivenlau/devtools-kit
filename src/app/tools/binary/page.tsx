@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Hash, Copy } from 'lucide-react'
+import { Binary, Copy } from 'lucide-react'
 import { useTransferData } from '@/lib/useTransferData'
+import { ToolShell } from '@/components/ToolShell'
 
 /**
  * 十进制转二进制
@@ -150,61 +151,38 @@ export default function BinaryConverterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
-      {/* Header */}
-      <header className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center">
-              <Hash className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold font-display">进制转换器</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                二进制、十进制、十六进制互转
-              </p>
-            </div>
-          </div>
-        </div>
-      </header>
-
+    <ToolShell
+      title="RADIX"
+      description="二进制、十进制、十六进制互转"
+      path="/tools/binary"
+      icon={Binary}
+      accent="purple"
+    >
       {/* Mode Tabs */}
-      <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-        <div className="container mx-auto px-4">
-          <div className="flex gap-2">
-            <button
-              onClick={() => {
-                setMode('number')
-                setInput('')
-                setResults({ dec: '', bin: '', hex: '' })
-              }}
-              className={`px-6 py-3 font-medium transition-all text-sm border-b-2 ${
-                mode === 'number'
-                  ? 'border-emerald-500 text-emerald-600'
-                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900'
-              }`}
-            >
-              数字转换
-            </button>
-            <button
-              onClick={() => {
-                setMode('text')
-                setInput('')
-                setTextResult('')
-              }}
-              className={`px-6 py-3 font-medium transition-all text-sm border-b-2 ${
-                mode === 'text'
-                  ? 'border-emerald-500 text-emerald-600'
-                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900'
-              }`}
-            >
-              文本转换
-            </button>
-          </div>
-        </div>
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <button
+          onClick={() => {
+            setMode('number')
+            setInput('')
+            setResults({ dec: '', bin: '', hex: '' })
+          }}
+          className={`chip !px-4 !py-2 ${mode === 'number' ? 'chip-active' : ''}`}
+        >
+          数字转换
+        </button>
+        <button
+          onClick={() => {
+            setMode('text')
+            setInput('')
+            setTextResult('')
+          }}
+          className={`chip !px-4 !py-2 ${mode === 'text' ? 'chip-active' : ''}`}
+        >
+          文本转换
+        </button>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
+      <div>
         {/* Number Mode */}
         {mode === 'number' && (
           <div className="max-w-4xl mx-auto space-y-6">
@@ -453,14 +431,9 @@ export default function BinaryConverterPage() {
         </div>
       </div>
 
-      {/* Footer Info */}
-      <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-3">
-          <div className="text-sm text-gray-600 dark:text-gray-400">
-            💡 支持数字转换和文本转换 • 实时双向转换 • 完整的进制对照表
-          </div>
-        </div>
+      <div className="mt-4 font-mono text-[11px] text-ink-muted">
+        local only · 数字/文本双向转换 · 完整进制对照表
       </div>
-    </div>
+    </ToolShell>
   )
 }

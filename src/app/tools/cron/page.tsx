@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Clock, Copy, Calendar } from 'lucide-react'
 import cronstrue from 'cronstrue/i18n'
 import { useTransferData } from '@/lib/useTransferData'
+import { ToolShell } from '@/components/ToolShell'
 
 import { CronExpressionParser } from 'cron-parser'
 
@@ -129,31 +130,21 @@ export default function CronGeneratorPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
-      {/* Header */}
-      <header className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-rose-500 to-pink-500 rounded-lg flex items-center justify-center">
-              <Clock className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold font-display">Cron 表达式生成器</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                生成和解析 Cron 定时任务表达式
-              </p>
-            </div>
-          </div>
-        </div>
-      </header>
+    <ToolShell
+      title="CRON EXPRESSION"
+      description="生成和解析 Cron 定时任务表达式"
+      path="/tools/cron"
+      icon={Clock}
+      accent="amber"
+    >
 
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Cron Expression Display */}
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+          <div className="panel p-6">
             <div className="flex items-center gap-4 mb-4">
               <div className="flex-1">
-                <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-xs text-ink-secondary mb-2">
                   Cron 表达式
                 </label>
                 <input
@@ -170,7 +161,7 @@ export default function CronGeneratorPage() {
                       setWeekday(parts[4])
                     }
                   }}
-                  className="w-full px-4 py-3 font-mono text-lg border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-rose-500"
+                  className="w-full px-4 py-3 font-mono text-lg border border-border-dim rounded-lg bg-void-200 focus:outline-none focus:ring-2 focus:ring-rose-500"
                   placeholder="* * * * *"
                 />
               </div>
@@ -191,7 +182,7 @@ export default function CronGeneratorPage() {
             }`}>
               <div className="flex items-center gap-2 mb-1">
                 <Calendar className={`h-4 w-4 ${error ? 'text-red-500' : 'text-rose-500'}`} />
-                <span className="text-xs text-gray-600 dark:text-gray-400">
+                <span className="text-xs text-ink-secondary">
                   {error ? '错误' : '说明'}
                 </span>
               </div>
@@ -206,7 +197,7 @@ export default function CronGeneratorPage() {
           </div>
 
           {/* Manual Builder */}
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+          <div className="panel p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold">手动配置</h3>
               <button
@@ -214,7 +205,7 @@ export default function CronGeneratorPage() {
                 className={`px-3 py-1 text-xs rounded transition-all ${
                   manualMode
                     ? 'bg-rose-500 text-white'
-                    : 'bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600'
+                    : 'bg-gray-100 dark:bg-gray-900 border border-border-dim'
                 }`}
               >
                 {manualMode ? '已启用' : '点击启用'}
@@ -223,7 +214,7 @@ export default function CronGeneratorPage() {
 
             <div className="grid grid-cols-5 gap-3">
               <div>
-                <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-xs text-ink-secondary mb-2">
                   分钟 (0-59)
                 </label>
                 <input
@@ -231,7 +222,7 @@ export default function CronGeneratorPage() {
                   value={minute}
                   onChange={(e) => setMinute(e.target.value)}
                   disabled={!manualMode}
-                  className="w-full px-3 py-2 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-rose-500 disabled:opacity-50"
+                  className="w-full px-3 py-2 font-mono text-sm border border-border-dim rounded bg-void-200 focus:outline-none focus:ring-2 focus:ring-rose-500 disabled:opacity-50"
                 />
                 <div className="mt-2 flex flex-wrap gap-1">
                   {commonValues.minute.map((val) => (
@@ -248,7 +239,7 @@ export default function CronGeneratorPage() {
               </div>
 
               <div>
-                <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-xs text-ink-secondary mb-2">
                   小时 (0-23)
                 </label>
                 <input
@@ -256,7 +247,7 @@ export default function CronGeneratorPage() {
                   value={hour}
                   onChange={(e) => setHour(e.target.value)}
                   disabled={!manualMode}
-                  className="w-full px-3 py-2 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-rose-500 disabled:opacity-50"
+                  className="w-full px-3 py-2 font-mono text-sm border border-border-dim rounded bg-void-200 focus:outline-none focus:ring-2 focus:ring-rose-500 disabled:opacity-50"
                 />
                 <div className="mt-2 flex flex-wrap gap-1">
                   {commonValues.hour.map((val) => (
@@ -273,7 +264,7 @@ export default function CronGeneratorPage() {
               </div>
 
               <div>
-                <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-xs text-ink-secondary mb-2">
                   日期 (1-31)
                 </label>
                 <input
@@ -281,7 +272,7 @@ export default function CronGeneratorPage() {
                   value={day}
                   onChange={(e) => setDay(e.target.value)}
                   disabled={!manualMode}
-                  className="w-full px-3 py-2 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-rose-500 disabled:opacity-50"
+                  className="w-full px-3 py-2 font-mono text-sm border border-border-dim rounded bg-void-200 focus:outline-none focus:ring-2 focus:ring-rose-500 disabled:opacity-50"
                 />
                 <div className="mt-2 flex flex-wrap gap-1">
                   {commonValues.day.map((val) => (
@@ -298,7 +289,7 @@ export default function CronGeneratorPage() {
               </div>
 
               <div>
-                <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-xs text-ink-secondary mb-2">
                   月份 (1-12)
                 </label>
                 <input
@@ -306,7 +297,7 @@ export default function CronGeneratorPage() {
                   value={month}
                   onChange={(e) => setMonth(e.target.value)}
                   disabled={!manualMode}
-                  className="w-full px-3 py-2 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-rose-500 disabled:opacity-50"
+                  className="w-full px-3 py-2 font-mono text-sm border border-border-dim rounded bg-void-200 focus:outline-none focus:ring-2 focus:ring-rose-500 disabled:opacity-50"
                 />
                 <div className="mt-2 flex flex-wrap gap-1">
                   {commonValues.month.map((val) => (
@@ -323,7 +314,7 @@ export default function CronGeneratorPage() {
               </div>
 
               <div>
-                <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-xs text-ink-secondary mb-2">
                   星期 (0-6)
                 </label>
                 <input
@@ -331,7 +322,7 @@ export default function CronGeneratorPage() {
                   value={weekday}
                   onChange={(e) => setWeekday(e.target.value)}
                   disabled={!manualMode}
-                  className="w-full px-3 py-2 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-rose-500 disabled:opacity-50"
+                  className="w-full px-3 py-2 font-mono text-sm border border-border-dim rounded bg-void-200 focus:outline-none focus:ring-2 focus:ring-rose-500 disabled:opacity-50"
                 />
                 <div className="mt-2 flex flex-wrap gap-1">
                   {commonValues.weekday.map((val) => (
@@ -350,7 +341,7 @@ export default function CronGeneratorPage() {
           </div>
 
           {/* Presets */}
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+          <div className="panel p-6">
             <h3 className="text-sm font-semibold mb-4">常用预设</h3>
 
             <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
@@ -361,7 +352,7 @@ export default function CronGeneratorPage() {
                   className={`p-3 rounded-lg border transition-all text-center ${
                     cron === preset.cron
                       ? 'bg-rose-500 text-white border-rose-500'
-                      : 'bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800'
+                      : 'bg-void-200 border-border-dim hover:bg-gray-100 dark:hover:bg-gray-800'
                   }`}
                 >
                   <div className="text-xs font-semibold mb-1">{preset.name}</div>
@@ -373,14 +364,14 @@ export default function CronGeneratorPage() {
 
           {/* Next Runs */}
           {nextRuns.length > 0 && (
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            <div className="panel p-6">
               <h3 className="text-sm font-semibold mb-4">接下来 5 次执行时间</h3>
 
               <div className="space-y-2">
                 {nextRuns.map((run, index) => (
                   <div
                     key={index}
-                    className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg"
+                    className="flex items-center gap-3 p-3 bg-void-200 rounded-lg"
                   >
                     <div className="w-6 h-6 bg-rose-100 dark:bg-rose-900/30 rounded-full flex items-center justify-center">
                       <span className="text-xs font-semibold text-rose-600 dark:text-rose-400">
@@ -418,14 +409,6 @@ export default function CronGeneratorPage() {
         </div>
       </div>
 
-      {/* Footer Info */}
-      <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-3">
-          <div className="text-sm text-gray-600 dark:text-gray-400">
-            💡 可视化配置 • 常用预设 • 执行时间预览
-          </div>
-        </div>
-      </div>
-    </div>
+    </ToolShell>
   )
 }

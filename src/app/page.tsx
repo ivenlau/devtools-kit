@@ -2,12 +2,71 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState, useCallback, useEffect } from 'react'
-import { Braces, FileCode, Hash, Clock, Link2, Regex, FileText, Palette } from 'lucide-react'
+import { useState, useCallback, useEffect, useMemo } from 'react'
+import {
+  Braces, FileCode, Hash, Clock, Link2, Regex, FileText, Palette,
+  Binary, Shield, Database, ArrowLeftRight, QrCode, Terminal, Globe,
+  RefreshCw, Image as ImageIcon, Minimize2, Code2, Monitor
+} from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { useTransferStore } from '@/stores/transferStore'
 import { detectByFile, detectByContent, DetectedTool } from '@/lib/detectTool'
+import { tools as allTools } from '@/lib/constants/tools'
 import { DropZone } from '@/components/DropZone'
 import { PasteHint } from '@/components/PasteHint'
+import { MouseGlow } from '@/components/MouseGlow'
+import { ToolOrbit } from '@/components/ToolOrbit'
+
+const iconMap: Record<string, LucideIcon> = {
+  Braces,
+  FileCode,
+  Hash,
+  Clock,
+  Link2,
+  Regex,
+  FileText,
+  Palette,
+  Binary,
+  Shield,
+  Database,
+  ArrowLeftRight,
+  QrCode,
+  Terminal,
+  Globe,
+  RefreshCw,
+  Image: ImageIcon,
+  Minimize2,
+  Code2,
+  Monitor,
+}
+
+const accents = [
+  '#00E5FF',
+  '#B8FF3C',
+  '#A855F7',
+  '#FFB020',
+  '#FF2D95',
+  '#FF79C6',
+]
+
+function pathToTag(path: string): string {
+  if (path === '/tools/regex' || path === '/tools/json') return 'HOT'
+  if (path === '/tools/jwt' || path === '/tools/cron') return 'NEW'
+  return 'P0'
+}
+
+function toOrbitTool(t: (typeof allTools)[number], i: number) {
+  const Icon = iconMap[t.icon] ?? Hash
+  return {
+    href: t.path,
+    name: t.name,
+    desc: t.description,
+    icon: Icon,
+    accent: accents[i % accents.length],
+    tag: pathToTag(t.path),
+    path: t.path,
+  }
+}
 
 export default function HomePage() {
   const router = useRouter()
@@ -15,12 +74,10 @@ export default function HomePage() {
   const [pasteCandidates, setPasteCandidates] = useState<DetectedTool[] | null>(null)
   const [pendingContent, setPendingContent] = useState<string>('')
 
-  // --- File drop handler ---
   const handleFileDrop = useCallback((file: File) => {
     const detected = detectByFile(file.name, file.type)
 
     if (detected?.path === '/tools/image-compress') {
-      // Images: pass as data URL
       const reader = new FileReader()
       reader.onload = () => {
         setPendingData({
@@ -35,7 +92,6 @@ export default function HomePage() {
     }
 
     if (detected) {
-      // Text files: read content then navigate
       const reader = new FileReader()
       reader.onload = () => {
         setPendingData({
@@ -47,7 +103,6 @@ export default function HomePage() {
       }
       reader.readAsText(file)
     } else {
-      // Unknown file type — read as text, fallback to markdown
       const reader = new FileReader()
       reader.onload = () => {
         setPendingData({
@@ -60,12 +115,10 @@ export default function HomePage() {
     }
   }, [router, setPendingData])
 
-  // --- Paste handler ---
   const handlePaste = useCallback((e: ClipboardEvent) => {
     const text = e.clipboardData?.getData('text/plain')
     if (!text || !text.trim()) return
 
-    // Don't intercept paste inside input/textarea/contentEditable
     const target = e.target as HTMLElement
     if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
       return
@@ -74,12 +127,10 @@ export default function HomePage() {
     const result = detectByContent(text)
 
     if (Array.isArray(result)) {
-      // Ambiguous — show selection modal
       e.preventDefault()
       setPendingContent(text)
       setPasteCandidates(result)
     } else {
-      // High confidence — navigate directly
       e.preventDefault()
       setPendingData({ content: text })
       router.push(result.path)
@@ -91,7 +142,64 @@ export default function HomePage() {
     return () => document.removeEventListener('paste', handlePaste)
   }, [handlePaste])
 
-  // --- PasteHint callbacks ---
+  const orbitTools = useMemo(() => allTools.map(toOrbitTool), [])
+
+  const [query, setQuery] = useState('')
+  const [focusIndex, setFocusIndex] = useState<number | null>(null)
+
+  const matchToolIndex = useCallback(
+    (q: string): number | null => {
+      const s = q.trim().toLowerCase()
+      if (!s) return null
+      let best = -1
+      let bestScore = 0
+      allTools.forEach((tool, i) => {
+        const hay = [
+          tool.name,
+          tool.description,
+          tool.path,
+          tool.id,
+          tool.category,
+          ...tool.keywords,
+        ]
+          .join(' ')
+          .toLowerCase()
+        let score = 0
+        if (hay.includes(s)) score = 3 + s.length / Math.max(hay.length, 1)
+        else if (s.split(/\s+/).every((w) => hay.includes(w))) score = 2
+        else if (hay.startsWith(s) || tool.name.toLowerCase().startsWith(s)) score = 2.5
+        if (score > bestScore) {
+          bestScore = score
+          best = i
+        }
+      })
+      return bestScore > 0 && best >= 0 ? best : null
+    },
+    []
+  )
+
+  const onQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const v = e.target.value
+    setQuery(v)
+    setFocusIndex(matchToolIndex(v))
+  }
+
+  const onQueryBlur = () => {
+    setQuery('')
+    setFocusIndex(null)
+  }
+
+  const onQueryKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && focusIndex !== null && orbitTools[focusIndex]) {
+      e.preventDefault()
+      router.push(orbitTools[focusIndex].href)
+    }
+    if (e.key === 'Escape') {
+      onQueryBlur()
+      e.currentTarget.blur()
+    }
+  }
+
   const handlePasteSelect = useCallback((tool: DetectedTool) => {
     setPendingData({ content: pendingContent })
     setPasteCandidates(null)
@@ -105,7 +213,7 @@ export default function HomePage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+    <div className="flex min-h-[calc(100dvh-3.5rem)] flex-col bg-void">
       <DropZone onFileDrop={handleFileDrop} />
       {pasteCandidates && (
         <PasteHint
@@ -115,150 +223,100 @@ export default function HomePage() {
         />
       )}
 
-      {/* Hero Section */}
-      <section className="py-24 px-4">
-        <div className="container mx-auto text-center">
-          <h1 className="text-6xl font-bold font-display mb-6 bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
-            开发工具箱
+      {/* Hero + 3D orbit — flex-1 so footer stays on the bottom */}
+      {/* overflow-x-hidden only: overflow-y-hidden clips 3D perspective */}
+      <section className="relative flex min-h-0 flex-1 flex-col overflow-x-hidden">
+        <div className="pointer-events-none absolute inset-0 cyber-grid opacity-60 [mask-image:radial-gradient(ellipse_80%_70%_at_50%_45%,#000_25%,transparent_75%)]" />
+        <MouseGlow />
+
+        {/* Title — fixed top of hero; chrome above title hides on short viewports */}
+        <div className="relative z-20 mx-auto flex w-full shrink-0 flex-col items-center px-4 pt-4 text-center sm:px-6 sm:pt-8 lg:px-8 [@media(min-height:821px)]:pt-10">
+          <div className="mb-3 hidden inline-flex items-center gap-2 rounded-full border border-neon-lime/60 bg-void-100/90 px-3 py-1 [@media(min-height:821px)]:inline-flex">
+            <span className="status-dot" />
+            <span className="font-mono text-[10px] tracking-wider text-neon-lime">
+              SYSTEM ONLINE · 21 MODULES
+            </span>
+          </div>
+
+          <p className="mb-2 hidden font-mono text-xs tracking-[0.2em] text-ink-muted [@media(min-height:821px)]:block">
+            // TOOLKIT FOR DEVELOPERS
+          </p>
+
+          <h1 className="font-display text-4xl font-bold leading-none tracking-tight sm:text-5xl md:text-6xl">
+            <span className="text-ink-primary">DEVTOOLS</span>
+            <span className="gradient-kit ml-3">KIT</span>
+            <span className="ml-1 font-mono text-neon-cyan animate-blink">&gt;_</span>
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400 mb-4 max-w-2xl mx-auto">
-            20+ 实用工具，无需安装，打开浏览器即用。
-            <br />
-            JSON格式化、Base64编解码、正则表达式测试、时间戳转换等
-          </p>
-          <p className="text-sm text-gray-400 dark:text-gray-500 mb-8">
-            💡 支持拖放文件或粘贴内容，自动识别并跳转到对应工具
-          </p>
-          <div className="flex justify-center gap-4">
-            <Link
-              href="/tools"
-              className="px-8 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-medium hover:shadow-lg transition-all"
-            >
-              开始使用
-            </Link>
-            <a
-              href="https://github.com/ivenlau/devtools-kit"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-8 py-3 border border-gray-300 dark:border-gray-600 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
-            >
-              GitHub
-            </a>
+        </div>
+
+        {/* Orbit — explicit band height so measurement always works */}
+        <div
+          className="relative z-10 w-full px-2"
+          style={{ height: 'clamp(260px, 46vh, 680px)' }}
+        >
+          <ToolOrbit
+            tools={orbitTools}
+            autoRotateSpeed={0.18}
+            focusIndex={focusIndex}
+          />
+        </div>
+
+        {/* Bottom dock — pinned above footer */}
+        <div className="relative z-20 mx-auto mt-auto flex w-full shrink-0 flex-col items-center px-4 pb-5 pt-2 text-center sm:px-6 lg:px-8">
+          <div
+            className={`panel-glow flex w-full max-w-xl items-center gap-3 px-4 py-3 text-left transition-all ${
+              focusIndex !== null
+                ? 'border-neon-cyan shadow-neon-cyan'
+                : 'hover:border-neon-cyan animate-glow-breathe'
+            }`}
+          >
+            <span className="font-mono text-sm text-neon-cyan">&gt;</span>
+            <input
+              type="text"
+              value={query}
+              onChange={onQueryChange}
+              onBlur={onQueryBlur}
+              onKeyDown={onQueryKeyDown}
+              placeholder="输入工具名、粘贴内容或拖入文件…"
+              aria-label="搜索工具"
+              className="flex-1 bg-transparent font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:outline-none"
+            />
+            {focusIndex !== null && orbitTools[focusIndex] ? (
+              <span className="shrink-0 font-mono text-[10px] tracking-wider text-neon-lime">
+                {orbitTools[focusIndex].name}
+              </span>
+            ) : (
+              <kbd className="shrink-0 rounded border border-border-dim bg-void-300 px-2 py-0.5 font-mono text-[10px] text-ink-secondary">
+                ⌘K
+              </kbd>
+            )}
+          </div>
+
+          {/* Stats hide on short viewports; input stays */}
+          <div className="mt-4 hidden flex-wrap items-center justify-center gap-6 sm:gap-10 [@media(min-height:761px)]:flex">
+            {[
+              ['21', 'TOOLS', 'text-neon-cyan'],
+              ['0ms', 'BOOT', 'text-neon-lime'],
+              ['100%', 'LOCAL', 'text-neon-magenta'],
+              ['MIT', 'LICENSE', 'text-neon-purple'],
+            ].map(([v, l, c]) => (
+              <div key={l} className="text-center">
+                <div className={`font-display text-lg font-bold sm:text-xl ${c}`}>{v}</div>
+                <div className="mt-0.5 font-mono text-[10px] tracking-[0.14em] text-ink-muted">
+                  {l}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Tools Grid */}
-      <section className="py-16 px-4 bg-white dark:bg-gray-900">
-        <div className="container mx-auto">
-          <h2 className="text-3xl font-bold font-display mb-8 text-center">核心工具</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* JSON Formatter */}
-            <Link href="/tools/json" className="group">
-              <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer">
-                <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <Braces className="h-6 w-6 text-blue-500" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">JSON 格式化</h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">格式化、压缩、验证 JSON 数据，支持转换为 CSV/XML</p>
-              </div>
-            </Link>
-
-            {/* Base64 Encoder */}
-            <Link href="/tools/base64" className="group">
-              <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer">
-                <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <FileCode className="h-6 w-6 text-green-500" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">Base64 编解码</h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">Base64 编码与解码，支持文本和图片</p>
-              </div>
-            </Link>
-
-            {/* Timestamp Converter */}
-            <Link href="/tools/timestamp" className="group">
-              <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer">
-                <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <Clock className="h-6 w-6 text-purple-500" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">时间戳转换</h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">Unix 时间戳与日期时间互转，支持批量转换</p>
-              </div>
-            </Link>
-
-            {/* Hash & UUID Generator */}
-            <Link href="/tools/uuid" className="group">
-              <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer">
-                <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <Hash className="h-6 w-6 text-orange-500" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">哈希 &amp; UUID</h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">MD5/SHA 哈希生成、UUID v4 生成</p>
-              </div>
-            </Link>
-
-            {/* URL Encoder */}
-            <Link href="/tools/url" className="group">
-              <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer">
-                <div className="w-12 h-12 bg-cyan-100 dark:bg-cyan-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <Link2 className="h-6 w-6 text-cyan-500" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">URL 编解码</h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">URL 编码、解码与解析</p>
-              </div>
-            </Link>
-
-            {/* Regex Tester */}
-            <Link href="/tools/regex" className="group">
-              <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer">
-                <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <Regex className="h-6 w-6 text-indigo-500" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">正则测试</h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">实时测试正则表达式</p>
-              </div>
-            </Link>
-
-            {/* Markdown Editor */}
-            <Link href="/tools/markdown" className="group">
-              <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer">
-                <div className="w-12 h-12 bg-pink-100 dark:bg-pink-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <FileText className="h-6 w-6 text-pink-500" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">Markdown</h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">实时预览 Markdown 编辑器</p>
-              </div>
-            </Link>
-
-            {/* Color Converter */}
-            <Link href="/tools/color" className="group">
-              <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer">
-                <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 via-pink-500 to-purple-500 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <Palette className="h-6 w-6 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">颜色转换</h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">HEX、RGB、HSL 互转</p>
-              </div>
-            </Link>
-
-            {/* Binary Converter */}
-            <Link href="/tools/binary" className="group">
-              <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer">
-                <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <Hash className="h-6 w-6 text-emerald-500" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">进制转换</h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">二进制、十进制、十六进制</p>
-              </div>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-8 px-4 border-t border-gray-200 dark:border-gray-700">
-        <div className="container mx-auto text-center text-gray-600 dark:text-gray-400">
-          <p>© 2025 DevToolsKit. MIT License.</p>
+      <footer className="w-full shrink-0 border-t border-border-dim bg-void-100">
+        <div className="flex w-full items-center gap-2.5 px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
+          <span className="status-dot" />
+          <span className="font-mono text-[11px] text-ink-muted">
+            © 2025 DevToolsKit · MIT · ivenlau@qq.com
+          </span>
         </div>
       </footer>
     </div>

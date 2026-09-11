@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Globe, MapPin, Copy, Info, Search } from 'lucide-react'
 import ipaddr from 'ipaddr.js'
 import { useTransferData } from '@/lib/useTransferData'
+import { ToolShell } from '@/components/ToolShell'
 
 interface IPInfo {
   version: 'IPv4' | 'IPv6' | null
@@ -146,28 +147,18 @@ export default function IPQueryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
-      {/* Header */}
-      <header className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
-              <Globe className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold font-display">IP 地址查询</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                查询 IP 地址信息和地理位置
-              </p>
-            </div>
-          </div>
-        </div>
-      </header>
+    <ToolShell
+      title="IP LOOKUP"
+      description="查询 IP 地址信息和地理位置"
+      path="/tools/ip"
+      icon={Globe}
+      accent="lime"
+    >
 
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Input Section */}
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+          <div className="panel p-6">
             <div className="flex gap-3">
               <div className="flex-1">
                 <input
@@ -176,7 +167,7 @@ export default function IPQueryPage() {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && queryIP()}
                   placeholder="输入 IP 地址 (如: 8.8.8.8)"
-                  className="w-full px-4 py-3 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 font-mono text-sm border border-border-dim rounded-lg bg-void-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
               <button
@@ -193,7 +184,7 @@ export default function IPQueryPage() {
             {myIP && (
               <div className="mt-4 flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                 <div className="flex items-center gap-2 text-sm">
-                  <span className="text-gray-600 dark:text-gray-400">本机 IP:</span>
+                  <span className="text-ink-secondary">本机 IP:</span>
                   <code className="font-mono text-blue-600 dark:text-blue-400">{myIP}</code>
                 </div>
                 <button
@@ -215,44 +206,44 @@ export default function IPQueryPage() {
 
           {/* IP Info */}
           {ipInfo && ipInfo.isValid && (
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            <div className="panel p-6">
               <h3 className="text-sm font-semibold mb-4 flex items-center gap-2">
                 <Info className="h-4 w-4 text-blue-500" />
                 IP 信息
               </h3>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">版本</div>
+                <div className="p-3 bg-void-200 rounded-lg">
+                  <div className="text-xs text-ink-muted dark:text-gray-400 mb-1">版本</div>
                   <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                     {ipInfo.version}
                   </div>
                 </div>
 
-                <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">类型</div>
+                <div className="p-3 bg-void-200 rounded-lg">
+                  <div className="text-xs text-ink-muted dark:text-gray-400 mb-1">类型</div>
                   <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                     {ipInfo.type}
                   </div>
                 </div>
 
-                <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">私有地址</div>
+                <div className="p-3 bg-void-200 rounded-lg">
+                  <div className="text-xs text-ink-muted dark:text-gray-400 mb-1">私有地址</div>
                   <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                     {ipInfo.isPrivate ? '是' : '否'}
                   </div>
                 </div>
 
-                <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">回环地址</div>
+                <div className="p-3 bg-void-200 rounded-lg">
+                  <div className="text-xs text-ink-muted dark:text-gray-400 mb-1">回环地址</div>
                   <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                     {ipInfo.isLoopback ? '是' : '否'}
                   </div>
                 </div>
 
                 {ipInfo.range && (
-                  <div className="col-span-2 md:col-span-4 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">地址范围</div>
+                  <div className="col-span-2 md:col-span-4 p-3 bg-void-200 rounded-lg">
+                    <div className="text-xs text-ink-muted dark:text-gray-400 mb-1">地址范围</div>
                     <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                       {ipInfo.range}
                     </div>
@@ -264,15 +255,15 @@ export default function IPQueryPage() {
 
           {/* Geolocation Info */}
           {geoLocation && (
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            <div className="panel p-6">
               <h3 className="text-sm font-semibold mb-4 flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-green-500" />
                 地理位置
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">IP 地址</div>
+                <div className="p-3 bg-void-200 rounded-lg">
+                  <div className="text-xs text-ink-muted dark:text-gray-400 mb-1">IP 地址</div>
                   <div className="flex items-center justify-between">
                     <div className="text-sm font-mono font-semibold text-gray-900 dark:text-gray-100">
                       {geoLocation.ip}
@@ -286,44 +277,44 @@ export default function IPQueryPage() {
                   </div>
                 </div>
 
-                <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">国家/地区</div>
+                <div className="p-3 bg-void-200 rounded-lg">
+                  <div className="text-xs text-ink-muted dark:text-gray-400 mb-1">国家/地区</div>
                   <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                     {geoLocation.country} ({geoLocation.countryCode})
                   </div>
                 </div>
 
-                <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">省份/州</div>
+                <div className="p-3 bg-void-200 rounded-lg">
+                  <div className="text-xs text-ink-muted dark:text-gray-400 mb-1">省份/州</div>
                   <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                     {geoLocation.region}
                   </div>
                 </div>
 
-                <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">城市</div>
+                <div className="p-3 bg-void-200 rounded-lg">
+                  <div className="text-xs text-ink-muted dark:text-gray-400 mb-1">城市</div>
                   <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                     {geoLocation.city}
                   </div>
                 </div>
 
-                <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">时区</div>
+                <div className="p-3 bg-void-200 rounded-lg">
+                  <div className="text-xs text-ink-muted dark:text-gray-400 mb-1">时区</div>
                   <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                     {geoLocation.timezone}
                   </div>
                 </div>
 
-                <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">ISP</div>
+                <div className="p-3 bg-void-200 rounded-lg">
+                  <div className="text-xs text-ink-muted dark:text-gray-400 mb-1">ISP</div>
                   <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                     {geoLocation.isp}
                   </div>
                 </div>
 
                 {geoLocation.org && (
-                  <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">组织</div>
+                  <div className="p-3 bg-void-200 rounded-lg">
+                    <div className="text-xs text-ink-muted dark:text-gray-400 mb-1">组织</div>
                     <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                       {geoLocation.org}
                     </div>
@@ -331,8 +322,8 @@ export default function IPQueryPage() {
                 )}
 
                 {geoLocation.as && (
-                  <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">AS 号</div>
+                  <div className="p-3 bg-void-200 rounded-lg">
+                    <div className="text-xs text-ink-muted dark:text-gray-400 mb-1">AS 号</div>
                     <div className="text-sm font-mono text-xs text-gray-900 dark:text-gray-100">
                       {geoLocation.as}
                     </div>
@@ -341,15 +332,15 @@ export default function IPQueryPage() {
 
                 {geoLocation.lat && geoLocation.lon && (
                   <>
-                    <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">纬度</div>
+                    <div className="p-3 bg-void-200 rounded-lg">
+                      <div className="text-xs text-ink-muted dark:text-gray-400 mb-1">纬度</div>
                       <div className="text-sm font-mono text-gray-900 dark:text-gray-100">
                         {geoLocation.lat.toFixed(4)}
                       </div>
                     </div>
 
-                    <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">经度</div>
+                    <div className="p-3 bg-void-200 rounded-lg">
+                      <div className="text-xs text-ink-muted dark:text-gray-400 mb-1">经度</div>
                       <div className="text-sm font-mono text-gray-900 dark:text-gray-100">
                         {geoLocation.lon.toFixed(4)}
                       </div>
@@ -361,7 +352,7 @@ export default function IPQueryPage() {
           )}
 
           {/* Quick Examples */}
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+          <div className="panel p-6">
             <h3 className="text-sm font-semibold mb-4">常用 IP 示例</h3>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -370,10 +361,10 @@ export default function IPQueryPage() {
                   setInput('8.8.8.8')
                   queryIP()
                 }}
-                className="p-3 bg-gray-50 dark:bg-gray-900 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left"
+                className="p-3 bg-void-200 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left"
               >
                 <div className="font-mono text-sm text-gray-900 dark:text-gray-100">8.8.8.8</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">Google DNS</div>
+                <div className="text-xs text-ink-muted dark:text-gray-400">Google DNS</div>
               </button>
 
               <button
@@ -381,10 +372,10 @@ export default function IPQueryPage() {
                   setInput('1.1.1.1')
                   queryIP()
                 }}
-                className="p-3 bg-gray-50 dark:bg-gray-900 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left"
+                className="p-3 bg-void-200 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left"
               >
                 <div className="font-mono text-sm text-gray-900 dark:text-gray-100">1.1.1.1</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">Cloudflare DNS</div>
+                <div className="text-xs text-ink-muted dark:text-gray-400">Cloudflare DNS</div>
               </button>
 
               <button
@@ -392,10 +383,10 @@ export default function IPQueryPage() {
                   setInput('114.114.114.114')
                   queryIP()
                 }}
-                className="p-3 bg-gray-50 dark:bg-gray-900 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left"
+                className="p-3 bg-void-200 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left"
               >
                 <div className="font-mono text-sm text-gray-900 dark:text-gray-100">114.114.114.114</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">国内 DNS</div>
+                <div className="text-xs text-ink-muted dark:text-gray-400">国内 DNS</div>
               </button>
             </div>
           </div>
@@ -413,14 +404,6 @@ export default function IPQueryPage() {
         </div>
       </div>
 
-      {/* Footer Info */}
-      <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-3">
-          <div className="text-sm text-gray-600 dark:text-gray-400">
-            💡 支持 IPv4/IPv6 • 地理位置查询 • 本机 IP 显示
-          </div>
-        </div>
-      </div>
-    </div>
+    </ToolShell>
   )
 }

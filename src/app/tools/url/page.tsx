@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Link2, Copy, Trash2 } from 'lucide-react'
 import { useTransferData } from '@/lib/useTransferData'
+import { ToolShell } from '@/components/ToolShell'
 
 /**
  * URL 编码
@@ -99,207 +100,175 @@ export default function UrlEncoderPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
-      {/* Header */}
-      <header className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-lg flex items-center justify-center">
-              <Link2 className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold font-display">URL 编解码</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                URL 编码、解码与解析
-              </p>
-            </div>
-          </div>
-        </div>
-      </header>
-
+    <ToolShell
+      title="URL CODEC"
+      description="URL 编码、解码与解析"
+      path="/tools/url"
+      icon={Link2}
+      accent="cyan"
+    >
       {/* Toolbar */}
-      <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-3 flex flex-wrap items-center gap-3">
-          <button
-            onClick={() => setMode('encode')}
-            className={`px-4 py-2 rounded-lg font-medium transition-all text-sm ${
-              mode === 'encode'
-                ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white'
-                : 'border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
-            }`}
-          >
-            编码模式
-          </button>
-          <button
-            onClick={() => setMode('decode')}
-            className={`px-4 py-2 rounded-lg font-medium transition-all text-sm ${
-              mode === 'decode'
-                ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white'
-                : 'border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
-            }`}
-          >
-            解码模式
-          </button>
-          <button
-            onClick={() => setMode('parse')}
-            className={`px-4 py-2 rounded-lg font-medium transition-all text-sm ${
-              mode === 'parse'
-                ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white'
-                : 'border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
-            }`}
-          >
-            URL 解析
-          </button>
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <button
+          onClick={() => setMode('encode')}
+          className={`chip !px-4 !py-2 ${mode === 'encode' ? 'chip-active' : ''}`}
+        >
+          编码模式
+        </button>
+        <button
+          onClick={() => setMode('decode')}
+          className={`chip !px-4 !py-2 ${mode === 'decode' ? 'chip-active' : ''}`}
+        >
+          解码模式
+        </button>
+        <button
+          onClick={() => setMode('parse')}
+          className={`chip !px-4 !py-2 ${mode === 'parse' ? 'chip-active' : ''}`}
+        >
+          URL 解析
+        </button>
 
-          <div className="ml-auto flex items-center gap-3">
-            <button
-              onClick={handleCopy}
-              disabled={!output && mode !== 'parse'}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-all text-sm disabled:opacity-50 flex items-center gap-2"
-            >
-              <Copy className="h-4 w-4" />
-              复制
-            </button>
-            <button
-              onClick={handleClear}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg font-medium hover:bg-red-50 dark:hover:bg-red-900/20 transition-all text-sm flex items-center gap-2"
-            >
-              <Trash2 className="h-4 w-4" />
-              清空
-            </button>
-          </div>
+        <div className="ml-auto flex items-center gap-2">
+          <button
+            onClick={handleCopy}
+            disabled={!output && mode !== 'parse'}
+            className="chip !px-4 !py-2 disabled:opacity-40"
+          >
+            <Copy className="mr-1.5 h-3.5 w-3.5" />
+            复制
+          </button>
+          <button
+            onClick={handleClear}
+            className="chip !px-4 !py-2 hover:!border-neon-red hover:!text-neon-red"
+          >
+            <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+            清空
+          </button>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-6">
-        {/* 编码/解码模式 */}
-        {mode !== 'parse' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Input */}
-            <div className="flex flex-col">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {mode === 'encode' ? '输入文本' : '输入 URL 编码'}
-                </h3>
-                {error && <span className="text-sm text-red-500">❌ {error}</span>}
-              </div>
-              <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder={mode === 'encode' ? '输入要编码的文本...' : '输入要解码的 URL 编码...'}
-                className="flex-1 min-h-[400px] p-4 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 resize-none focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                spellCheck={false}
-              />
+      {/* 编码/解码模式 */}
+      {mode !== 'parse' && (
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          {/* Input */}
+          <div className="flex flex-col">
+            <div className="mb-2 flex items-center justify-between">
+              <h3 className="font-mono text-[11px] text-ink-secondary">
+                {mode === 'encode' ? '输入文本' : '输入 URL 编码'}
+              </h3>
+              {error && <span className="font-mono text-[11px] text-neon-red">ERR · {error}</span>}
             </div>
-
-            {/* Output */}
-            <div className="flex flex-col">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {mode === 'encode' ? 'URL 编码结果' : '解码结果'}
-                </h3>
-                {output && !error && <span className="text-sm text-green-500">✓ 处理成功</span>}
-              </div>
-              <textarea
-                value={output}
-                readOnly
-                placeholder="处理结果将显示在这里..."
-                className="flex-1 min-h-[400px] p-4 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 resize-none"
-                spellCheck={false}
-              />
-            </div>
+            <textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={mode === 'encode' ? '输入要编码的文本...' : '输入要解码的 URL 编码...'}
+              className="panel-glow min-h-[400px] flex-1 resize-none p-4 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:outline-none"
+              spellCheck={false}
+            />
           </div>
-        )}
 
-        {/* URL 解析模式 */}
-        {mode === 'parse' && (
-          <div className="max-w-4xl mx-auto space-y-6">
-            {/* Input */}
-            <div>
-              <label className="block text-sm font-medium mb-2">输入 URL</label>
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="https://example.com:8080/path/to/page?param1=value1&param2=value2#section"
-                className="w-full px-4 py-3 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                spellCheck={false}
-              />
-              {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
+          {/* Output */}
+          <div className="flex flex-col">
+            <div className="mb-2 flex items-center justify-between">
+              <h3 className="font-mono text-[11px] text-ink-secondary">
+                {mode === 'encode' ? 'URL 编码结果' : '解码结果'}
+              </h3>
+              {output && !error && <span className="font-mono text-[11px] text-neon-lime">✓ OK</span>}
             </div>
+            <textarea
+              value={output}
+              readOnly
+              placeholder="处理结果将显示在这里..."
+              className="panel-glow min-h-[400px] flex-1 resize-none p-4 font-mono text-sm text-ink-primary placeholder:text-ink-muted"
+              spellCheck={false}
+            />
+          </div>
+        </div>
+      )}
 
-            {/* Parsed Data */}
-            {urlData && (
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-                <h3 className="text-lg font-semibold mb-4">解析结果</h3>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <span className="text-xs text-gray-500 dark:text-gray-400 uppercase">Protocol</span>
-                      <p className="font-mono text-sm">{urlData.protocol}</p>
-                    </div>
-                    <div>
-                      <span className="text-xs text-gray-500 dark:text-gray-400 uppercase">Hostname</span>
-                      <p className="font-mono text-sm">{urlData.hostname}</p>
-                    </div>
-                    <div>
-                      <span className="text-xs text-gray-500 dark:text-gray-400 uppercase">Port</span>
-                      <p className="font-mono text-sm">{urlData.port || '(默认)'}</p>
-                    </div>
-                    <div>
-                      <span className="text-xs text-gray-500 dark:text-gray-400 uppercase">Pathname</span>
-                      <p className="font-mono text-sm break-all">{urlData.pathname}</p>
-                    </div>
-                    <div>
-                      <span className="text-xs text-gray-500 dark:text-gray-400 uppercase">Search</span>
-                      <p className="font-mono text-sm break-all">{urlData.search || '(无)'}</p>
-                    </div>
-                    <div>
-                      <span className="text-xs text-gray-500 dark:text-gray-400 uppercase">Hash</span>
-                      <p className="font-mono text-sm break-all">{urlData.hash || '(无)'}</p>
+      {/* URL 解析模式 */}
+      {mode === 'parse' && (
+        <div className="mx-auto max-w-4xl space-y-4">
+          {/* Input */}
+          <div>
+            <label className="mb-2 block font-mono text-[11px] text-ink-secondary">输入 URL</label>
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="https://example.com:8080/path/to/page?param1=value1&param2=value2#section"
+              className="w-full rounded-lg border border-border-dim bg-void-200 px-4 py-3 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:border-neon-cyan focus:outline-none"
+              spellCheck={false}
+            />
+            {error && <p className="mt-2 font-mono text-[11px] text-neon-red">{error}</p>}
+          </div>
+
+          {/* Parsed Data */}
+          {urlData && (
+            <div className="panel-glow rounded-xl p-6">
+              <h3 className="mb-4 font-display text-lg font-semibold text-ink-primary">解析结果</h3>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">Protocol</span>
+                    <p className="font-mono text-sm text-ink-primary">{urlData.protocol}</p>
+                  </div>
+                  <div>
+                    <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">Hostname</span>
+                    <p className="font-mono text-sm text-ink-primary">{urlData.hostname}</p>
+                  </div>
+                  <div>
+                    <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">Port</span>
+                    <p className="font-mono text-sm text-ink-primary">{urlData.port || '(默认)'}</p>
+                  </div>
+                  <div>
+                    <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">Pathname</span>
+                    <p className="break-all font-mono text-sm text-ink-primary">{urlData.pathname}</p>
+                  </div>
+                  <div>
+                    <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">Search</span>
+                    <p className="break-all font-mono text-sm text-ink-primary">{urlData.search || '(无)'}</p>
+                  </div>
+                  <div>
+                    <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">Hash</span>
+                    <p className="break-all font-mono text-sm text-ink-primary">{urlData.hash || '(无)'}</p>
+                  </div>
+                </div>
+
+                {/* Query Parameters */}
+                {Object.keys(urlData.params).length > 0 && (
+                  <div className="mt-6">
+                    <h4 className="mb-3 font-mono text-[11px] uppercase tracking-wider text-ink-secondary">Query Parameters</h4>
+                    <div className="space-y-2">
+                      {Object.entries(urlData.params).map(([key, value]) => (
+                        <div
+                          key={key}
+                          className="flex items-center gap-4 rounded-lg bg-void-200 p-3"
+                        >
+                          <code className="font-mono text-sm font-bold text-neon-cyan">{key}</code>
+                          <span className="text-ink-muted">=</span>
+                          <code className="flex-1 break-all font-mono text-sm text-ink-primary">{String(value)}</code>
+                          <button
+                            onClick={() => copyToClipboard(`${key}=${value}`)}
+                            className="text-ink-muted hover:text-neon-cyan"
+                          >
+                            <Copy className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
                     </div>
                   </div>
-
-                  {/* Query Parameters */}
-                  {Object.keys(urlData.params).length > 0 && (
-                    <div className="mt-6">
-                      <h4 className="text-sm font-semibold mb-3">Query Parameters</h4>
-                      <div className="space-y-2">
-                        {Object.entries(urlData.params).map(([key, value]) => (
-                          <div
-                            key={key}
-                            className="flex items-center gap-4 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg"
-                          >
-                            <code className="text-sm font-mono text-cyan-600 font-bold">{key}</code>
-                            <span className="text-gray-400">=</span>
-                            <code className="text-sm font-mono flex-1 break-all">{String(value)}</code>
-                            <button
-                              onClick={() => copyToClipboard(`${key}=${value}`)}
-                              className="text-gray-400 hover:text-cyan-500"
-                            >
-                              <Copy className="h-4 w-4" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
+                )}
               </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Footer Info */}
-      <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-3">
-          <div className="text-sm text-gray-600 dark:text-gray-400">
-            💡 URL 编码用于处理特殊字符 • URL 解析可分解URL的各个组成部分
-          </div>
+            </div>
+          )}
         </div>
+      )}
+
+      <div className="mt-4 font-mono text-[11px] text-ink-muted">
+        local only · URL 编码处理特殊字符 · URL 解析可分解各组成部分
       </div>
-    </div>
+    </ToolShell>
   )
 }
 

@@ -5,6 +5,7 @@ import { RefreshCw, Copy, Trash2, FileCode } from 'lucide-react'
 import yaml from 'js-yaml'
 import xmlFormat from 'xml-formatter'
 import { useTransferData } from '@/lib/useTransferData'
+import { ToolShell } from '@/components/ToolShell'
 // @ts-ignore
 const TOML = require('toml')
 
@@ -290,31 +291,21 @@ email = "jane@example.com"`,
   ]
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
-      {/* Header */}
-      <header className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-purple-500 rounded-lg flex items-center justify-center">
-              <RefreshCw className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold font-display">数据格式转换</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                JSON、XML、YAML、TOML 格式互转
-              </p>
-            </div>
-          </div>
-        </div>
-      </header>
+    <ToolShell
+      title="DATA CONVERT"
+      description="JSON、XML、YAML、TOML 格式互转"
+      path="/tools/convert"
+      icon={RefreshCw}
+      accent="purple"
+    >
 
       <div className="container mx-auto px-4 py-8">
         {/* Format Selector */}
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 mb-6">
+        <div className="panel p-6 mb-6">
           <div className="flex items-center justify-center gap-4">
             {/* Input Format */}
             <div className="flex-1">
-              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2 text-center">
+              <label className="block text-xs text-ink-secondary mb-2 text-center">
                 输入格式
               </label>
               <div className="flex gap-2 justify-center">
@@ -325,7 +316,7 @@ email = "jane@example.com"`,
                     className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
                       inputFormat === format.value
                         ? `bg-gradient-to-r ${format.color} text-white`
-                        : 'bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-800'
+                        : 'bg-gray-100 dark:bg-gray-900 border border-border-dim hover:bg-gray-200 dark:hover:bg-gray-800'
                     }`}
                   >
                     {format.label}
@@ -345,7 +336,7 @@ email = "jane@example.com"`,
 
             {/* Output Format */}
             <div className="flex-1">
-              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2 text-center">
+              <label className="block text-xs text-ink-secondary mb-2 text-center">
                 输出格式
               </label>
               <div className="flex gap-2 justify-center">
@@ -356,7 +347,7 @@ email = "jane@example.com"`,
                     className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
                       outputFormat === format.value
                         ? `bg-gradient-to-r ${format.color} text-white`
-                        : 'bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-800'
+                        : 'bg-gray-100 dark:bg-gray-900 border border-border-dim hover:bg-gray-200 dark:hover:bg-gray-800'
                     }`}
                   >
                     {format.label}
@@ -370,7 +361,7 @@ email = "jane@example.com"`,
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left Column - Input */}
           <div className="space-y-4">
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            <div className="panel p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-semibold flex items-center gap-2">
                   <FileCode className="h-4 w-4 text-violet-500" />
@@ -379,14 +370,14 @@ email = "jane@example.com"`,
                 <div className="flex gap-2">
                   <button
                     onClick={loadExample}
-                    className="px-3 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className="px-3 py-1 text-xs border border-border-dim rounded hover:bg-gray-100 dark:hover:bg-gray-800"
                   >
                     加载示例
                   </button>
                   {input && (
                     <button
                       onClick={clearAll}
-                      className="px-3 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-1"
+                      className="px-3 py-1 text-xs border border-border-dim rounded hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-1"
                     >
                       <Trash2 className="h-3 w-3" />
                       清空
@@ -399,7 +390,7 @@ email = "jane@example.com"`,
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={`输入 ${inputFormat.toUpperCase()} 数据...`}
-                className="w-full h-96 p-4 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 resize-none focus:outline-none focus:ring-2 focus:ring-violet-500"
+                className="w-full h-96 p-4 font-mono text-sm border border-border-dim rounded-lg bg-void-200 resize-none focus:outline-none focus:ring-2 focus:ring-violet-500"
                 spellCheck={false}
               />
             </div>
@@ -407,7 +398,7 @@ email = "jane@example.com"`,
 
           {/* Right Column - Output */}
           <div className="space-y-4">
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            <div className="panel p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-semibold flex items-center gap-2">
                   <FileCode className="h-4 w-4 text-violet-500" />
@@ -433,7 +424,7 @@ email = "jane@example.com"`,
                   value={output}
                   readOnly
                   placeholder={`转换后的 ${outputFormat.toUpperCase()} 将显示在这里...`}
-                  className="w-full h-96 p-4 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 resize-none focus:outline-none"
+                  className="w-full h-96 p-4 font-mono text-sm border border-border-dim rounded-lg bg-void-200 resize-none focus:outline-none"
                 />
               )}
             </div>
@@ -441,18 +432,18 @@ email = "jane@example.com"`,
         </div>
 
         {/* Conversion Matrix */}
-        <div className="mt-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+        <div className="mt-6 panel p-6">
           <h3 className="text-sm font-semibold mb-4">支持的转换</h3>
 
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 w-32">
+                  <th className="px-4 py-2 text-left text-xs font-semibold text-ink-secondary w-32">
                     FROM \ TO
                   </th>
                   {['JSON', 'YAML', 'XML', 'TOML'].map((format) => (
-                    <th key={format} className="px-4 py-2 text-center text-xs font-semibold text-gray-600 dark:text-gray-400">
+                    <th key={format} className="px-4 py-2 text-center text-xs font-semibold text-ink-secondary">
                       {format}
                     </th>
                   ))}
@@ -496,14 +487,6 @@ email = "jane@example.com"`,
         </div>
       </div>
 
-      {/* Footer Info */}
-      <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-3">
-          <div className="text-sm text-gray-600 dark:text-gray-400">
-            💡 JSON ↔ YAML ↔ XML ↔ TOML • 一键格式互换 • 实时转换
-          </div>
-        </div>
-      </div>
-    </div>
+    </ToolShell>
   )
 }

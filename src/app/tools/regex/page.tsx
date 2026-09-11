@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Regex, Copy, Trash2 } from 'lucide-react'
 import { useTransferData } from '@/lib/useTransferData'
+import { ToolShell } from '@/components/ToolShell'
 
 // 常用正则表达式库
 const commonRegex = [
@@ -83,52 +84,32 @@ export default function RegexTesterPage() {
   }, [regex, flags, testString, replacePattern])
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
-      {/* Header */}
-      <header className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center">
-              <Regex className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold font-display">正则表达式测试器</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                实时测试正则表达式，查看匹配结果
-              </p>
-            </div>
-          </div>
-        </div>
-      </header>
-
+    <ToolShell
+      title="REGEX LAB"
+      description="实时测试正则表达式，查看匹配结果"
+      path="/tools/regex"
+      icon={Regex}
+      accent="magenta"
+    >
       {/* Common Regex Presets */}
-      <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center gap-3 overflow-x-auto">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
-              常用正则:
-            </span>
-            <div className="flex gap-2">
-              {commonRegex.map((preset, index) => (
-                <button
-                  key={index}
-                  onClick={() => applyPreset(preset, index)}
-                  className={`px-3 py-1.5 text-sm whitespace-nowrap rounded-lg transition-all ${
-                    selectedPreset === index
-                      ? 'bg-indigo-500 text-white'
-                      : 'bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 hover:border-indigo-300'
-                  }`}
-                >
-                  {preset.name}
-                </button>
-              ))}
-            </div>
-          </div>
+      <div className="mb-4 flex items-center gap-3 overflow-x-auto">
+        <span className="whitespace-nowrap font-mono text-[11px] text-ink-muted">
+          PRESETS
+        </span>
+        <div className="flex gap-2">
+          {commonRegex.map((preset, index) => (
+            <button
+              key={index}
+              onClick={() => applyPreset(preset, index)}
+              className={`chip whitespace-nowrap !px-3 !py-1.5 !text-xs ${selectedPreset === index ? 'chip-active' : ''}`}
+            >
+              {preset.name}
+            </button>
+          ))}
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {/* Left Column - Input */}
           <div className="space-y-4">
             {/* Regex Input */}
@@ -333,16 +314,11 @@ export default function RegexTesterPage() {
             </div>
           </div>
         </div>
-      </div>
 
       {/* Footer Info */}
-      <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-3">
-          <div className="text-sm text-gray-600 dark:text-gray-400">
-            💡 支持所有JavaScript正则表达式语法 • 点击常用正则快速应用 • 使用 $1, $2 引用捕获组
-          </div>
-        </div>
+      <div className="mt-4 font-mono text-[11px] text-ink-muted">
+        local only · JavaScript 正则语法 · 点击预设快速应用 · 使用 $1, $2 引用捕获组
       </div>
-    </div>
+    </ToolShell>
   )
 }

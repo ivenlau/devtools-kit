@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Terminal, Copy, Trash2, FileText } from 'lucide-react'
 import { useTransferData } from '@/lib/useTransferData'
+import { ToolShell } from '@/components/ToolShell'
 
 export default function CurlGeneratorPage() {
   const [url, setUrl] = useState('https://api.example.com/users')
@@ -83,36 +84,26 @@ export default function CurlGeneratorPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
-      {/* Header */}
-      <header className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-gray-700 to-gray-900 rounded-lg flex items-center justify-center">
-              <Terminal className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold font-display">cURL 命令生成器</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                可视化构建 HTTP 请求，生成 cURL 命令
-              </p>
-            </div>
-          </div>
-        </div>
-      </header>
+    <ToolShell
+      title="CURL BUILDER"
+      description="可视化构建 HTTP 请求，生成 cURL 命令"
+      path="/tools/curl"
+      icon={Terminal}
+      accent="cyan"
+    >
 
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left Column - Builder */}
           <div className="space-y-4">
             {/* Request Info */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            <div className="panel p-6">
               <h3 className="text-sm font-semibold mb-4">请求信息</h3>
 
               <div className="space-y-4">
                 {/* URL */}
                 <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-ink-secondary mb-2">
                     URL
                   </label>
                   <input
@@ -120,13 +111,13 @@ export default function CurlGeneratorPage() {
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
                     placeholder="https://api.example.com/users"
-                    className="w-full px-3 py-2 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    className="w-full px-3 py-2 font-mono text-sm border border-border-dim rounded-lg bg-void-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
                   />
                 </div>
 
                 {/* Method */}
                 <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <label className="block text-xs text-ink-secondary mb-2">
                     请求方法
                   </label>
                   <div className="flex gap-2">
@@ -137,7 +128,7 @@ export default function CurlGeneratorPage() {
                         className={`px-4 py-2 font-mono text-sm rounded-lg transition-all ${
                           method === m
                             ? 'bg-gray-800 text-white'
-                            : 'bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-800'
+                            : 'bg-gray-100 dark:bg-gray-900 border border-border-dim hover:bg-gray-200 dark:hover:bg-gray-800'
                         }`}
                       >
                         {m}
@@ -149,16 +140,16 @@ export default function CurlGeneratorPage() {
                 {/* Headers */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="block text-xs text-gray-600 dark:text-gray-400">
+                    <label className="block text-xs text-ink-secondary">
                       请求头
                     </label>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-500">预设:</span>
+                      <span className="text-xs text-ink-muted">预设:</span>
                       {headerPresets.map((preset, index) => (
                         <button
                           key={index}
                           onClick={() => applyPreset(preset)}
-                          className="px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+                          className="px-2 py-1 text-xs border border-border-dim rounded hover:bg-gray-100 dark:hover:bg-gray-800"
                         >
                           {preset.name}
                         </button>
@@ -174,7 +165,7 @@ export default function CurlGeneratorPage() {
                           value={header.key}
                           onChange={(e) => updateHeader(index, 'key', e.target.value)}
                           placeholder="Header name"
-                          className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                          className="flex-1 px-3 py-2 text-sm border border-border-dim rounded bg-void-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
                         />
                         <span className="text-gray-400">:</span>
                         <input
@@ -182,7 +173,7 @@ export default function CurlGeneratorPage() {
                           value={header.value}
                           onChange={(e) => updateHeader(index, 'value', e.target.value)}
                           placeholder="Value"
-                          className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                          className="flex-1 px-3 py-2 text-sm border border-border-dim rounded bg-void-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
                         />
                         <button
                           onClick={() => removeHeader(index)}
@@ -196,7 +187,7 @@ export default function CurlGeneratorPage() {
 
                   <button
                     onClick={addHeader}
-                    className="w-full px-3 py-2 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-500 hover:text-gray-700 hover:border-gray-400 transition-all"
+                    className="w-full px-3 py-2 border border-dashed border-border-dim rounded-lg text-sm text-ink-muted hover:text-gray-700 hover:border-gray-400 transition-all"
                   >
                     + 添加请求头
                   </button>
@@ -205,14 +196,14 @@ export default function CurlGeneratorPage() {
                 {/* Body */}
                 {(method === 'POST' || method === 'PUT' || method === 'PATCH') && (
                   <div>
-                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+                    <label className="block text-xs text-ink-secondary mb-2">
                       请求体
                     </label>
                     <textarea
                       value={body}
                       onChange={(e) => setBody(e.target.value)}
                       placeholder='{"name": "John", "age": 30}'
-                      className="w-full h-32 p-3 font-mono text-xs border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 resize-none focus:outline-none focus:ring-2 focus:ring-gray-500"
+                      className="w-full h-32 p-3 font-mono text-xs border border-border-dim rounded-lg bg-void-200 resize-none focus:outline-none focus:ring-2 focus:ring-gray-500"
                       spellCheck={false}
                     />
                   </div>
@@ -268,12 +259,12 @@ export default function CurlGeneratorPage() {
             </div>
 
             {/* Examples */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            <div className="panel p-6">
               <h3 className="text-sm font-semibold mb-4">常用示例</h3>
 
               <div className="space-y-3">
                 <div>
-                  <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">GET 请求</h4>
+                  <h4 className="text-xs font-semibold text-ink-secondary mb-2">GET 请求</h4>
                   <button
                     onClick={() => {
                       setUrl('https://api.github.com/users/octocat')
@@ -281,16 +272,16 @@ export default function CurlGeneratorPage() {
                       setHeaders([{ key: 'User-Agent', value: 'MyApp/1.0' }])
                       setBody('')
                     }}
-                    className="w-full text-left p-3 bg-gray-50 dark:bg-gray-900 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-xs text-left"
+                    className="w-full text-left p-3 bg-void-200 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-xs text-left"
                   >
-                    <div className="font-mono text-left text-gray-600 dark:text-gray-400">
+                    <div className="font-mono text-left text-ink-secondary">
                       API调用
                     </div>
                   </button>
                 </div>
 
                 <div>
-                  <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">POST JSON</h4>
+                  <h4 className="text-xs font-semibold text-ink-secondary mb-2">POST JSON</h4>
                   <button
                     onClick={() => {
                       setUrl('https://api.example.com/users')
@@ -298,25 +289,25 @@ export default function CurlGeneratorPage() {
                       setHeaders([{ key: 'Content-Type', value: 'application/json' }])
                       setBody('{"name":"John","email":"john@example.com"}')
                     }}
-                    className="w-full text-left p-3 bg-gray-50 dark:bg-gray-900 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-xs text-left"
+                    className="w-full text-left p-3 bg-void-200 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-xs text-left"
                   >
-                    <div className="font-mono text-left text-gray-600 dark:text-gray-400">
+                    <div className="font-mono text-left text-ink-secondary">
                       POST JSON数据
                     </div>
                   </button>
                 </div>
 
                 <div>
-                  <                  h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">带认证</h4>
+                  <                  h4 className="text-xs font-semibold text-ink-secondary mb-2">带认证</h4>
                   <button
                     onClick={() => {
                       setUrl('https://api.example.com/protected')
                       setMethod('GET')
                       setHeaders([{ key: 'Authorization', value: 'Bearer YOUR_TOKEN' }])
                     }}
-                    className="w-full text-left p-3 bg-gray-50 dark:bg-gray-900 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-xs text-left"
+                    className="w-full text-left p-3 bg-void-200 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-xs text-left"
                   >
-                    <div className="font-mono text-left text-gray-600 dark:text-gray-400">
+                    <div className="font-mono text-left text-ink-secondary">
                       API认证请求
                     </div>
                   </button>
@@ -327,14 +318,6 @@ export default function CurlGeneratorPage() {
         </div>
       </div>
 
-      {/* Footer Info */}
-      <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-3">
-          <div className="text-sm text-gray-600 dark:text-gray-400">
-            💡 支持所有HTTP方法 • 自定义请求头 • 实时生成cURL命令
-          </div>
-        </div>
-      </div>
-    </div>
+    </ToolShell>
   )
 }

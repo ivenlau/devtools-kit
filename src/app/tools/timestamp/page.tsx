@@ -10,6 +10,7 @@ import {
   parseTimestampInput,
 } from '@/lib/timestamp'
 import { useTransferData } from '@/lib/useTransferData'
+import { ToolShell } from '@/components/ToolShell'
 
 interface TimestampOutput {
   seconds: string
@@ -77,57 +78,48 @@ export default function TimestampToolPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
-      <header className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-              <Clock className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold font-display">时间戳转换</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Unix 时间戳与日期时间互转，支持毫秒级精度
-              </p>
-            </div>
-          </div>
+    <ToolShell
+      title="TIMESTAMP"
+      description="Unix 时间戳与日期时间互转，支持毫秒级精度"
+      path="/tools/timestamp"
+      icon={Clock}
+      accent="purple"
+    >
+      {/* Live clock hero */}
+      <div className="relative overflow-hidden rounded-xl border border-border-dim bg-void-100 px-6 py-8 text-center">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_50%_50%,rgba(168,85,247,0.16),transparent_65%)]" />
+        <div className="relative">
+          <p className="font-mono text-[11px] tracking-[0.28em] text-ink-muted">
+            CURRENT UNIX TIME
+          </p>
+          <button
+            onClick={() => copyToClipboard(formatTimestampSeconds(currentTimeMs))}
+            className="mx-auto mt-2 block font-mono text-4xl font-bold tracking-wide text-ink-primary transition-opacity hover:opacity-80 sm:text-5xl md:text-6xl"
+            style={{ textShadow: '0 0 28px rgba(168,85,247,0.4)' }}
+            title="复制秒级时间戳"
+          >
+            {formatTimestampSeconds(currentTimeMs)}
+          </button>
+          <button
+            onClick={() => copyToClipboard(formatTimestampMilliseconds(currentTimeMs))}
+            className="mt-1 font-mono text-base text-neon-purple transition-opacity hover:opacity-80 sm:text-lg"
+            title="复制毫秒级时间戳"
+          >
+            {formatTimestampMilliseconds(currentTimeMs)}
+          </button>
+          <p className="mt-2 text-sm text-ink-secondary">
+            {formatTimestampDate(currentTimeMs)}
+          </p>
         </div>
-      </header>
+      </div>
 
-      <div className="container mx-auto px-4 py-8 space-y-8">
-        <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl p-6 text-white">
-          <div className="flex items-center justify-between">
-            <div className="min-w-0">
-              <h2 className="text-sm font-medium opacity-90 mb-2">当前时间戳</h2>
-              <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2">
-                <button
-                  onClick={() => copyToClipboard(formatTimestampSeconds(currentTimeMs))}
-                  className="text-4xl font-bold cursor-pointer hover:opacity-80 transition-opacity"
-                  title="复制秒级时间戳"
-                >
-                  {formatTimestampSeconds(currentTimeMs)}
-                </button>
-                <span className="text-lg opacity-90">秒</span>
-                <button
-                  onClick={() => copyToClipboard(formatTimestampMilliseconds(currentTimeMs))}
-                  className="text-xl font-semibold cursor-pointer hover:opacity-80 transition-opacity"
-                  title="复制毫秒级时间戳"
-                >
-                  {formatTimestampMilliseconds(currentTimeMs)}
-                </button>
-                <span className="text-sm opacity-90">毫秒</span>
-              </div>
-              <div className="mt-2 text-sm opacity-90">
-                {formatTimestampDate(currentTimeMs)}
-              </div>
-            </div>
-            <Clock className="h-16 w-16 opacity-50 shrink-0" />
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-          <h3 className="text-lg font-semibold mb-4">时间戳 → 日期</h3>
-          <div className="space-y-4">
+      {/* Converters */}
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="panel p-5">
+          <h3 className="mb-4 font-mono text-[11px] tracking-[0.16em] text-neon-purple">
+            UNIX → HUMAN
+          </h3>
+          <div className="space-y-3">
             <input
               type="text"
               inputMode="decimal"
@@ -135,74 +127,78 @@ export default function TimestampToolPage() {
               onChange={(e) => setInputTimestamp(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleTimestampToDate()}
               placeholder="例如: 1706610000 或 1706610000123.456"
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full rounded-md border border-border-glow bg-void-200 px-4 py-3 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:border-neon-purple focus:outline-none focus:ring-1 focus:ring-neon-purple/40"
             />
-            <button
-              onClick={handleTimestampToDate}
-              className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-medium hover:shadow-lg transition-all"
-            >
-              转换
+            <button onClick={handleTimestampToDate} className="btn-neon !bg-none" style={{ background: 'linear-gradient(90deg,#A855F7,#FF2D95)' }}>
+              CONVERT
             </button>
-            {timestampError && <p className="text-sm text-red-500">{timestampError}</p>}
+            {timestampError && (
+              <p className="font-mono text-xs text-neon-red">{timestampError}</p>
+            )}
             {outputDate && (
-              <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">本地时间</p>
-                  <code className="text-lg">{outputDate}</code>
+              <div className="flex items-center justify-between gap-4 rounded-lg border border-neon-purple/40 bg-[#0A0C12] p-4">
+                <div className="min-w-0">
+                  <p className="mb-1 font-mono text-[10px] text-ink-muted">LOCAL</p>
+                  <code className="font-mono text-base text-neon-lime">{outputDate}</code>
                 </div>
                 <button
                   onClick={() => copyToClipboard(outputDate)}
-                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all text-sm flex items-center gap-2 shrink-0"
+                  className="chip shrink-0"
                 >
-                  <Copy className="h-4 w-4" />
-                  复制
+                  <Copy className="mr-1 h-3.5 w-3.5" />
+                  COPY
                 </button>
               </div>
             )}
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-          <h3 className="text-lg font-semibold mb-4">日期 → 时间戳</h3>
-          <div className="space-y-4">
+        <div className="panel p-5">
+          <h3 className="mb-4 font-mono text-[11px] tracking-[0.16em] text-neon-cyan">
+            HUMAN → UNIX
+          </h3>
+          <div className="space-y-3">
             <input
               type="text"
               value={inputDate}
               onChange={(e) => setInputDate(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleDateToTimestamp()}
               placeholder="例如: 2024-01-30 12:00:00.123 或 2024年1月30日"
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full rounded-md border border-border-glow bg-void-200 px-4 py-3 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:border-neon-cyan focus:outline-none focus:ring-1 focus:ring-neon-cyan/40"
             />
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-[11px] text-ink-muted">
               支持 ISO 8601、`YYYY-MM-DD HH:mm:ss`、斜杠日期、中文日期和带时区的日期格式
             </p>
-            <button
-              onClick={handleDateToTimestamp}
-              className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-medium hover:shadow-lg transition-all"
-            >
-              转换
+            <button onClick={handleDateToTimestamp} className="btn-neon">
+              CONVERT
             </button>
-            {dateError && <p className="text-sm text-red-500">{dateError}</p>}
+            {dateError && (
+              <p className="font-mono text-xs text-neon-red">{dateError}</p>
+            )}
             {outputTimestamp && (
-              <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg space-y-3">
+              <div className="space-y-2 rounded-lg border border-neon-cyan/40 bg-[#0A0C12] p-4">
                 <div className="flex items-center justify-between gap-4">
-                  <code>秒：{outputTimestamp.seconds}</code>
+                  <code className="font-mono text-sm text-neon-lime">
+                    s · {outputTimestamp.seconds}
+                  </code>
                   <button
                     onClick={() => copyToClipboard(outputTimestamp.seconds)}
-                    className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all text-sm flex items-center gap-2 shrink-0"
+                    className="chip shrink-0"
                   >
-                    <Copy className="h-4 w-4" />
-                    复制
+                    <Copy className="mr-1 h-3.5 w-3.5" />
+                    COPY
                   </button>
                 </div>
                 <div className="flex items-center justify-between gap-4">
-                  <code>毫秒：{outputTimestamp.milliseconds}</code>
+                  <code className="font-mono text-sm text-neon-cyan">
+                    ms · {outputTimestamp.milliseconds}
+                  </code>
                   <button
                     onClick={() => copyToClipboard(outputTimestamp.milliseconds)}
-                    className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all text-sm flex items-center gap-2 shrink-0"
+                    className="chip shrink-0"
                   >
-                    <Copy className="h-4 w-4" />
-                    复制
+                    <Copy className="mr-1 h-3.5 w-3.5" />
+                    COPY
                   </button>
                 </div>
               </div>
@@ -211,13 +207,9 @@ export default function TimestampToolPage() {
         </div>
       </div>
 
-      <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-3">
-          <div className="text-sm text-gray-600 dark:text-gray-400">
-            💡 支持秒级、毫秒级和小数秒时间戳；主页粘贴时间戳或日期可快速打开本工具
-          </div>
-        </div>
+      <div className="mt-4 font-mono text-[11px] text-ink-muted">
+        点击大号时间戳可复制 · 主页粘贴时间戳或日期可快速打开本工具
       </div>
-    </div>
+    </ToolShell>
   )
 }

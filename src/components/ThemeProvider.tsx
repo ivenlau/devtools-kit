@@ -6,7 +6,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Apply theme on mount
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | 'system' | null
-    const theme = savedTheme || 'system'
+    // Cyber terminal identity is dark-first; only honor explicit light choice.
+    const theme = savedTheme === 'light' ? 'light' : 'dark'
 
     const applyTheme = (theme: 'light' | 'dark' | 'system') => {
       const root = document.documentElement

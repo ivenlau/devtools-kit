@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Code2, Copy, Trash2, ArrowLeftRight } from 'lucide-react'
 import { useTransferData } from '@/lib/useTransferData'
+import { ToolShell } from '@/components/ToolShell'
 
 type ModeType = 'encode' | 'decode'
 
@@ -127,27 +128,17 @@ export default function HTMLEntityPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
-      {/* Header */}
-      <header className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-amber-500 rounded-lg flex items-center justify-center">
-              <Code2 className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold font-display">HTML 实体编解码</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                HTML 特殊字符与实体互转
-              </p>
-            </div>
-          </div>
-        </div>
-      </header>
+    <ToolShell
+      title="HTML ENTITY"
+      description="HTML 特殊字符与实体互转"
+      path="/tools/html-entity"
+      icon={Code2}
+      accent="amber"
+    >
 
       <div className="container mx-auto px-4 py-8">
         {/* Mode Selector */}
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 mb-6">
+        <div className="panel p-6 mb-6">
           <div className="flex items-center justify-center gap-4">
             <div className="flex items-center gap-2">
               <button
@@ -155,7 +146,7 @@ export default function HTMLEntityPage() {
                 className={`px-6 py-3 text-sm font-medium rounded-lg transition-all ${
                   mode === 'encode'
                     ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white'
-                    : 'bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-800'
+                    : 'bg-gray-100 dark:bg-gray-900 border border-border-dim hover:bg-gray-200 dark:hover:bg-gray-800'
                 }`}
               >
                 编码
@@ -165,7 +156,7 @@ export default function HTMLEntityPage() {
                 className={`px-6 py-3 text-sm font-medium rounded-lg transition-all ${
                   mode === 'decode'
                     ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white'
-                    : 'bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-800'
+                    : 'bg-gray-100 dark:bg-gray-900 border border-border-dim hover:bg-gray-200 dark:hover:bg-gray-800'
                 }`}
               >
                 解码
@@ -174,7 +165,7 @@ export default function HTMLEntityPage() {
 
             <button
               onClick={swapMode}
-              className="p-3 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 transition-all"
+              className="p-3 bg-gray-100 dark:bg-gray-900 border border-border-dim rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 transition-all"
               title="互换模式"
             >
               <ArrowLeftRight className="h-5 w-5" />
@@ -182,7 +173,7 @@ export default function HTMLEntityPage() {
           </div>
 
           <div className="mt-4 text-center">
-            <p className="text-xs text-gray-600 dark:text-gray-400">
+            <p className="text-xs text-ink-secondary">
               {mode === 'encode' ? '将特殊字符转换为 HTML 实体' : '将 HTML 实体转换回原始字符'}
             </p>
           </div>
@@ -191,7 +182,7 @@ export default function HTMLEntityPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left Column - Input */}
           <div className="space-y-4">
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            <div className="panel p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-semibold">
                   {mode === 'encode' ? '原始文本' : 'HTML 实体'}
@@ -199,14 +190,14 @@ export default function HTMLEntityPage() {
                 <div className="flex gap-2">
                   <button
                     onClick={loadExample}
-                    className="px-3 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className="px-3 py-1 text-xs border border-border-dim rounded hover:bg-gray-100 dark:hover:bg-gray-800"
                   >
                     加载示例
                   </button>
                   {input && (
                     <button
                       onClick={clearAll}
-                      className="px-3 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-1"
+                      className="px-3 py-1 text-xs border border-border-dim rounded hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-1"
                     >
                       <Trash2 className="h-3 w-3" />
                       清空
@@ -219,7 +210,7 @@ export default function HTMLEntityPage() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={mode === 'encode' ? '输入包含特殊字符的文本...' : '输入 HTML 实体...'}
-                className="w-full h-80 p-4 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 resize-none focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full h-80 p-4 font-mono text-sm border border-border-dim rounded-lg bg-void-200 resize-none focus:outline-none focus:ring-2 focus:ring-orange-500"
                 spellCheck={false}
               />
             </div>
@@ -227,7 +218,7 @@ export default function HTMLEntityPage() {
 
           {/* Right Column - Output */}
           <div className="space-y-4">
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            <div className="panel p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-semibold">
                   {mode === 'encode' ? 'HTML 实体' : '解码结果'}
@@ -247,12 +238,12 @@ export default function HTMLEntityPage() {
                 value={output}
                 readOnly
                 placeholder={mode === 'encode' ? 'HTML 实体将显示在这里...' : '解码结果将显示在这里...'}
-                className="w-full h-80 p-4 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 resize-none focus:outline-none"
+                className="w-full h-80 p-4 font-mono text-sm border border-border-dim rounded-lg bg-void-200 resize-none focus:outline-none"
               />
 
               {/* Character count */}
               {output && (
-                <div className="mt-3 text-xs text-gray-500">
+                <div className="mt-3 text-xs text-ink-muted">
                   {output.length} 个字符
                 </div>
               )}
@@ -261,7 +252,7 @@ export default function HTMLEntityPage() {
         </div>
 
         {/* Common Entities Reference */}
-        <div className="mt-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+        <div className="mt-6 panel p-6">
           <h3 className="text-sm font-semibold mb-4">常用 HTML 实体</h3>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -271,15 +262,15 @@ export default function HTMLEntityPage() {
                 onClick={() => {
                   setInput(mode === 'encode' ? entity.char : entity.entity)
                 }}
-                className="p-3 bg-gray-50 dark:bg-gray-900 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left"
+                className="p-3 bg-void-200 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left"
               >
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-lg text-orange-600 dark:text-orange-400">{entity.char}</span>
                 </div>
-                <div className="font-mono text-xs text-gray-600 dark:text-gray-400 mb-1">
+                <div className="font-mono text-xs text-ink-secondary mb-1">
                   {entity.entity}
                 </div>
-                <div className="text-xs text-gray-500 dark:text-gray-500">
+                <div className="text-xs text-ink-muted">
                   {entity.name}
                 </div>
               </button>
@@ -299,14 +290,6 @@ export default function HTMLEntityPage() {
         </div>
       </div>
 
-      {/* Footer Info */}
-      <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-3">
-          <div className="text-sm text-gray-600 dark:text-gray-400">
-            💡 实时编解码 • 常用实体参考 • 一键模式互换
-          </div>
-        </div>
-      </div>
-    </div>
+    </ToolShell>
   )
 }

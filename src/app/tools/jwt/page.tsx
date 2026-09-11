@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Shield, Copy, Trash2, Eye, EyeOff } from 'lucide-react'
 import { jwtDecode } from 'jwt-decode'
 import { useTransferData } from '@/lib/useTransferData'
+import { ToolShell } from '@/components/ToolShell'
 
 interface JWTPayload {
   [key: string]: any
@@ -122,36 +123,26 @@ export default function JWTDecoderPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
-      {/* Header */}
-      <header className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center">
-              <Shield className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold font-display">JWT 解码器</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                解码和验证 JSON Web Token
-              </p>
-            </div>
-          </div>
-        </div>
-      </header>
+    <ToolShell
+      title="JWT DECODE"
+      description="解码和验证 JSON Web Token"
+      path="/tools/jwt"
+      icon={Shield}
+      accent="amber"
+    >
 
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left Column - Input */}
           <div className="space-y-4">
             {/* Input */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            <div className="panel p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-semibold">JWT Token</h3>
                 {input && (
                   <button
                     onClick={clearAll}
-                    className="px-3 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center gap-1"
+                    className="px-3 py-1 text-xs border border-border-dim rounded hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center gap-1"
                   >
                     <Trash2 className="h-3 w-3" />
                     清空
@@ -163,7 +154,7 @@ export default function JWTDecoderPage() {
                 value={input}
                 onChange={(e) => setInput(e.target.value.trim())}
                 placeholder="粘贴 JWT Token..."
-                className="w-full h-64 p-4 font-mono text-xs border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full h-64 p-4 font-mono text-xs border border-border-dim rounded-lg bg-void-200 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 spellCheck={false}
               />
 
@@ -176,15 +167,15 @@ export default function JWTDecoderPage() {
             </div>
 
             {/* Example Token */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            <div className="panel p-6">
               <h3 className="text-sm font-semibold mb-4">示例 Token</h3>
               <button
                 onClick={() => {
                   setInput('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c')
                 }}
-                className="w-full p-3 bg-gray-50 dark:bg-gray-900 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left"
+                className="w-full p-3 bg-void-200 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left"
               >
-                <div className="font-mono text-xs text-gray-600 dark:text-gray-400 break-all">
+                <div className="font-mono text-xs text-ink-secondary break-all">
                   加载示例 JWT Token
                 </div>
               </button>
@@ -221,7 +212,7 @@ export default function JWTDecoderPage() {
                         </div>
                       )}
                       {decoded.isValid && decoded.payload.exp && (
-                        <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                        <div className="text-xs text-ink-secondary mt-1">
                           剩余时间: {getTimeRemaining()}
                         </div>
                       )}
@@ -230,7 +221,7 @@ export default function JWTDecoderPage() {
                 </div>
 
                 {/* Header */}
-                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+                <div className="panel overflow-hidden">
                   <button
                     onClick={() => setShowHeader(!showHeader)}
                     className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -246,7 +237,7 @@ export default function JWTDecoderPage() {
                       </pre>
                       <button
                         onClick={() => copyToClipboard(prettyJSON(decoded.header))}
-                        className="mt-2 w-full px-3 py-2 text-xs border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center gap-2"
+                        className="mt-2 w-full px-3 py-2 text-xs border border-border-dim rounded hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center gap-2"
                       >
                         <Copy className="h-3 w-3" />
                         复制 Header
@@ -256,7 +247,7 @@ export default function JWTDecoderPage() {
                 </div>
 
                 {/* Payload */}
-                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+                <div className="panel overflow-hidden">
                   <button
                     onClick={() => setShowPayload(!showPayload)}
                     className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -270,7 +261,7 @@ export default function JWTDecoderPage() {
                       {/* Standard Claims */}
                       {decoded.isValid && (
                         <div className="space-y-2">
-                          <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                          <h4 className="text-xs font-semibold text-ink-secondary">
                             标准声明
                           </h4>
 
@@ -286,9 +277,9 @@ export default function JWTDecoderPage() {
                             value && (
                               <div
                                 key={key}
-                                className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-900 rounded text-xs"
+                                className="flex items-center justify-between p-2 bg-void-200 rounded text-xs"
                               >
-                                <span className="text-gray-600 dark:text-gray-400">{key}</span>
+                                <span className="text-ink-secondary">{key}</span>
                                 <span className="font-mono text-gray-900 dark:text-gray-100">
                                   {typeof value === 'number'
                                     ? (key.includes('Time') || key.includes('exp') || key.includes('nbf') || key.includes('iat'))
@@ -304,7 +295,7 @@ export default function JWTDecoderPage() {
 
                       {/* Custom Claims */}
                       <div>
-                        <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        <h4 className="text-xs font-semibold text-ink-secondary mb-2">
                           完整数据
                         </h4>
                         <pre className="bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto text-xs">
@@ -312,7 +303,7 @@ export default function JWTDecoderPage() {
                         </pre>
                         <button
                           onClick={() => copyToClipboard(prettyJSON(decoded.payload))}
-                          className="mt-2 w-full px-3 py-2 text-xs border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center gap-2"
+                          className="mt-2 w-full px-3 py-2 text-xs border border-border-dim rounded hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center gap-2"
                         >
                           <Copy className="h-3 w-3" />
                           复制 Payload
@@ -323,14 +314,14 @@ export default function JWTDecoderPage() {
                 </div>
 
                 {/* Signature */}
-                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+                <div className="panel p-6">
                   <h3 className="text-sm font-semibold mb-3">Signature (签名)</h3>
                   <div className="bg-gray-900 p-4 rounded-lg">
                     <p className="font-mono text-xs text-yellow-400 break-all">
                       {decoded.signature}
                     </p>
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  <p className="text-xs text-ink-muted dark:text-gray-400 mt-2">
                     签名用于验证 token 在传输过程中未被篡改
                   </p>
                 </div>
@@ -338,7 +329,7 @@ export default function JWTDecoderPage() {
             )}
 
             {!decoded && (
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-12 text-center">
+              <div className="panel p-12 text-center">
                 <Shield className="h-16 w-16 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
                 <p className="text-gray-400 dark:text-gray-600">输入 JWT Token 开始解码</p>
               </div>
@@ -347,14 +338,6 @@ export default function JWTDecoderPage() {
         </div>
       </div>
 
-      {/* Footer Info */}
-      <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-3">
-          <div className="text-sm text-gray-600 dark:text-gray-400">
-            💡 解码 Header 和 Payload • 验证过期时间 • 查看标准声明
-          </div>
-        </div>
-      </div>
-    </div>
+    </ToolShell>
   )
 }

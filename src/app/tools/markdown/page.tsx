@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { FileText, Copy, Trash2, Upload, ArrowLeft, Eye, ChevronUp, Download } from 'lucide-react'
 import { marked } from 'marked'
 import { useTransferStore } from '@/stores/transferStore'
+import { ToolShell } from '@/components/ToolShell'
 
 // 配置marked选项
 marked.setOptions({
@@ -288,28 +289,19 @@ function hello() {
 
   return (
     <div
-      className="min-h-screen bg-white dark:bg-gray-900"
+      className="min-h-screen bg-void"
       onDragEnter={handleDrag}
       onDragLeave={handleDrag}
       onDragOver={handleDrag}
       onDrop={handleDrop}
     >
-      {/* Header */}
-      <header className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-rose-500 rounded-lg flex items-center justify-center">
-              <FileText className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold font-display">Markdown 编辑器</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                实时预览，支持 GFM 语法
-              </p>
-            </div>
-          </div>
-        </div>
-      </header>
+      <ToolShell
+        title="MARKDOWN"
+        description="实时预览，支持 GFM 语法"
+        path="/tools/markdown"
+        icon={FileText}
+        accent="magenta"
+      >
 
       {/* Toolbar */}
       <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
@@ -452,7 +444,7 @@ function hello() {
                   实时预览
                 </h3>
               </div>
-              <div className="flex-1 min-h-[600px] p-6 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 overflow-auto">
+              <div className="flex-1 min-h-[600px] p-6 border border-border-dim rounded-lg bg-void-200 overflow-auto">
                 {/* Preview Content */}
                 <div
                   className="markdown-preview"
@@ -470,9 +462,9 @@ function hello() {
               </h3>
               <span className="text-sm text-gray-500">{markdown.length} 字符</span>
             </div>
-            <div className="min-h-[700px] p-8 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 overflow-auto shadow-lg">
+            <div className="min-h-[700px] p-8 border border-border-dim rounded-lg bg-void-200 overflow-auto shadow-panel">
               <div
-                className="markdown-preview prose dark:prose-invert max-w-none"
+                className="markdown-preview max-w-none"
                 dangerouslySetInnerHTML={{ __html: html }}
               />
             </div>
@@ -516,10 +508,10 @@ function hello() {
       </div>
 
       {/* Footer Info */}
-      <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-3">
-          <div className="text-sm text-gray-600 dark:text-gray-400">
-            💡 支持 GitHub Flavored Markdown • 自动保存到本地存储 • 实时预览
+      <div className="border-t border-border-dim bg-void-100">
+        <div className="w-full px-4 py-3 sm:px-6 lg:px-8">
+          <div className="font-mono text-[11px] text-ink-muted">
+            GFM · autosave to localStorage · live preview
           </div>
         </div>
       </div>
@@ -528,12 +520,13 @@ function hello() {
       {showBackToTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-8 right-8 w-12 h-12 bg-pink-500 hover:bg-pink-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 z-50"
+          className="fixed bottom-8 right-8 w-12 h-12 bg-neon-magenta hover:opacity-90 text-white rounded-full shadow-neon-magenta flex items-center justify-center transition-all hover:scale-110 z-50"
           aria-label="返回顶部"
         >
           <ChevronUp className="h-6 w-6" />
         </button>
       )}
+      </ToolShell>
     </div>
   )
 }

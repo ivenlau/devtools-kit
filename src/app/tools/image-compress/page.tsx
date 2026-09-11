@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Image as ImageIcon, Upload, Download, X } from 'lucide-react'
 import imageCompression from 'browser-image-compression'
 import { useTransferStore } from '@/stores/transferStore'
+import { ToolShell } from '@/components/ToolShell'
 
 export default function ImageCompressPage() {
   const [originalImage, setOriginalImage] = useState<string | null>(null)
@@ -136,35 +137,25 @@ export default function ImageCompressPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
-      {/* Header */}
-      <header className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-rose-500 rounded-lg flex items-center justify-center">
-              <ImageIcon className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold font-display">图片压缩</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                在线压缩图片，减小文件大小
-              </p>
-            </div>
-          </div>
-        </div>
-      </header>
+    <ToolShell
+      title="IMAGE COMPRESS"
+      description="在线压缩图片，减小文件大小"
+      path="/tools/image-compress"
+      icon={ImageIcon}
+      accent="purple"
+    >
 
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           {/* Upload Area */}
           {!originalImage && (
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-12">
+            <div className="panel p-12">
               <div className="flex flex-col items-center">
                 <div className="w-20 h-20 bg-pink-100 dark:bg-pink-900/30 rounded-full flex items-center justify-center mb-4">
                   <Upload className="h-10 w-10 text-pink-500" />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">上传图片</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                <p className="text-sm text-ink-secondary mb-6">
                   支持 JPG、PNG、WebP 等格式
                 </p>
                 <input
@@ -189,13 +180,13 @@ export default function ImageCompressPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Left Column - Settings */}
               <div className="space-y-4">
-                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+                <div className="panel p-6">
                   <h3 className="text-sm font-semibold mb-4">压缩设置</h3>
 
                   <div className="space-y-6">
                     {/* Quality */}
                     <div>
-                      <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">
+                      <label className="block text-sm text-ink-secondary mb-2">
                         压缩质量: {(quality * 100).toFixed(0)}%
                       </label>
                       <input
@@ -211,7 +202,7 @@ export default function ImageCompressPage() {
 
                     {/* Max Width */}
                     <div>
-                      <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">
+                      <label className="block text-sm text-ink-secondary mb-2">
                         最大宽度: {maxWidth}px
                       </label>
                       <input
@@ -237,7 +228,7 @@ export default function ImageCompressPage() {
                     {/* Clear Button */}
                     <button
                       onClick={clearAll}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
+                      className="w-full px-4 py-3 border border-border-dim rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
                     >
                       <X className="h-4 w-4" />
                       清空
@@ -247,19 +238,19 @@ export default function ImageCompressPage() {
 
                 {/* Stats */}
                 {compressedSize > 0 && (
-                  <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+                  <div className="panel p-6">
                     <h3 className="text-sm font-semibold mb-4">压缩统计</h3>
 
                     <div className="space-y-4">
-                      <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                        <span className="text-sm text-gray-600 dark:text-gray-400">原始大小</span>
+                      <div className="flex items-center justify-between p-3 bg-void-200 rounded-lg">
+                        <span className="text-sm text-ink-secondary">原始大小</span>
                         <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                           {formatSize(originalSize)}
                         </span>
                       </div>
 
-                      <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                        <span className="text-sm text-gray-600 dark:text-gray-400">压缩后</span>
+                      <div className="flex items-center justify-between p-3 bg-void-200 rounded-lg">
+                        <span className="text-sm text-ink-secondary">压缩后</span>
                         <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                           {formatSize(compressedSize)}
                         </span>
@@ -279,9 +270,9 @@ export default function ImageCompressPage() {
               {/* Right Column - Preview */}
               <div className="lg:col-span-2 space-y-4">
                 {/* Original Image */}
-                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+                <div className="panel p-6">
                   <h3 className="text-sm font-semibold mb-4">原始图片</h3>
-                  <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 flex items-center justify-center min-h-[300px]">
+                  <div className="bg-void-200 rounded-lg p-4 flex items-center justify-center min-h-[300px]">
                     <img
                       src={originalImage}
                       alt="Original"
@@ -292,7 +283,7 @@ export default function ImageCompressPage() {
 
                 {/* Compressed Image */}
                 {compressedImage && (
-                  <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+                  <div className="panel p-6">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-sm font-semibold">压缩后图片</h3>
                       <button
@@ -303,7 +294,7 @@ export default function ImageCompressPage() {
                         下载
                       </button>
                     </div>
-                    <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 flex items-center justify-center min-h-[300px]">
+                    <div className="bg-void-200 rounded-lg p-4 flex items-center justify-center min-h-[300px]">
                       <img
                         src={compressedImage}
                         alt="Compressed"
@@ -314,16 +305,16 @@ export default function ImageCompressPage() {
                 )}
 
                 {!compressedImage && !compressing && (
-                  <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-12 text-center">
+                  <div className="panel p-12 text-center">
                     <div className="inline-block w-16 h-16 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-                    <p className="text-gray-600 dark:text-gray-400">准备压缩...</p>
+                    <p className="text-ink-secondary">准备压缩...</p>
                   </div>
                 )}
 
                 {compressing && (
-                  <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-12 text-center">
+                  <div className="panel p-12 text-center">
                     <div className="inline-block w-16 h-16 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-                    <p className="text-gray-600 dark:text-gray-400">压缩中，请稍候...</p>
+                    <p className="text-ink-secondary">压缩中，请稍候...</p>
                   </div>
                 )}
               </div>
@@ -343,14 +334,6 @@ export default function ImageCompressPage() {
         </div>
       </div>
 
-      {/* Footer Info */}
-      <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-3">
-          <div className="text-sm text-gray-600 dark:text-gray-400">
-            💡 本地压缩 • 隐私安全 • 自动调整尺寸
-          </div>
-        </div>
-      </div>
-    </div>
+    </ToolShell>
   )
 }

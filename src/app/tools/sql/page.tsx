@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Database, Copy, Trash2, CheckCircle } from 'lucide-react'
 import { format } from 'sql-formatter'
 import { useTransferData } from '@/lib/useTransferData'
+import { ToolShell } from '@/components/ToolShell'
 
 export default function SQLFormatterPage() {
   const [input, setInput] = useState('')
@@ -85,31 +86,21 @@ export default function SQLFormatterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
-      {/* Header */}
-      <header className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center">
-              <Database className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold font-display">SQL 格式化</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                美化和格式化 SQL 语句
-              </p>
-            </div>
-          </div>
-        </div>
-      </header>
+    <ToolShell
+      title="SQL FORMAT"
+      description="美化和格式化 SQL 语句"
+      path="/tools/sql"
+      icon={Database}
+      accent="cyan"
+    >
 
       <div className="container mx-auto px-4 py-8">
         {/* Options */}
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 mb-6">
+        <div className="panel p-6 mb-6">
           <div className="flex flex-wrap items-center gap-6">
             {/* Language */}
             <div>
-              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+              <label className="block text-xs text-ink-secondary mb-2">
                 SQL 方言
               </label>
               <div className="flex gap-2">
@@ -120,7 +111,7 @@ export default function SQLFormatterPage() {
                     className={`px-3 py-2 text-xs font-medium rounded-lg transition-all ${
                       language === lang.value
                         ? 'bg-emerald-500 text-white'
-                        : 'bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-800'
+                        : 'bg-gray-100 dark:bg-gray-900 border border-border-dim hover:bg-gray-200 dark:hover:bg-gray-800'
                     }`}
                   >
                     {lang.label}
@@ -131,7 +122,7 @@ export default function SQLFormatterPage() {
 
             {/* Indent */}
             <div>
-              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-2">
+              <label className="block text-xs text-ink-secondary mb-2">
                 缩进
               </label>
               <div className="flex gap-2">
@@ -142,7 +133,7 @@ export default function SQLFormatterPage() {
                     className={`px-3 py-2 text-xs font-medium rounded-lg transition-all ${
                       indent === indentOption
                         ? 'bg-emerald-500 text-white'
-                        : 'bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-800'
+                        : 'bg-gray-100 dark:bg-gray-900 border border-border-dim hover:bg-gray-200 dark:hover:bg-gray-800'
                     }`}
                   >
                     {indentOption === '\t' ? 'Tab' : indentOption === '  ' ? '2空格' : '4空格'}
@@ -160,7 +151,7 @@ export default function SQLFormatterPage() {
                 onChange={(e) => setUppercase(e.target.checked)}
                 className="rounded"
               />
-              <label htmlFor="uppercase" className="text-xs text-gray-600 dark:text-gray-400">
+              <label htmlFor="uppercase" className="text-xs text-ink-secondary">
                 关键字大写
               </label>
             </div>
@@ -170,20 +161,20 @@ export default function SQLFormatterPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left Column - Input */}
           <div className="space-y-4">
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            <div className="panel p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-semibold">原始 SQL</h3>
                 <div className="flex gap-2">
                   <button
                     onClick={loadExample}
-                    className="px-3 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className="px-3 py-1 text-xs border border-border-dim rounded hover:bg-gray-100 dark:hover:bg-gray-800"
                   >
                     加载示例
                   </button>
                   {input && (
                     <button
                       onClick={clearAll}
-                      className="px-3 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-1"
+                      className="px-3 py-1 text-xs border border-border-dim rounded hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-1"
                     >
                       <Trash2 className="h-3 w-3" />
                       清空
@@ -196,7 +187,7 @@ export default function SQLFormatterPage() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="粘贴 SQL 语句..."
-                className="w-full h-96 p-4 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full h-96 p-4 font-mono text-sm border border-border-dim rounded-lg bg-void-200 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 spellCheck={false}
               />
             </div>
@@ -204,7 +195,7 @@ export default function SQLFormatterPage() {
 
           {/* Right Column - Output */}
           <div className="space-y-4">
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+            <div className="panel p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-semibold flex items-center gap-2">
                   <CheckCircle className="h-4 w-4 text-emerald-500" />
@@ -225,14 +216,14 @@ export default function SQLFormatterPage() {
                 value={output}
                 readOnly
                 placeholder="格式化后的 SQL 将显示在这里..."
-                className="w-full h-96 p-4 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 resize-none focus:outline-none"
+                className="w-full h-96 p-4 font-mono text-sm border border-border-dim rounded-lg bg-void-200 resize-none focus:outline-none"
               />
             </div>
           </div>
         </div>
 
         {/* Examples */}
-        <div className="mt-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+        <div className="mt-6 panel p-6">
           <h3 className="text-sm font-semibold mb-4">常用示例</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -240,9 +231,9 @@ export default function SQLFormatterPage() {
               onClick={() => {
                 setInput(`SELECT id, name, email FROM users WHERE status = 'active' ORDER BY created_at DESC`)
               }}
-              className="text-left p-3 bg-gray-50 dark:bg-gray-900 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="text-left p-3 bg-void-200 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
-              <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">简单查询</div>
+              <div className="text-xs text-ink-secondary mb-1">简单查询</div>
               <div className="font-mono text-xs text-gray-900 dark:text-gray-100 truncate">SELECT ... FROM users</div>
             </button>
 
@@ -250,9 +241,9 @@ export default function SQLFormatterPage() {
               onClick={() => {
                 setInput(`INSERT INTO users (name, email, created_at) VALUES ('John', 'john@example.com', NOW()), ('Jane', 'jane@example.com', NOW())`)
               }}
-              className="text-left p-3 bg-gray-50 dark:bg-gray-900 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="text-left p-3 bg-void-200 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
-              <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">批量插入</div>
+              <div className="text-xs text-ink-secondary mb-1">批量插入</div>
               <div className="font-mono text-xs text-gray-900 dark:text-gray-100 truncate">INSERT INTO ... VALUES</div>
             </button>
 
@@ -260,9 +251,9 @@ export default function SQLFormatterPage() {
               onClick={() => {
                 setInput(`UPDATE users SET email = 'newemail@example.com', updated_at = NOW() WHERE id = 1`)
               }}
-              className="text-left p-3 bg-gray-50 dark:bg-gray-900 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="text-left p-3 bg-void-200 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
-              <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">更新语句</div>
+              <div className="text-xs text-ink-secondary mb-1">更新语句</div>
               <div className="font-mono text-xs text-gray-900 dark:text-gray-100 truncate">UPDATE users SET ...</div>
             </button>
 
@@ -270,9 +261,9 @@ export default function SQLFormatterPage() {
               onClick={() => {
                 setInput(`DELETE FROM sessions WHERE expires_at < NOW()`)
               }}
-              className="text-left p-3 bg-gray-50 dark:bg-gray-900 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="text-left p-3 bg-void-200 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
-              <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">删除语句</div>
+              <div className="text-xs text-ink-secondary mb-1">删除语句</div>
               <div className="font-mono text-xs text-gray-900 dark:text-gray-100 truncate">DELETE FROM sessions</div>
             </button>
           </div>
@@ -291,14 +282,6 @@ export default function SQLFormatterPage() {
         </div>
       </div>
 
-      {/* Footer Info */}
-      <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-3">
-          <div className="text-sm text-gray-600 dark:text-gray-400">
-            💡 支持多种 SQL 方言 • 自定义格式化选项 • 实时预览
-          </div>
-        </div>
-      </div>
-    </div>
+    </ToolShell>
   )
 }
