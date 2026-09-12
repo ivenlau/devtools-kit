@@ -12,10 +12,13 @@ import type { LucideIcon } from 'lucide-react'
 import { useTransferStore } from '@/stores/transferStore'
 import { detectByFile, detectByContent, DetectedTool } from '@/lib/detectTool'
 import { tools as allTools } from '@/lib/constants/tools'
+import { accentsFor } from '@/lib/constants/accents'
 import { DropZone } from '@/components/DropZone'
 import { PasteHint } from '@/components/PasteHint'
 import { MouseGlow } from '@/components/MouseGlow'
 import { ToolOrbit } from '@/components/ToolOrbit'
+import { useTheme } from '@/components/ThemeProvider'
+import { useI18n } from '@/components/I18nProvider'
 
 const iconMap: Record<string, LucideIcon> = {
   Braces,
@@ -40,36 +43,107 @@ const iconMap: Record<string, LucideIcon> = {
   Monitor,
 }
 
-const accents = [
-  '#00E5FF',
-  '#B8FF3C',
-  '#A855F7',
-  '#FFB020',
-  '#FF2D95',
-  '#FF79C6',
-]
-
 function pathToTag(path: string): string {
   if (path === '/tools/regex' || path === '/tools/json') return 'HOT'
   if (path === '/tools/jwt' || path === '/tools/cron') return 'NEW'
   return 'P0'
 }
 
-function toOrbitTool(t: (typeof allTools)[number], i: number) {
-  const Icon = iconMap[t.icon] ?? Hash
+const TITLE_TEXT = 'DEVTOOLSKIT'
+const TYPE_INTERVAL_MS = 85
+const PROMPT_DELAY_MS = 150
+const HOLD_MS = 2600
+const RESTART_DELAY_MS = 400
+
+/** Hero title with a looping typewriter effect: type DEVTOOLSKIT, pop in
+ *  >_ with a blinking underscore, hold, then clear and start over. */
+function TypingTitle() {
+  const [typedCount, setTypedCount] = useState(0)
+  const [showPrompt, setShowPrompt] = useState(false)
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setTypedCount(TITLE_TEXT.length)
+      setShowPrompt(true)
+      return
+    }
+
+    let cancelled = false
+    const timers: number[] = []
+    const schedule = (fn: () => void, ms: number) => {
+      timers.push(window.setTimeout(() => !cancelled && fn(), ms))
+    }
+    const run = () => {
+      for (let i = 1; i <= TITLE_TEXT.length; i++) {
+        schedule(() => setTypedCount(i), i * TYPE_INTERVAL_MS)
+      }
+      const typedAt = TITLE_TEXT.length * TYPE_INTERVAL_MS
+      schedule(() => setShowPrompt(true), typedAt + PROMPT_DELAY_MS)
+      schedule(() => {
+        setShowPrompt(false)
+        setTypedCount(0)
+        schedule(run, RESTART_DELAY_MS)
+      }, typedAt + PROMPT_DELAY_MS + HOLD_MS)
+    }
+    run()
+
+    return () => {
+      cancelled = true
+      timers.forEach((id) => window.clearTimeout(id))
+    }
+  }, [])
+
+  const typed = TITLE_TEXT.slice(0, typedCount)
+
+  return (
+    <h1
+      className="relative font-display text-4xl font-bold leading-none tracking-tight sm:text-5xl md:text-6xl"
+      aria-label="DEVTOOLS KIT"
+    >
+      {/* Invisible full title reserves the box so the clear phase doesn't
+          collapse the height (which would bounce the 3D orbit below) */}
+      <span aria-hidden className="invisible">
+        <span className="text-ink-primary">DEVTOOLS</span>
+        <span className="gradient-kit ml-3">KIT</span>
+        <span className="ml-1 font-mono text-neon-cyan">&gt;_</span>
+      </span>
+      {/* Typed overlay — fixed to the reserved box's left edge so letters
+          type in place instead of re-centering on every keystroke */}
+      <span aria-hidden className="absolute inset-0 text-left">
+        <span className="text-ink-primary">{typed.slice(0, 8)}</span>
+        <span className={`gradient-kit ${typedCount > 8 ? 'ml-3' : ''}`}>{typed.slice(8)}</span>
+        <span
+          className={`ml-1 font-mono text-neon-cyan ${showPrompt ? '' : 'hidden'}`}
+        >
+          &gt;<span className="animate-blink">_</span>
+        </span>
+      </span>
+    </h1>
+  )
+}
+
+function toOrbitTool(
+  tool: (typeof allTools)[number],
+  i: number,
+  accents: string[],
+  lang: string
+) {
+  const Icon = iconMap[tool.icon] ?? Hash
   return {
-    href: t.path,
-    name: t.name,
-    desc: t.description,
+    href: tool.path,
+    name: lang === 'en' ? tool.nameEn : tool.name,
+    desc: lang === 'en' ? tool.descriptionEn : tool.description,
     icon: Icon,
     accent: accents[i % accents.length],
-    tag: pathToTag(t.path),
-    path: t.path,
+    tag: pathToTag(tool.path),
+    path: tool.path,
   }
 }
 
 export default function HomePage() {
   const router = useRouter()
+  const { theme } = useTheme()
+  const { t, lang } = useI18n()
   const setPendingData = useTransferStore((s) => s.setPendingData)
   const [pasteCandidates, setPasteCandidates] = useState<DetectedTool[] | null>(null)
   const [pendingContent, setPendingContent] = useState<string>('')
@@ -142,7 +216,10 @@ export default function HomePage() {
     return () => document.removeEventListener('paste', handlePaste)
   }, [handlePaste])
 
-  const orbitTools = useMemo(() => allTools.map(toOrbitTool), [])
+  const orbitTools = useMemo(
+    () => allTools.map((tool, i) => toOrbitTool(tool, i, accentsFor(theme), lang)),
+    [theme, lang]
+  )
 
   const [query, setQuery] = useState('')
   const [focusIndex, setFocusIndex] = useState<number | null>(null)
@@ -242,11 +319,7 @@ export default function HomePage() {
             // TOOLKIT FOR DEVELOPERS
           </p>
 
-          <h1 className="font-display text-4xl font-bold leading-none tracking-tight sm:text-5xl md:text-6xl">
-            <span className="text-ink-primary">DEVTOOLS</span>
-            <span className="gradient-kit ml-3">KIT</span>
-            <span className="ml-1 font-mono text-neon-cyan animate-blink">&gt;_</span>
-          </h1>
+          <TypingTitle />
         </div>
 
         {/* Orbit — explicit band height so measurement always works */}
@@ -277,8 +350,8 @@ export default function HomePage() {
               onChange={onQueryChange}
               onBlur={onQueryBlur}
               onKeyDown={onQueryKeyDown}
-              placeholder="输入工具名、粘贴内容或拖入文件…"
-              aria-label="搜索工具"
+              placeholder={t('输入工具名、粘贴内容或拖入文件…')}
+              aria-label={t('搜索工具')}
               className="flex-1 bg-transparent font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:outline-none"
             />
             {focusIndex !== null && orbitTools[focusIndex] ? (
@@ -314,8 +387,8 @@ export default function HomePage() {
       <footer className="w-full shrink-0 border-t border-border-dim bg-void-100">
         <div className="hero-footer flex w-full items-center gap-2.5 px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
           <span className="status-dot" />
-          <span className="font-mono text-[11px] text-ink-muted">
-            © 2025 DevToolsKit · MIT · ivenlau@qq.com
+          <span className="font-mono text-xs font-medium text-ink-secondary">
+            © 2025 DevToolsKit · MIT
           </span>
         </div>
       </footer>

@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { FileCode, Copy, Trash2 } from 'lucide-react'
+import { FileCode, Copy, Trash2, ArrowRight, ArrowLeft } from 'lucide-react'
 import { useTransferData } from '@/lib/useTransferData'
 import { ToolShell } from '@/components/ToolShell'
+import { useI18n } from '@/components/I18nProvider'
 
 /**
  * Base64 编码
@@ -37,6 +38,7 @@ const base64Decode = (base64: string): string => {
 }
 
 export default function Base64ToolPage() {
+  const { t } = useI18n()
   const [mode, setMode] = useState<'encode' | 'decode'>('encode')
   const [input, setInput] = useState('')
   const [output, setOutput] = useState('')
@@ -59,7 +61,7 @@ export default function Base64ToolPage() {
       }
       setError(null)
     } catch (err: any) {
-      setError(err.message || '转换失败')
+      setError(err.message === '无效的Base64字符串' ? t('无效的Base64字符串') : err.message || t('转换失败'))
       setOutput('')
     }
   }, [input, mode])
@@ -77,7 +79,7 @@ export default function Base64ToolPage() {
   return (
     <ToolShell
       title="BASE64"
-      description="Base64 编码与解码，支持 UTF-8 文本"
+      description={t('Base64 编码与解码，支持 UTF-8 文本')}
       path="/tools/base64"
       icon={FileCode}
       accent="lime"
@@ -85,23 +87,27 @@ export default function Base64ToolPage() {
         <>
           <button
             onClick={() => setMode('encode')}
-            className={`tool-btn ${mode === 'encode' ? 'tool-btn-accent' : ''}`}
+            aria-pressed={mode === 'encode'}
+            title={t('编码')}
+            aria-label={t('编码')}
+            className={`tool-btn tool-btn-icon ${mode === 'encode' ? 'tool-btn-accent' : ''}`}
           >
-            编码
+            <ArrowRight className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={() => setMode('decode')}
-            className={`tool-btn ${mode === 'decode' ? 'tool-btn-accent' : ''}`}
+            aria-pressed={mode === 'decode'}
+            title={t('解码')}
+            aria-label={t('解码')}
+            className={`tool-btn tool-btn-icon ${mode === 'decode' ? 'tool-btn-accent' : ''}`}
           >
-            解码
+            <ArrowLeft className="h-3.5 w-3.5" />
           </button>
-          <button onClick={handleCopy} disabled={!output} className="tool-btn">
+          <button onClick={handleCopy} disabled={!output} className="tool-btn tool-btn-icon" title={t('复制')} aria-label={t('复制')}>
             <Copy className="h-3.5 w-3.5" />
-            复制
           </button>
-          <button onClick={handleClear} className="tool-btn tool-btn-danger">
+          <button onClick={handleClear} className="tool-btn tool-btn-icon tool-btn-danger" title={t('清空')} aria-label={t('清空')}>
             <Trash2 className="h-3.5 w-3.5" />
-            清空
           </button>
         </>
       }
@@ -119,13 +125,13 @@ export default function Base64ToolPage() {
                   ERR · {error}
                 </span>
               ) : (
-                <span className="ml-auto normal-case tracking-normal">{input.length} 字符</span>
+                <span className="ml-auto normal-case tracking-normal">{input.length} {t('字符')}</span>
               )}
             </div>
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={mode === 'encode' ? '输入要编码的文本...' : '输入要解码的 Base64...'}
+              placeholder={mode === 'encode' ? t('输入要编码的文本...') : t('输入要解码的 Base64...')}
               className="min-h-0 flex-1 resize-none bg-void-100 p-4 font-mono text-sm text-ink-primary caret-neon-lime placeholder:text-ink-muted focus:outline-none"
               spellCheck={false}
             />
@@ -149,7 +155,7 @@ export default function Base64ToolPage() {
             <textarea
               value={output}
               readOnly
-              placeholder="转换结果将显示在这里..."
+              placeholder={t('转换结果将显示在这里...')}
               className="min-h-0 flex-1 resize-none bg-void-100 p-4 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:outline-none"
               spellCheck={false}
             />

@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { FileText, Copy, Trash2, Upload, ArrowLeft, Eye, ChevronUp, Download } from 'lucide-react'
+import { FileText, Copy, Trash2, Upload, ArrowLeft, Eye, ChevronUp, Download, Check } from 'lucide-react'
 import { marked } from 'marked'
 import { useTransferStore } from '@/stores/transferStore'
 import { ToolShell } from '@/components/ToolShell'
+import { useI18n } from '@/components/I18nProvider'
 
 // 配置marked选项
 marked.setOptions({
@@ -12,8 +13,7 @@ marked.setOptions({
   gfm: true,
 })
 
-export default function MarkdownEditorPage() {
-  const [markdown, setMarkdown] = useState(`# 欢迎使用 Markdown 编辑器
+const ZH_SAMPLE = `# 欢迎使用 Markdown 编辑器
 
 这是一个**实时预览**的Markdown编辑器。
 
@@ -61,7 +61,61 @@ function hello() {
 ---
 
 开始编辑吧！✨
-`)
+`
+
+const EN_SAMPLE = `# Welcome to the Markdown Editor
+
+This is a Markdown editor with **live preview**.
+
+## Features
+
+- Live preview
+- GitHub Flavored Markdown (GFM)
+- Code highlighting
+- Autosave to localStorage
+- Drag & drop local files
+
+## Code Example
+
+\`\`\`javascript
+function hello() {
+  console.log('Hello, World!');
+}
+\`\`\`
+
+## Lists
+
+1. First item
+2. Second item
+3. Third item
+
+- Unordered item
+- Another item
+
+## Quote
+
+> A quoted block
+> can span multiple lines
+
+## Link
+
+[Visit GitHub](https://github.com)
+
+## Table
+
+| C1 | C2 | C3 |
+|----|----|----|
+| A  | B  | C  |
+| D  | E  | F  |
+
+---
+
+Start editing! ✨
+`
+
+export default function MarkdownEditorPage() {
+  const { t, lang } = useI18n()
+  const [markdown, setMarkdown] = useState(ZH_SAMPLE)
   const [html, setHtml] = useState('')
   const [copySuccess, setCopySuccess] = useState(false)
   const [dragActive, setDragActive] = useState(false)
@@ -69,6 +123,9 @@ function hello() {
   const [isPreviewMode, setIsPreviewMode] = useState(false)
   const [showBackToTop, setShowBackToTop] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  // In EN mode, present the English sample until the user edits the content
+  const displayMarkdown = lang === 'en' && markdown === ZH_SAMPLE ? EN_SAMPLE : markdown
 
   // 接收传输数据（优先于 localStorage）
   const transferredRef = useRef(false)
@@ -94,7 +151,7 @@ function hello() {
   // 实时转换Markdown到HTML
   useEffect(() => {
     const convert = async () => {
-      const convertedHtml = await marked(markdown)
+      const convertedHtml = await marked(displayMarkdown)
       setHtml(convertedHtml)
     }
     convert()
@@ -103,7 +160,7 @@ function hello() {
     if (!localFileName) {
       localStorage.setItem('markdown-editor-content', markdown)
     }
-  }, [markdown, localFileName])
+  }, [displayMarkdown, markdown, localFileName])
 
   // 清空内容
   const handleClear = () => {
@@ -152,7 +209,7 @@ function hello() {
       setLocalFileName(file.name)
       setIsPreviewMode(true)
     } else {
-      alert('请选择 Markdown 文件 (.md)')
+      alert(t('请选择 Markdown 文件 (.md)'))
     }
   }
 
@@ -281,7 +338,7 @@ function hello() {
       await html2pdf().set(opt).from(element).save()
     } catch (error) {
       console.error('PDF export failed:', error)
-      alert('PDF 导出失败，请重试')
+      alert(t('PDF 导出失败，请重试'))
     } finally {
       document.head.removeChild(style)
     }
@@ -297,24 +354,26 @@ function hello() {
     >
       <ToolShell
         title="MARKDOWN"
-        description="实时预览，支持 GFM 语法"
+        description={t('实时预览，支持 GFM 语法')}
         path="/tools/markdown"
         icon={FileText}
         accent="magenta"
         actions={
           !isPreviewMode ? (
             <>
-              <button onClick={handleCopyMarkdown} className="tool-btn">
+              <button onClick={handleCopyMarkdown} className="tool-btn tool-btn-icon" title={t('复制 MD')} aria-label={t('复制 MD')}>
                 <Copy className="h-3.5 w-3.5" />
-                复制 MD
               </button>
-              <button onClick={handleCopyHtml} className="tool-btn">
-                <Copy className="h-3.5 w-3.5" />
-                {copySuccess ? '✓ HTML' : '复制 HTML'}
+              <button
+                onClick={handleCopyHtml}
+                className={`tool-btn tool-btn-icon ${copySuccess ? 'tool-btn-accent' : ''}`}
+                title={t('复制 HTML')}
+                aria-label={t('复制 HTML')}
+              >
+                {copySuccess ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
               </button>
-              <button onClick={() => inputRef.current?.click()} className="tool-btn">
+              <button onClick={() => inputRef.current?.click()} className="tool-btn tool-btn-icon" title={t('打开')} aria-label={t('打开')}>
                 <Upload className="h-3.5 w-3.5" />
-                打开
               </button>
               <input
                 ref={inputRef}
@@ -323,9 +382,8 @@ function hello() {
                 onChange={handleFileSelect}
                 className="hidden"
               />
-              <button onClick={handleClear} className="tool-btn tool-btn-danger">
+              <button onClick={handleClear} className="tool-btn tool-btn-icon tool-btn-danger" title={t('清空')} aria-label={t('清空')}>
                 <Trash2 className="h-3.5 w-3.5" />
-                清空
               </button>
               <button onClick={exportAsMarkdown} className="tool-btn">
                 <Download className="h-3.5 w-3.5" />
@@ -335,16 +393,14 @@ function hello() {
                 <Download className="h-3.5 w-3.5" />
                 PDF
               </button>
-              <button onClick={handleTogglePreview} className="tool-btn tool-btn-accent">
+              <button onClick={handleTogglePreview} className="tool-btn tool-btn-icon tool-btn-accent" title={t('预览')} aria-label={t('预览')}>
                 <Eye className="h-3.5 w-3.5" />
-                预览
               </button>
             </>
           ) : (
             <>
-              <button onClick={handleBackToEdit} className="tool-btn tool-btn-accent">
+              <button onClick={handleBackToEdit} className="tool-btn tool-btn-icon tool-btn-accent" title={t('编辑')} aria-label={t('编辑')}>
                 <ArrowLeft className="h-3.5 w-3.5" />
-                编辑
               </button>
               <button onClick={exportAsMarkdown} className="tool-btn">
                 <Download className="h-3.5 w-3.5" />
@@ -367,13 +423,13 @@ function hello() {
                   <span className="text-neon-magenta">&gt;_</span>
                   <span>INPUT.MD</span>
                   <span className="ml-auto normal-case tracking-normal">
-                    {markdown.length} 字符 · 支持拖放
+                    {displayMarkdown.length} {t('字符')} · {t('支持拖放')}
                   </span>
                 </div>
                 <textarea
-                  value={markdown}
+                  value={displayMarkdown}
                   onChange={(e) => setMarkdown(e.target.value)}
-                  placeholder="输入 Markdown 内容..."
+                  placeholder={t('输入 Markdown 内容...')}
                   spellCheck={false}
                   className="min-h-0 flex-1 resize-none bg-void-100 p-4 font-mono text-sm leading-relaxed text-ink-primary caret-neon-magenta placeholder:text-ink-muted focus:outline-none"
                 />
@@ -402,7 +458,7 @@ function hello() {
               <div className="tool-panel-head">
                 <span className="text-neon-magenta">&gt;_</span>
                 <span>{localFileName ? localFileName.toUpperCase() : 'PREVIEW'}</span>
-                <span className="ml-auto normal-case tracking-normal">{markdown.length} 字符</span>
+                <span className="ml-auto normal-case tracking-normal">{displayMarkdown.length} {t('字符')}</span>
               </div>
               <div className="min-h-0 flex-1 overflow-auto px-8 py-6">
                 <div
@@ -433,7 +489,7 @@ function hello() {
           <button
             onClick={scrollToTop}
             className="fixed bottom-8 right-8 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-neon-magenta bg-void-200 text-neon-magenta shadow-neon-magenta transition-all hover:scale-110 hover:bg-neon-magenta/10"
-            aria-label="返回顶部"
+            aria-label={t('返回顶部')}
           >
             <ChevronUp className="h-6 w-6" />
           </button>

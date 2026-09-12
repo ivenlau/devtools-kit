@@ -9,29 +9,31 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // Palette values live in CSS variables (globals.css) so the whole
+        // theme can flip between dark and light via the `light` class.
         void: {
-          DEFAULT: '#05060A',
-          50: '#05060A',
-          100: '#0B0D14',
-          200: '#111522',
-          300: '#161B2E',
+          DEFAULT: 'rgb(var(--c-void) / <alpha-value>)',
+          50: 'rgb(var(--c-void) / <alpha-value>)',
+          100: 'rgb(var(--c-void-100) / <alpha-value>)',
+          200: 'rgb(var(--c-void-200) / <alpha-value>)',
+          300: 'rgb(var(--c-void-300) / <alpha-value>)',
         },
         neon: {
-          cyan: '#00E5FF',
-          magenta: '#FF2D95',
-          lime: '#B8FF3C',
-          purple: '#A855F7',
-          amber: '#FFB020',
-          red: '#FF4757',
+          cyan: 'rgb(var(--c-cyan) / <alpha-value>)',
+          magenta: 'rgb(var(--c-magenta) / <alpha-value>)',
+          lime: 'rgb(var(--c-lime) / <alpha-value>)',
+          purple: 'rgb(var(--c-purple) / <alpha-value>)',
+          amber: 'rgb(var(--c-amber) / <alpha-value>)',
+          red: 'rgb(var(--c-red) / <alpha-value>)',
         },
         border: {
-          dim: '#1A2035',
-          glow: '#2A3558',
+          dim: 'rgb(var(--c-border-dim) / <alpha-value>)',
+          glow: 'rgb(var(--c-border-glow) / <alpha-value>)',
         },
         ink: {
-          primary: '#E8ECF4',
-          secondary: '#8B96AD',
-          muted: '#4E5A73',
+          primary: 'rgb(var(--c-ink) / <alpha-value>)',
+          secondary: 'rgb(var(--c-ink-secondary) / <alpha-value>)',
+          muted: 'rgb(var(--c-ink-muted) / <alpha-value>)',
         },
         primary: {
           50: '#E8F4FF',
@@ -69,7 +71,7 @@ module.exports = {
         'neon-magenta': '0 0 20px rgba(255, 45, 149, 0.35)',
         'neon-lime': '0 0 20px rgba(184, 255, 60, 0.3)',
         'neon-purple': '0 0 20px rgba(168, 85, 247, 0.35)',
-        'panel': '0 8px 32px rgba(0, 0, 0, 0.45)',
+        'panel': 'var(--shadow-panel)',
       },
       keyframes: {
         'grid-pan': {

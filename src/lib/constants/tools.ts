@@ -1,7 +1,9 @@
 export interface ToolConfig {
   id: string
   name: string
+  nameEn: string
   description: string
+  descriptionEn: string
   category: string
   icon: string
   path: string
@@ -12,8 +14,10 @@ export interface ToolConfig {
 export const tools: ToolConfig[] = [
   {
     id: 'json-formatter',
+    nameEn: 'JSON Formatter',
     name: 'JSON 格式化',
     description: '格式化、压缩、验证 JSON 数据',
+    descriptionEn: 'Format, minify and validate JSON data',
     category: 'text',
     icon: 'Braces',
     path: '/tools/json',
@@ -22,8 +26,10 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'base64-encoder',
+    nameEn: 'Base64 Codec',
     name: 'Base64 编解码',
     description: 'Base64 编码与解码，支持文本和图片',
+    descriptionEn: 'Base64 encode/decode for text and images',
     category: 'encoder',
     icon: 'FileCode',
     path: '/tools/base64',
@@ -32,8 +38,10 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'timestamp-converter',
+    nameEn: 'Timestamp Converter',
     name: '时间戳转换',
     description: 'Unix 时间戳与日期时间互转',
+    descriptionEn: 'Convert Unix timestamps to dates and back',
     category: 'datetime',
     icon: 'Clock',
     path: '/tools/timestamp',
@@ -42,8 +50,10 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'regex-tester',
+    nameEn: 'Regex Tester',
     name: '正则表达式测试',
     description: '实时测试正则表达式，查看匹配结果',
+    descriptionEn: 'Test regular expressions live with match results',
     category: 'developer',
     icon: 'Regex',
     path: '/tools/regex',
@@ -52,8 +62,10 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'hash-generator',
+    nameEn: 'Hash & UUID',
     name: '哈希 & UUID 生成',
     description: 'MD5/SHA 哈希生成、UUID v4 生成',
+    descriptionEn: 'MD5/SHA hashing and UUID v4 generation',
     category: 'developer',
     icon: 'Hash',
     path: '/tools/uuid',
@@ -62,8 +74,10 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'url-encoder',
+    nameEn: 'URL Codec',
     name: 'URL 编解码',
     description: 'URL 编码、解码与解析',
+    descriptionEn: 'URL encode, decode and parse',
     category: 'encoder',
     icon: 'Link2',
     path: '/tools/url',
@@ -72,8 +86,10 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'markdown-editor',
+    nameEn: 'Markdown Editor',
     name: 'Markdown 编辑器',
     description: '实时预览 Markdown，支持 GFM 语法',
+    descriptionEn: 'Live Markdown preview with GFM support',
     category: 'text',
     icon: 'FileText',
     path: '/tools/markdown',
@@ -82,8 +98,10 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'color-converter',
+    nameEn: 'Color Converter',
     name: '颜色转换器',
     description: 'HEX、RGB、HSL、RGBA 颜色格式互转',
+    descriptionEn: 'HEX, RGB, HSL, RGBA color conversions',
     category: 'frontend',
     icon: 'Palette',
     path: '/tools/color',
@@ -92,8 +110,10 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'binary-converter',
+    nameEn: 'Radix Converter',
     name: '进制转换器',
     description: '二进制、十进制、十六进制互转',
+    descriptionEn: 'Binary, decimal and hexadecimal conversion',
     category: 'converter',
     icon: 'Hash',
     path: '/tools/binary',
@@ -102,8 +122,10 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'qrcode-generator',
+    nameEn: 'QR Code Generator',
     name: '二维码生成器',
     description: '生成自定义二维码，支持多种格式',
+    descriptionEn: 'Generate custom QR codes in multiple formats',
     category: 'developer',
     icon: 'QrCode',
     path: '/tools/qrcode',
@@ -112,8 +134,10 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'diff-tool',
+    nameEn: 'Text Diff',
     name: 'Diff 文本对比',
     description: '对比两段文本的差异',
+    descriptionEn: 'Compare two texts side by side',
     category: 'text',
     icon: 'ArrowLeftRight',
     path: '/tools/diff',
@@ -122,8 +146,10 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'curl-generator',
+    nameEn: 'cURL Generator',
     name: 'cURL 命令生成',
     description: '可视化构建 HTTP 请求',
+    descriptionEn: 'Build HTTP requests visually, export cURL',
     category: 'network',
     icon: 'Terminal',
     path: '/tools/curl',
@@ -132,8 +158,10 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'ip-query',
+    nameEn: 'IP Lookup',
     name: 'IP 地址查询',
     description: '查询 IP 地址信息和地理位置',
+    descriptionEn: 'Query IP address info and geolocation',
     category: 'network',
     icon: 'Globe',
     path: '/tools/ip',
@@ -142,8 +170,10 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'jwt-decoder',
+    nameEn: 'JWT Decoder',
     name: 'JWT 解码器',
     description: '解码和验证 JSON Web Token',
+    descriptionEn: 'Decode and verify JSON Web Tokens',
     category: 'developer',
     icon: 'Shield',
     path: '/tools/jwt',
@@ -152,8 +182,10 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'sql-formatter',
+    nameEn: 'SQL Formatter',
     name: 'SQL 格式化',
     description: '美化和格式化 SQL 语句',
+    descriptionEn: 'Beautify and format SQL statements',
     category: 'developer',
     icon: 'Database',
     path: '/tools/sql',
@@ -162,8 +194,10 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'data-converter',
+    nameEn: 'Data Converter',
     name: '数据格式转换',
     description: 'JSON、XML、YAML、TOML 格式互转',
+    descriptionEn: 'Convert between JSON, XML, YAML and TOML',
     category: 'converter',
     icon: 'RefreshCw',
     path: '/tools/convert',
@@ -172,8 +206,10 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'image-compress',
+    nameEn: 'Image Compress',
     name: '图片压缩',
     description: '在线压缩图片，减小文件大小',
+    descriptionEn: 'Compress images online to reduce file size',
     category: 'image',
     icon: 'Image',
     path: '/tools/image-compress',
@@ -182,8 +218,10 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'code-minify',
+    nameEn: 'Code Minifier',
     name: '代码压缩',
     description: '压缩 JavaScript、CSS、HTML 代码',
+    descriptionEn: 'Minify JavaScript, CSS and HTML code',
     category: 'developer',
     icon: 'Minimize2',
     path: '/tools/minify',
@@ -192,8 +230,10 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'html-entity',
+    nameEn: 'HTML Entity',
     name: 'HTML 实体编解码',
     description: 'HTML 特殊字符与实体互转',
+    descriptionEn: 'Encode and decode HTML entities',
     category: 'encoder',
     icon: 'Code2',
     path: '/tools/html-entity',
@@ -202,8 +242,10 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'useragent-parser',
+    nameEn: 'User-Agent Parser',
     name: 'User-Agent 解析',
     description: '解析浏览器和设备信息',
+    descriptionEn: 'Parse browser and device info',
     category: 'network',
     icon: 'Monitor',
     path: '/tools/useragent',
@@ -212,8 +254,10 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'cron-generator',
+    nameEn: 'Cron Builder',
     name: 'Cron 表达式生成',
     description: '生成和解析 Cron 定时任务表达式',
+    descriptionEn: 'Build and explain Cron schedule expressions',
     category: 'developer',
     icon: 'Clock',
     path: '/tools/cron',

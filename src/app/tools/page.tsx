@@ -9,7 +9,10 @@ import {
   Image, Minimize2, Code2, Monitor,
 } from 'lucide-react'
 import { tools } from '@/lib/constants/tools'
+import { accentsFor } from '@/lib/constants/accents'
 import { ToolShell } from '@/components/ToolShell'
+import { useTheme } from '@/components/ThemeProvider'
+import { useI18n } from '@/components/I18nProvider'
 
 const iconMap: Record<string, any> = {
   Braces, FileCode, Clock, Regex, Hash, Link2, FileText, Palette,
@@ -17,10 +20,10 @@ const iconMap: Record<string, any> = {
   Image, Minimize2, Code2, Monitor,
 }
 
-const accents = ['#00E5FF', '#B8FF3C', '#A855F7', '#FFB020', '#FF2D95', '#FF79C6']
-
 export default function ToolsPage() {
   const [query, setQuery] = useState('')
+  const { t, lang } = useI18n()
+  const { theme } = useTheme()
 
   const filtered = query
     ? tools.filter(
@@ -34,7 +37,7 @@ export default function ToolsPage() {
   return (
     <ToolShell
       title="TOOLS"
-      description={`${filtered.length} / ${tools.length} 实用工具 · 本地运行 · 零安装`}
+      description={`${filtered.length} / ${tools.length} ${t('实用工具')} · ${t('本地运行 · 零安装')}`}
       path="/tools"
       icon={Wrench}
       accent="cyan"
@@ -44,7 +47,7 @@ export default function ToolsPage() {
           <input
             id="tool-search"
             type="text"
-            placeholder="search tools…"
+            placeholder={t('搜索工具…')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="w-40 rounded-md border border-border-dim bg-void-200 py-1.5 pl-8 pr-7 font-mono text-xs text-ink-primary placeholder:text-ink-muted focus:border-neon-cyan focus:outline-none focus:ring-1 focus:ring-neon-cyan/40 sm:w-56"
@@ -52,7 +55,7 @@ export default function ToolsPage() {
           {query && (
             <button
               onClick={() => setQuery('')}
-              aria-label="清空搜索"
+              aria-label={t('清空搜索')}
               className="absolute right-2 top-1/2 -translate-y-1/2 text-ink-muted hover:text-ink-primary"
             >
               <X className="h-3.5 w-3.5" />
@@ -66,7 +69,10 @@ export default function ToolsPage() {
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filtered.map((tool, i) => {
               const Icon = iconMap[tool.icon] || Hash
+              const accents = accentsFor(theme)
               const accent = accents[i % accents.length]
+              const name = lang === 'en' ? tool.nameEn : tool.name
+              const description = lang === 'en' ? tool.descriptionEn : tool.description
               return (
                 <Link
                   key={tool.id}
@@ -85,10 +91,10 @@ export default function ToolsPage() {
                       <Icon className="h-5 w-5" />
                     </div>
                     <h3 className="font-display text-base font-semibold text-ink-primary">
-                      {tool.name}
+                      {name}
                     </h3>
                     <p className="mt-1 text-[11px] leading-snug text-ink-secondary">
-                      {tool.description}
+                      {description}
                     </p>
                     <div className="mt-2.5 flex items-center justify-between">
                       <span className="font-mono text-[10px] text-ink-muted">{tool.path}</span>
@@ -105,7 +111,7 @@ export default function ToolsPage() {
           <div className="flex flex-col items-center gap-3 py-24 text-center">
             <Search className="h-8 w-8 text-ink-muted" />
             <p className="font-mono text-sm text-ink-secondary">NO MATCH</p>
-            <p className="text-xs text-ink-muted">没有匹配「{query}」的工具，试试其他关键词</p>
+            <p className="text-xs text-ink-muted">{t('没有匹配的工具，试试其他关键词')}</p>
           </div>
         )}
       </main>

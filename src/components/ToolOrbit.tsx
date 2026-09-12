@@ -235,12 +235,10 @@ export function ToolOrbit({
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 rounded-[50%] opacity-60"
+        className="orbit-glow pointer-events-none absolute left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 rounded-[50%] opacity-60"
         style={{
           width: glowW,
           height: glowH,
-          background:
-            'radial-gradient(ellipse at center, rgba(0,229,255,0.12) 0%, rgba(255,45,149,0.06) 40%, transparent 70%)',
           filter: 'blur(8px)',
         }}
       />

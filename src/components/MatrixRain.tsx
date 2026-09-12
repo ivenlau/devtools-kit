@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { useTheme } from '@/components/ThemeProvider'
 
 const GLYPHS =
   'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホ0123456789ABCDEF<>[]{}$#@%&*'
@@ -14,12 +15,14 @@ interface MatrixRainProps {
 /** Faint Matrix-style code rain behind the orbit axis. */
 export function MatrixRain({ intensity = 0.55, className = '' }: MatrixRainProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const { theme } = useTheme()
 
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     if (!ctx) return
+    const light = theme === 'light'
 
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     let raf = 0
@@ -51,8 +54,8 @@ export function MatrixRain({ intensity = 0.55, className = '' }: MatrixRainProps
 
     const draw = () => {
       if (!running) return
-      // Trail fade
-      ctx.fillStyle = 'rgba(5, 6, 10, 0.12)'
+      // Trail fade — matches the active theme's page background
+      ctx.fillStyle = light ? 'rgba(244, 245, 249, 0.18)' : 'rgba(5, 6, 10, 0.12)'
       ctx.fillRect(0, 0, w, h)
 
       ctx.font = `${fontSize}px ui-monospace, SFMono-Regular, Menlo, monospace`
@@ -64,15 +67,19 @@ export function MatrixRain({ intensity = 0.55, className = '' }: MatrixRainProps
 
         // Head brighter
         const head = (i / cols) * 0.5 + 0.5
-        ctx.fillStyle = `rgba(184, 255, 60, ${0.55 * intensity * head})`
-        ctx.shadowColor = 'rgba(0, 229, 255, 0.35)'
+        ctx.fillStyle = light
+          ? `rgba(84, 144, 0, ${0.5 * intensity * head})`
+          : `rgba(184, 255, 60, ${0.55 * intensity * head})`
+        ctx.shadowColor = light ? 'rgba(0, 132, 173, 0.25)' : 'rgba(0, 229, 255, 0.35)'
         ctx.shadowBlur = 6
         ctx.fillText(ch, x, y)
         ctx.shadowBlur = 0
 
         // Occasional cyan highlight
         if (Math.random() > 0.97) {
-          ctx.fillStyle = `rgba(0, 229, 255, ${0.7 * intensity})`
+          ctx.fillStyle = light
+            ? `rgba(0, 132, 173, ${0.6 * intensity})`
+            : `rgba(0, 229, 255, ${0.7 * intensity})`
           ctx.fillText(ch, x, y)
         }
 
@@ -91,7 +98,9 @@ export function MatrixRain({ intensity = 0.55, className = '' }: MatrixRainProps
       for (let i = 0; i < cols; i += 2) {
         const y = ((i * 37) % h) + 10
         const ch = GLYPHS[(i * 13) % GLYPHS.length]
-        ctx.fillStyle = `rgba(184, 255, 60, ${0.2 * intensity})`
+        ctx.fillStyle = light
+          ? `rgba(84, 144, 0, ${0.2 * intensity})`
+          : `rgba(184, 255, 60, ${0.2 * intensity})`
         ctx.fillText(ch, i * fontSize, y)
       }
     }
@@ -113,7 +122,7 @@ export function MatrixRain({ intensity = 0.55, className = '' }: MatrixRainProps
       ro?.disconnect()
       window.removeEventListener('resize', resize)
     }
-  }, [intensity])
+  }, [intensity, theme])
 
   return (
     <div
@@ -126,8 +135,8 @@ export function MatrixRain({ intensity = 0.55, className = '' }: MatrixRainProps
           'radial-gradient(ellipse at center, #000 0%, #000 35%, transparent 72%)',
         WebkitMaskImage:
           'radial-gradient(ellipse at center, #000 0%, #000 35%, transparent 72%)',
-        opacity: 0.9,
-        mixBlendMode: 'screen',
+        opacity: theme === 'light' ? 0.55 : 0.9,
+        mixBlendMode: theme === 'light' ? 'multiply' : 'screen',
       }}
     >
       <canvas ref={canvasRef} className="h-full w-full" />

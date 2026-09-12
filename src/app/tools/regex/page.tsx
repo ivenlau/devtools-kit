@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Regex, Copy, Trash2 } from 'lucide-react'
 import { useTransferData } from '@/lib/useTransferData'
 import { ToolShell } from '@/components/ToolShell'
+import { useI18n } from '@/components/I18nProvider'
 
 // 常用正则表达式库
 const commonRegex = [
@@ -26,6 +27,7 @@ const flagOptions = [
 ]
 
 export default function RegexTesterPage() {
+  const { t, lang } = useI18n()
   const [regex, setRegex] = useState('')
   const [flags, setFlags] = useState('gm')
   const [testString, setTestString] = useState('')
@@ -69,7 +71,7 @@ export default function RegexTesterPage() {
   const applyPreset = (preset: typeof commonRegex[0], index: number) => {
     setRegex(preset.pattern)
     setSelectedPreset(index)
-    setTestString(preset.description)
+    setTestString(t(preset.description))
   }
 
   // 切换单个正则 flag（复选框）
@@ -92,14 +94,14 @@ export default function RegexTesterPage() {
       const result = testString.replace(re, replacePattern)
       setReplaceResult(result)
     } catch (err) {
-      setReplaceResult('替换失败')
+      setReplaceResult(t('替换失败'))
     }
   }, [regex, flags, testString, replacePattern])
 
   return (
     <ToolShell
       title="REGEX LAB"
-      description="实时测试正则表达式，查看匹配结果"
+      description={t('实时测试正则表达式，查看匹配结果')}
       path="/tools/regex"
       icon={Regex}
       accent="magenta"
@@ -111,7 +113,7 @@ export default function RegexTesterPage() {
               onClick={() => applyPreset(preset, index)}
               className={`chip whitespace-nowrap ${selectedPreset === index ? 'chip-active' : ''}`}
             >
-              {preset.name}
+              {t(preset.name)}
             </button>
           ))}
 
@@ -120,15 +122,13 @@ export default function RegexTesterPage() {
           {replaceResult && (
             <button
               onClick={() => navigator.clipboard.writeText(replaceResult)}
-              className="tool-btn"
-            >
+              className="tool-btn tool-btn-icon"
+             title={t('复制结果')} aria-label={t('复制结果')}>
               <Copy className="h-3.5 w-3.5" />
-              复制结果
             </button>
           )}
-          <button onClick={() => setTestString('')} className="tool-btn tool-btn-danger">
+          <button onClick={() => setTestString('')} className="tool-btn tool-btn-icon tool-btn-danger" title={t('清空')} aria-label={t('清空')}>
             <Trash2 className="h-3.5 w-3.5" />
-            清空
           </button>
         </>
       }
@@ -144,7 +144,7 @@ export default function RegexTesterPage() {
               {flagOptions.map(({ flag, label }) => (
                 <label
                   key={flag}
-                  title={label}
+                  title={t(label)}
                   className="flex cursor-pointer select-none items-center gap-1 font-mono text-[11px] text-ink-secondary"
                 >
                   <input
@@ -163,7 +163,7 @@ export default function RegexTesterPage() {
               </span>
             ) : (
               <span className="ml-auto normal-case tracking-normal">
-                {matches.length} 个匹配 · 实时校验
+                {matches.length} {t('个匹配')} · {t('实时校验')}
               </span>
             )}
           </div>
@@ -188,13 +188,13 @@ export default function RegexTesterPage() {
               <span className="text-neon-magenta">&gt;_</span>
               <span>INPUT</span>
               <span className="ml-auto normal-case tracking-normal">
-                {testString.length} 字符
+                {testString.length} {t('字符')}
               </span>
             </div>
             <textarea
               value={testString}
               onChange={(e) => setTestString(e.target.value)}
-              placeholder="输入要测试的文本..."
+              placeholder={t('输入要测试的文本...')}
               spellCheck={false}
               className="min-h-0 flex-1 resize-none bg-void-100 p-4 font-mono text-sm leading-relaxed text-ink-primary caret-neon-magenta placeholder:text-ink-muted focus:outline-none"
             />
@@ -205,13 +205,13 @@ export default function RegexTesterPage() {
               <span className="text-neon-magenta">&gt;_</span>
               <span>MATCHES</span>
               <span className="ml-auto normal-case tracking-normal">
-                {matches.length} 个匹配
+                {matches.length} {t('个匹配')}
               </span>
             </div>
             <div className="min-h-0 flex-1 overflow-auto p-4">
               {matches.length === 0 ? (
                 <div className="py-12 text-center font-mono text-xs text-ink-muted">
-                  {testString && regex ? '未找到匹配' : '输入正则表达式和测试文本开始匹配'}
+                  {testString && regex ? t('未找到匹配') : t('输入正则表达式和测试文本开始匹配')}
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -222,16 +222,16 @@ export default function RegexTesterPage() {
                     >
                       <div className="mb-2 flex items-center justify-between">
                         <span className="font-mono text-xs font-semibold text-neon-magenta">
-                          匹配 #{index + 1}
+                          {`${t('匹配')} #${index + 1}`}
                         </span>
                         <span className="font-mono text-[11px] text-ink-muted">
-                          位置: {match.index} - {match.index! + match[0].length}
+                          {t('位置:')} {match.index} - {match.index! + match[0].length}
                         </span>
                       </div>
 
                       {/* Matched Text */}
                       <div className="mb-2">
-                        <span className="text-xs text-ink-muted">匹配文本:</span>
+                        <span className="text-xs text-ink-muted">{t('匹配文本:')}</span>
                         <code className="ml-2 rounded bg-neon-magenta/10 px-2 py-1 font-mono text-sm text-neon-magenta">
                           {match[0]}
                         </code>
@@ -240,13 +240,13 @@ export default function RegexTesterPage() {
                       {/* Capture Groups */}
                       {match.length > 1 && (
                         <div>
-                          <span className="text-xs text-ink-muted">捕获组:</span>
+                          <span className="text-xs text-ink-muted">{t('捕获组:')}</span>
                           <div className="mt-1 space-y-1">
                             {Array.from(match).slice(1).map((group, i) => (
                               <div key={i} className="flex items-center gap-2 text-sm">
                                 <span className="font-mono text-xs text-ink-muted">${i + 1}</span>
                                 <code className="rounded bg-neon-lime/10 px-2 py-0.5 font-mono text-xs text-neon-lime">
-                                  {group || '(空)'}
+                                  {group || t('(空)')}
                                 </code>
                               </div>
                             ))}
@@ -266,23 +266,23 @@ export default function RegexTesterPage() {
           <div className="tool-panel-head">
             <span className="text-neon-magenta">&gt;_</span>
             <span>REPLACE</span>
-            <span className="ml-auto normal-case tracking-normal">使用 $1, $2 引用捕获组</span>
+            <span className="ml-auto normal-case tracking-normal">{t('使用 $1, $2 引用捕获组')}</span>
           </div>
           <div className="space-y-3 p-4">
             <div>
-              <label className="mb-1 block font-mono text-[11px] text-ink-muted">替换为</label>
+              <label className="mb-1 block font-mono text-[11px] text-ink-muted">{t('替换为')}</label>
               <input
                 type="text"
                 value={replacePattern}
                 onChange={(e) => setReplacePattern(e.target.value)}
-                placeholder="替换文本（可以使用 $1, $2 等捕获组）"
+                placeholder={t('替换文本（可以使用 $1, $2 等捕获组）')}
                 className="w-full rounded-md border border-border-dim bg-void-200 px-3 py-2 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:border-neon-magenta focus:outline-none"
               />
             </div>
 
             {replaceResult && (
               <div>
-                <label className="mb-1 block font-mono text-[11px] text-ink-muted">替换结果</label>
+                <label className="mb-1 block font-mono text-[11px] text-ink-muted">{t('替换结果')}</label>
                 <pre className="w-full overflow-x-auto whitespace-pre-wrap break-all rounded-md border border-border-dim bg-void-200 p-3 font-mono text-sm text-ink-primary">
                   {replaceResult}
                 </pre>

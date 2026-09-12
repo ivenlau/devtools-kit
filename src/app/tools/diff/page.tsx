@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ArrowLeftRight, Copy, Trash2 } from 'lucide-react'
+import { ArrowLeftRight, Copy, Trash2, ListOrdered } from 'lucide-react'
 import { diffLines } from 'diff'
 import { useTransferData } from '@/lib/useTransferData'
 import { ToolShell } from '@/components/ToolShell'
+import { useI18n } from '@/components/I18nProvider'
 
 interface DiffResult {
   type: 'unchanged' | 'added' | 'removed'
@@ -15,6 +16,7 @@ interface DiffResult {
 }
 
 export default function DiffToolPage() {
+  const { t } = useI18n()
   const [oldText, setOldText] = useState('')
   const [newText, setNewText] = useState('')
   const [diff, setDiff] = useState<DiffResult[]>([])
@@ -123,21 +125,19 @@ export default function DiffToolPage() {
   return (
     <ToolShell
       title="TEXT DIFF"
-      description="对比两段文本的差异，支持并排和统一视图"
+      description={t('对比两段文本的差异，支持并排和统一视图')}
       path="/tools/diff"
       icon={ArrowLeftRight}
       accent="magenta"
       actions={
         <>
           {diff.length > 0 && (
-            <button onClick={copyUnifiedDiff} className="tool-btn">
+            <button onClick={copyUnifiedDiff} className="tool-btn tool-btn-icon" title={t('复制Diff')} aria-label={t('复制Diff')}>
               <Copy className="h-3.5 w-3.5" />
-              复制Diff
             </button>
           )}
-          <button onClick={handleClear} className="tool-btn tool-btn-danger">
+          <button onClick={handleClear} className="tool-btn tool-btn-icon tool-btn-danger" title={t('清空')} aria-label={t('清空')}>
             <Trash2 className="h-3.5 w-3.5" />
-            清空
           </button>
         </>
       }
@@ -150,13 +150,13 @@ export default function DiffToolPage() {
               <span className="text-neon-magenta">&gt;_</span>
               <span>OLD</span>
               <span className="ml-auto normal-case tracking-normal">
-                {oldText.split('\n').length} 行
+                {oldText.split('\n').length} {t('行')}
               </span>
             </div>
             <textarea
               value={oldText}
               onChange={(e) => setOldText(e.target.value)}
-              placeholder="输入原始文本..."
+              placeholder={t('输入原始文本...')}
               spellCheck={false}
               className="min-h-0 flex-1 resize-none bg-void-100 p-4 font-mono text-sm leading-relaxed text-ink-primary caret-neon-magenta placeholder:text-ink-muted focus:outline-none"
             />
@@ -167,13 +167,13 @@ export default function DiffToolPage() {
               <span className="text-neon-magenta">&gt;_</span>
               <span>NEW</span>
               <span className="ml-auto normal-case tracking-normal">
-                {newText.split('\n').length} 行
+                {newText.split('\n').length} {t('行')}
               </span>
             </div>
             <textarea
               value={newText}
               onChange={(e) => setNewText(e.target.value)}
-              placeholder="输入新文本..."
+              placeholder={t('输入新文本...')}
               spellCheck={false}
               className="min-h-0 flex-1 resize-none bg-void-100 p-4 font-mono text-sm leading-relaxed text-ink-primary caret-neon-magenta placeholder:text-ink-muted focus:outline-none"
             />
@@ -187,21 +187,21 @@ export default function DiffToolPage() {
               <span className="text-neon-magenta">&gt;_</span>
               <span>DIFF</span>
               <span className="ml-3 flex items-center gap-3 normal-case tracking-normal">
-                <span className="text-neon-lime" title="新增行">+{stats.added}</span>
-                <span className="text-neon-red" title="删除行">-{stats.removed}</span>
-                <span className="hidden text-ink-muted sm:inline" title="未改变行">
+                <span className="text-neon-lime" title={t('新增行')}>+{stats.added}</span>
+                <span className="text-neon-red" title={t('删除行')}>-{stats.removed}</span>
+                <span className="hidden text-ink-muted sm:inline" title={t('未改变行')}>
                   ={stats.unchanged}
                 </span>
               </span>
-              <label className="ml-auto flex cursor-pointer select-none items-center gap-1.5 normal-case tracking-normal text-ink-secondary">
-                <input
-                  type="checkbox"
-                  checked={lineMode}
-                  onChange={(e) => setLineMode(e.target.checked)}
-                  className="h-3 w-3 accent-neon-magenta"
-                />
-                显示行号
-              </label>
+              <button
+                onClick={() => setLineMode(!lineMode)}
+                aria-pressed={lineMode}
+                title={t('显示行号')}
+                aria-label={t('显示行号')}
+                className={`tool-btn tool-btn-icon ml-auto ${lineMode ? 'tool-btn-accent' : ''}`}
+              >
+                <ListOrdered className="h-3.5 w-3.5" />
+              </button>
               <span className="normal-case tracking-normal">{diff.length} 行</span>
             </div>
             <div className="max-h-[440px] min-h-0 flex-1 overflow-auto">

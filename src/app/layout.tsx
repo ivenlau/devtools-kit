@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter, JetBrains_Mono, Space_Grotesk } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/ThemeProvider'
+import { I18nProvider } from '@/components/I18nProvider'
 import { Header } from '@/components/Header'
 
 const inter = Inter({
@@ -25,13 +26,8 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: 'DevToolsKit - 开发工具箱',
   description: '20+实用工具，无需安装，打开浏览器即用。JSON格式化、Base64编解码、正则表达式测试、时间戳转换等',
-  icons: {
-    icon: [
-      { url: '/icon.svg', type: 'image/svg+xml' },
-      { url: '/favicon.ico', sizes: '32x32' },
-    ],
-    shortcut: '/favicon.ico',
-  },
+  // Favicon: src/app/icon.svg + src/app/favicon.ico (App Router conventions,
+  // auto-injected — no explicit icons config needed here)
 }
 
 export default function RootLayout({
@@ -40,14 +36,22 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="zh-CN" className="dark">
+    <html lang="zh-CN" suppressHydrationWarning>
       <body
         className={`${inter.variable} ${jetBrainsMono.variable} ${spaceGrotesk.variable} font-sans app-shell`}
       >
-        <ThemeProvider>
-          <Header />
-          {children}
-        </ThemeProvider>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(localStorage.getItem('theme')==='light')document.documentElement.classList.add('light');if(localStorage.getItem('lang')==='en')document.documentElement.lang='en'}catch(e){}",
+          }}
+        />
+        <I18nProvider>
+          <ThemeProvider>
+            <Header />
+            {children}
+          </ThemeProvider>
+        </I18nProvider>
       </body>
     </html>
   )

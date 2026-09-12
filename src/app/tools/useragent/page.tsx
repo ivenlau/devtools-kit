@@ -5,6 +5,7 @@ import { Monitor, Copy, Smartphone, Tablet, Globe } from 'lucide-react'
 import { UAParser } from 'ua-parser-js'
 import { useTransferData } from '@/lib/useTransferData'
 import { ToolShell } from '@/components/ToolShell'
+import { useI18n } from '@/components/I18nProvider'
 
 interface ParsedUA {
   browser: { name: string; version: string }
@@ -14,6 +15,7 @@ interface ParsedUA {
 }
 
 export default function UserAgentPage() {
+  const { t, lang } = useI18n()
   const [input, setInput] = useState('')
   const [parsed, setParsed] = useState<ParsedUA | null>(null)
   const [myUA, setMyUA] = useState('')
@@ -103,7 +105,7 @@ export default function UserAgentPage() {
   return (
     <ToolShell
       title="USER-AGENT"
-      description="解析浏览器和设备信息"
+      description={t('解析浏览器和设备信息')}
       path="/tools/useragent"
       icon={Monitor}
       accent="cyan"
@@ -112,13 +114,12 @@ export default function UserAgentPage() {
           {myUA && (
             <button onClick={useMyUA} className="tool-btn">
               <Globe className="h-3.5 w-3.5" />
-              本机 UA
+              {t('本机')} UA
             </button>
           )}
           {input && (
-            <button onClick={() => copyToClipboard(input)} className="tool-btn">
+            <button onClick={() => copyToClipboard(input)} className="tool-btn tool-btn-icon" title={t('复制')} aria-label={t('复制')}>
               <Copy className="h-3.5 w-3.5" />
-              复制
             </button>
           )}
         </>
@@ -130,12 +131,12 @@ export default function UserAgentPage() {
           <div className="tool-panel-head">
             <span className="text-neon-cyan">&gt;_</span>
             <span>USER-AGENT</span>
-            <span className="ml-auto normal-case tracking-normal">{input.length} 字符</span>
+            <span className="ml-auto normal-case tracking-normal">{input.length} {t('字符')}</span>
           </div>
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="粘贴 User-Agent 字符串..."
+            placeholder={t('粘贴 User-Agent 字符串...')}
             spellCheck={false}
             className="h-36 w-full resize-none bg-void-100 p-4 font-mono text-sm text-ink-primary caret-neon-cyan placeholder:text-ink-muted focus:outline-none"
           />
@@ -150,15 +151,15 @@ export default function UserAgentPage() {
                 <div className="flex h-7 w-7 items-center justify-center rounded-md border border-border-dim bg-void-200">
                   <Globe className="h-4 w-4 text-neon-cyan" />
                 </div>
-                <h4 className="font-mono text-xs text-ink-secondary">浏览器</h4>
+                <h4 className="font-mono text-xs text-ink-secondary">{t('浏览器')}</h4>
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between gap-3 text-xs">
-                  <span className="text-ink-muted">名称</span>
+                  <span className="text-ink-muted">{t('名称')}</span>
                   <span className="font-semibold text-ink-primary">{parsed.browser.name}</span>
                 </div>
                 <div className="flex justify-between gap-3 text-xs">
-                  <span className="text-ink-muted">版本</span>
+                  <span className="text-ink-muted">{t('版本')}</span>
                   <span className="font-mono text-ink-primary">{parsed.browser.version}</span>
                 </div>
               </div>
@@ -170,15 +171,15 @@ export default function UserAgentPage() {
                 <div className="flex h-7 w-7 items-center justify-center rounded-md border border-border-dim bg-void-200">
                   <Monitor className="h-4 w-4 text-neon-cyan" />
                 </div>
-                <h4 className="font-mono text-xs text-ink-secondary">操作系统</h4>
+                <h4 className="font-mono text-xs text-ink-secondary">{t('操作系统')}</h4>
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between gap-3 text-xs">
-                  <span className="text-ink-muted">名称</span>
+                  <span className="text-ink-muted">{t('名称')}</span>
                   <span className="font-semibold text-ink-primary">{parsed.os.name}</span>
                 </div>
                 <div className="flex justify-between gap-3 text-xs">
-                  <span className="text-ink-muted">版本</span>
+                  <span className="text-ink-muted">{t('版本')}</span>
                   <span className="font-mono text-ink-primary">{parsed.os.version}</span>
                 </div>
               </div>
@@ -190,21 +191,21 @@ export default function UserAgentPage() {
                 <div className="flex h-7 w-7 items-center justify-center rounded-md border border-border-dim bg-void-200">
                   {getDeviceIcon()}
                 </div>
-                <h4 className="font-mono text-xs text-ink-secondary">设备</h4>
+                <h4 className="font-mono text-xs text-ink-secondary">{t('设备')}</h4>
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between gap-3 text-xs">
-                  <span className="text-ink-muted">类型</span>
+                  <span className="text-ink-muted">{t('类型')}</span>
                   <span className="font-semibold capitalize text-ink-primary">
                     {parsed.device.type}
                   </span>
                 </div>
                 <div className="flex justify-between gap-3 text-xs">
-                  <span className="text-ink-muted">厂商</span>
+                  <span className="text-ink-muted">{t('厂商')}</span>
                   <span className="text-ink-primary">{parsed.device.vendor}</span>
                 </div>
                 <div className="flex justify-between gap-3 text-xs">
-                  <span className="text-ink-muted">型号</span>
+                  <span className="text-ink-muted">{t('型号')}</span>
                   <span className="text-ink-primary">{parsed.device.model}</span>
                 </div>
               </div>
@@ -216,15 +217,15 @@ export default function UserAgentPage() {
                 <div className="flex h-7 w-7 items-center justify-center rounded-md border border-border-dim bg-void-200">
                   <Monitor className="h-4 w-4 text-neon-cyan" />
                 </div>
-                <h4 className="font-mono text-xs text-ink-secondary">渲染引擎</h4>
+                <h4 className="font-mono text-xs text-ink-secondary">{t('渲染引擎')}</h4>
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between gap-3 text-xs">
-                  <span className="text-ink-muted">名称</span>
+                  <span className="text-ink-muted">{t('名称')}</span>
                   <span className="font-semibold text-ink-primary">{parsed.engine.name}</span>
                 </div>
                 <div className="flex justify-between gap-3 text-xs">
-                  <span className="text-ink-muted">版本</span>
+                  <span className="text-ink-muted">{t('版本')}</span>
                   <span className="font-mono text-ink-primary">{parsed.engine.version}</span>
                 </div>
               </div>
@@ -234,7 +235,7 @@ export default function UserAgentPage() {
 
         {/* Examples */}
         <div className="rounded-lg border border-border-dim bg-void-100 p-4">
-          <h3 className="mb-3 font-mono text-[11px] text-ink-muted">常用 User-Agent</h3>
+          <h3 className="mb-3 font-mono text-[11px] text-ink-muted">{t('常用 User-Agent')}</h3>
 
           <div className="space-y-2">
             {examples.map((example, index) => (

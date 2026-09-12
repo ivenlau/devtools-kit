@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Palette, Copy } from 'lucide-react'
 import { useTransferData } from '@/lib/useTransferData'
 import { ToolShell } from '@/components/ToolShell'
+import { useI18n } from '@/components/I18nProvider'
 
 /**
  * HEX转RGB
@@ -110,6 +111,7 @@ const hslToRgb = (h: number, s: number, l: number) => {
 }
 
 export default function ColorConverterPage() {
+  const { t } = useI18n()
   const [hex, setHex] = useState('#1E84FF')
   const [rgb, setRgb] = useState({ r: 30, g: 132, b: 255 })
   const [hsl, setHsl] = useState({ h: 217, s: 100, l: 56 })
@@ -167,7 +169,7 @@ export default function ColorConverterPage() {
   return (
     <ToolShell
       title="COLOR"
-      description="HEX、RGB、HSL、RGBA 颜色格式互转"
+      description={t('HEX、RGB、HSL、RGBA 颜色格式互转')}
       path="/tools/color"
       icon={Palette}
       accent="lime"
@@ -191,7 +193,7 @@ export default function ColorConverterPage() {
               <span>HEX</span>
               <button
                 onClick={() => copyToClipboard(hex)}
-                aria-label="复制 HEX"
+                aria-label={t('复制 HEX')}
                 className="ml-auto text-ink-muted transition-colors hover:text-neon-lime"
               >
                 <Copy className="h-3.5 w-3.5" />
@@ -199,7 +201,7 @@ export default function ColorConverterPage() {
             </div>
             <div className="space-y-4 p-4">
               <div>
-                <label className="mb-2 block font-mono text-[11px] text-ink-muted">颜色值</label>
+                <label className="mb-2 block font-mono text-[11px] text-ink-muted">{t('颜色值')}</label>
                 <input
                   type="text"
                   value={hex}
@@ -233,7 +235,7 @@ export default function ColorConverterPage() {
               <span>RGB</span>
               <button
                 onClick={() => copyToClipboard(`rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`)}
-                aria-label="复制 RGB"
+                aria-label={t('复制 RGB')}
                 className="ml-auto text-ink-muted transition-colors hover:text-neon-lime"
               >
                 <Copy className="h-3.5 w-3.5" />
@@ -242,7 +244,7 @@ export default function ColorConverterPage() {
             <div className="space-y-4 p-4">
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="mb-1 block font-mono text-[11px] text-ink-muted">R (红)</label>
+                  <label className="mb-1 block font-mono text-[11px] text-ink-muted">{t('R (红)')}</label>
                   <input
                     type="number"
                     min={0}
@@ -253,7 +255,7 @@ export default function ColorConverterPage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block font-mono text-[11px] text-ink-muted">G (绿)</label>
+                  <label className="mb-1 block font-mono text-[11px] text-ink-muted">{t('G (绿)')}</label>
                   <input
                     type="number"
                     min={0}
@@ -264,7 +266,7 @@ export default function ColorConverterPage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block font-mono text-[11px] text-ink-muted">B (蓝)</label>
+                  <label className="mb-1 block font-mono text-[11px] text-ink-muted">{t('B (蓝)')}</label>
                   <input
                     type="number"
                     min={0}
@@ -322,7 +324,7 @@ export default function ColorConverterPage() {
               <span>HSL</span>
               <button
                 onClick={() => copyToClipboard(`hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`)}
-                aria-label="复制 HSL"
+                aria-label={t('复制 HSL')}
                 className="ml-auto text-ink-muted transition-colors hover:text-neon-lime"
               >
                 <Copy className="h-3.5 w-3.5" />
@@ -331,7 +333,7 @@ export default function ColorConverterPage() {
             <div className="space-y-4 p-4">
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="mb-1 block font-mono text-[11px] text-ink-muted">H (色相)</label>
+                  <label className="mb-1 block font-mono text-[11px] text-ink-muted">{t('H (色相)')}</label>
                   <input
                     type="number"
                     min={0}
@@ -342,7 +344,7 @@ export default function ColorConverterPage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block font-mono text-[11px] text-ink-muted">S (饱和度)</label>
+                  <label className="mb-1 block font-mono text-[11px] text-ink-muted">{t('S (饱和度)')}</label>
                   <input
                     type="number"
                     min={0}
@@ -353,7 +355,7 @@ export default function ColorConverterPage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block font-mono text-[11px] text-ink-muted">L (亮度)</label>
+                  <label className="mb-1 block font-mono text-[11px] text-ink-muted">{t('L (亮度)')}</label>
                   <input
                     type="number"
                     min={0}
@@ -421,7 +423,7 @@ export default function ColorConverterPage() {
           <div className="tool-panel-head">
             <span className="text-neon-lime">&gt;_</span>
             <span>FORMATS</span>
-            <span className="ml-auto normal-case tracking-normal">其他格式</span>
+            <span className="ml-auto normal-case tracking-normal">{t('其他格式')}</span>
           </div>
           <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2">
             <div>
@@ -430,7 +432,7 @@ export default function ColorConverterPage() {
                 <code className="break-all">{rgba}</code>
                 <button
                   onClick={() => copyToClipboard(rgba)}
-                  aria-label="复制 RGBA"
+                  aria-label={t('复制 RGBA')}
                   className="ml-2 shrink-0 text-ink-muted transition-colors hover:text-neon-lime"
                 >
                   <Copy className="h-3.5 w-3.5" />
@@ -439,12 +441,12 @@ export default function ColorConverterPage() {
             </div>
 
             <div>
-              <label className="mb-2 block font-mono text-[11px] text-ink-muted">RGB (逗号分隔)</label>
+              <label className="mb-2 block font-mono text-[11px] text-ink-muted">{t('RGB (逗号分隔)')}</label>
               <div className="flex items-center justify-between rounded-md bg-void-200 p-3 font-mono text-sm text-ink-primary">
                 <code>{rgb.r}, {rgb.g}, {rgb.b}</code>
                 <button
                   onClick={() => copyToClipboard(`${rgb.r}, ${rgb.g}, ${rgb.b}`)}
-                  aria-label="复制 RGB"
+                  aria-label={t('复制 RGB')}
                   className="ml-2 shrink-0 text-ink-muted transition-colors hover:text-neon-lime"
                 >
                   <Copy className="h-3.5 w-3.5" />
@@ -453,12 +455,12 @@ export default function ColorConverterPage() {
             </div>
 
             <div>
-              <label className="mb-2 block font-mono text-[11px] text-ink-muted">RGB (十六进制)</label>
+              <label className="mb-2 block font-mono text-[11px] text-ink-muted">{t('RGB (十六进制)')}</label>
               <div className="flex items-center justify-between rounded-md bg-void-200 p-3 font-mono text-sm text-ink-primary">
                 <code className="break-all">rgb(0x{rgb.r.toString(16).padStart(2, '0')}, 0x{rgb.g.toString(16).padStart(2, '0')}, 0x{rgb.b.toString(16).padStart(2, '0')})</code>
                 <button
                   onClick={() => copyToClipboard(`rgb(0x${rgb.r.toString(16).padStart(2, '0')}, 0x${rgb.g.toString(16).padStart(2, '0')}, 0x${rgb.b.toString(16).padStart(2, '0')})`)}
-                  aria-label="复制十六进制 RGB"
+                  aria-label={t('复制十六进制 RGB')}
                   className="ml-2 shrink-0 text-ink-muted transition-colors hover:text-neon-lime"
                 >
                   <Copy className="h-3.5 w-3.5" />
@@ -467,7 +469,7 @@ export default function ColorConverterPage() {
             </div>
 
             <div>
-              <label className="mb-2 block font-mono text-[11px] text-ink-muted">RGBA (百分比)</label>
+              <label className="mb-2 block font-mono text-[11px] text-ink-muted">{t('RGBA (百分比)')}</label>
               <div className="flex items-center justify-between rounded-md bg-void-200 p-3 font-mono text-sm text-ink-primary">
                 <code className="break-all">rgba({Math.round((rgb.r / 255) * 100)}%, {Math.round((rgb.g / 255) * 100)}%, {Math.round((rgb.b / 255) * 100)}%, 1)</code>
               </div>

@@ -2,6 +2,8 @@
 
 import Link from 'next/link'
 import type { LucideIcon } from 'lucide-react'
+import { useTheme } from '@/components/ThemeProvider'
+import { useI18n } from '@/components/I18nProvider'
 
 interface ToolShellProps {
   title: string
@@ -14,31 +16,36 @@ interface ToolShellProps {
   children: React.ReactNode
 }
 
-const accentMap: Record<string, { box: string; line: string; raw: string }> = {
+const accentMap: Record<string, { box: string; line: string; dark: string; light: string }> = {
   cyan: {
     box: 'text-neon-cyan',
     line: 'via-neon-cyan/60',
-    raw: '#00E5FF',
+    dark: '#00E5FF',
+    light: '#0084AD',
   },
   magenta: {
     box: 'text-neon-magenta',
     line: 'via-neon-magenta/60',
-    raw: '#FF2D95',
+    dark: '#FF2D95',
+    light: '#C81E6E',
   },
   lime: {
     box: 'text-neon-lime',
     line: 'via-neon-lime/60',
-    raw: '#B8FF3C',
+    dark: '#B8FF3C',
+    light: '#549000',
   },
   purple: {
     box: 'text-neon-purple',
     line: 'via-neon-purple/60',
-    raw: '#A855F7',
+    dark: '#A855F7',
+    light: '#7C3AED',
   },
   amber: {
     box: 'text-neon-amber',
     line: 'via-neon-amber/60',
-    raw: '#FFB020',
+    dark: '#FFB020',
+    light: '#A16A00',
   },
 }
 
@@ -50,30 +57,32 @@ export function ToolShell({
   actions,
   children,
 }: ToolShellProps) {
+  const { theme } = useTheme()
+  const { t } = useI18n()
   const a = accentMap[accent] ?? accentMap.cyan
 
   return (
     <div
       className="flex min-h-[calc(100dvh-3.5rem)] w-full flex-col bg-void"
-      style={{ '--accent': a.raw } as React.CSSProperties}
+      style={{ '--accent': theme === 'light' ? a.light : a.dark } as React.CSSProperties}
     >
       {/* Single compact strip: back · path · icon · title · description · actions */}
       <div className="relative w-full border-b border-border-dim bg-void-100">
         <div className="flex min-h-11 w-full flex-wrap items-center gap-x-2.5 gap-y-1.5 px-4 py-2 sm:px-6 lg:px-8">
           <Link
             href="/"
-            aria-label="返回主页"
+            aria-label={t('返回主页')}
             className="font-mono text-[11px] text-ink-muted transition-colors hover:text-neon-cyan"
           >
             ←
           </Link>
           <Icon className={`ml-1 h-4 w-4 shrink-0 ${a.box}`} />
-          <h1 className="font-display text-base font-bold tracking-tight text-ink-primary">
+          <h1
+            className="font-display text-base font-bold tracking-tight text-ink-primary"
+            title={description}
+          >
             {title}
           </h1>
-          <span className="hidden min-w-0 truncate font-mono text-[11px] text-ink-muted lg:inline">
-            {description}
-          </span>
           {actions && (
             <div className="ml-auto flex flex-wrap items-center gap-2">{actions}</div>
           )}

@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Link2, Copy, Trash2 } from 'lucide-react'
+import { Link2, Copy, Trash2, ArrowRight, ArrowLeft, ScanSearch } from 'lucide-react'
 import { useTransferData } from '@/lib/useTransferData'
 import { ToolShell } from '@/components/ToolShell'
+import { useI18n } from '@/components/I18nProvider'
 
 /**
  * URL 编码
@@ -48,6 +49,7 @@ const parseUrl = (urlString: string) => {
 }
 
 export default function UrlEncoderPage() {
+  const { t } = useI18n()
   const [mode, setMode] = useState<'encode' | 'decode' | 'parse'>('encode')
   const [input, setInput] = useState('')
   const [output, setOutput] = useState('')
@@ -77,12 +79,12 @@ export default function UrlEncoderPage() {
           setUrlData(parsed)
           setError(null)
         } else {
-          setError('无效的URL')
+          setError(t('无效的URL'))
           setUrlData(null)
         }
       }
     } catch (err: any) {
-      setError(err.message || '处理失败')
+      setError(err.message || t('处理失败'))
       setOutput('')
       setUrlData(null)
     }
@@ -102,7 +104,7 @@ export default function UrlEncoderPage() {
   return (
     <ToolShell
       title="URL CODEC"
-      description="URL 编码、解码与解析"
+      description={t('URL 编码、解码与解析')}
       path="/tools/url"
       icon={Link2}
       accent="cyan"
@@ -110,33 +112,40 @@ export default function UrlEncoderPage() {
         <>
           <button
             onClick={() => setMode('encode')}
-            className={`tool-btn ${mode === 'encode' ? 'tool-btn-accent' : ''}`}
+            aria-pressed={mode === 'encode'}
+            title={t('编码')}
+            aria-label={t('编码')}
+            className={`tool-btn tool-btn-icon ${mode === 'encode' ? 'tool-btn-accent' : ''}`}
           >
-            编码
+            <ArrowRight className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={() => setMode('decode')}
-            className={`tool-btn ${mode === 'decode' ? 'tool-btn-accent' : ''}`}
+            aria-pressed={mode === 'decode'}
+            title={t('解码')}
+            aria-label={t('解码')}
+            className={`tool-btn tool-btn-icon ${mode === 'decode' ? 'tool-btn-accent' : ''}`}
           >
-            解码
+            <ArrowLeft className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={() => setMode('parse')}
-            className={`tool-btn ${mode === 'parse' ? 'tool-btn-accent' : ''}`}
+            aria-pressed={mode === 'parse'}
+            title={t('解析')}
+            aria-label={t('解析')}
+            className={`tool-btn tool-btn-icon ${mode === 'parse' ? 'tool-btn-accent' : ''}`}
           >
-            解析
+            <ScanSearch className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={handleCopy}
             disabled={!output && mode !== 'parse'}
-            className="tool-btn"
-          >
+            className="tool-btn tool-btn-icon"
+           title={t('复制')} aria-label={t('复制')}>
             <Copy className="h-3.5 w-3.5" />
-            复制
           </button>
-          <button onClick={handleClear} className="tool-btn tool-btn-danger">
+          <button onClick={handleClear} className="tool-btn tool-btn-icon tool-btn-danger" title={t('清空')} aria-label={t('清空')}>
             <Trash2 className="h-3.5 w-3.5" />
-            清空
           </button>
         </>
       }
@@ -155,13 +164,13 @@ export default function UrlEncoderPage() {
                     ERR · {error}
                   </span>
                 ) : (
-                  <span className="ml-auto normal-case tracking-normal">{input.length} 字符</span>
+                  <span className="ml-auto normal-case tracking-normal">{input.length} {t('字符')}</span>
                 )}
               </div>
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder={mode === 'encode' ? '输入要编码的文本...' : '输入要解码的 URL 编码...'}
+                placeholder={mode === 'encode' ? t('输入要编码的文本...') : t('输入要解码的 URL 编码...')}
                 className="min-h-0 flex-1 resize-none bg-void-100 p-4 font-mono text-sm text-ink-primary caret-neon-cyan placeholder:text-ink-muted focus:outline-none"
                 spellCheck={false}
               />
@@ -183,9 +192,9 @@ export default function UrlEncoderPage() {
                 </span>
               </div>
               <textarea
-                value={output}
+                value={output === '解码失败：无效的URL编码' ? t('解码失败：无效的URL编码') : output}
                 readOnly
-                placeholder="处理结果将显示在这里..."
+                placeholder={t('处理结果将显示在这里...')}
                 className="min-h-0 flex-1 resize-none bg-void-100 p-4 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:outline-none"
                 spellCheck={false}
               />
@@ -217,7 +226,7 @@ export default function UrlEncoderPage() {
                   spellCheck={false}
                 />
                 <p className="font-mono text-[11px] text-ink-muted">
-                  输入完整 URL，右侧实时分解 protocol / host / path / query 各组成部分
+                  {t('输入完整 URL，右侧实时分解各组成部分')}
                 </p>
               </div>
             </div>
@@ -251,7 +260,7 @@ export default function UrlEncoderPage() {
                       </div>
                       <div>
                         <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">Port</span>
-                        <p className="font-mono text-sm text-ink-primary">{urlData.port || '(默认)'}</p>
+                        <p className="font-mono text-sm text-ink-primary">{urlData.port || t('(默认)')}</p>
                       </div>
                       <div>
                         <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">Pathname</span>
@@ -259,11 +268,11 @@ export default function UrlEncoderPage() {
                       </div>
                       <div>
                         <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">Search</span>
-                        <p className="break-all font-mono text-sm text-ink-primary">{urlData.search || '(无)'}</p>
+                        <p className="break-all font-mono text-sm text-ink-primary">{urlData.search || t('(无)')}</p>
                       </div>
                       <div>
                         <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">Hash</span>
-                        <p className="break-all font-mono text-sm text-ink-primary">{urlData.hash || '(无)'}</p>
+                        <p className="break-all font-mono text-sm text-ink-primary">{urlData.hash || t('(无)')}</p>
                       </div>
                     </div>
 
@@ -293,7 +302,7 @@ export default function UrlEncoderPage() {
                     )}
                   </div>
                 ) : (
-                  <p className="font-mono text-xs text-ink-muted">// 等待输入有效的 URL</p>
+                  <p className="font-mono text-xs text-ink-muted">// {t('等待输入有效的 URL')}</p>
                 )}
               </div>
             </div>

@@ -4,10 +4,12 @@ import { useState, useEffect } from 'react'
 import { Code2, Copy, Trash2, ArrowLeftRight, Sparkles } from 'lucide-react'
 import { useTransferData } from '@/lib/useTransferData'
 import { ToolShell } from '@/components/ToolShell'
+import { useI18n } from '@/components/I18nProvider'
 
 type ModeType = 'encode' | 'decode'
 
 export default function HTMLEntityPage() {
+  const { t } = useI18n()
   const [input, setInput] = useState('')
   const [output, setOutput] = useState('')
   const [mode, setMode] = useState<ModeType>('encode')
@@ -32,7 +34,7 @@ export default function HTMLEntityPage() {
 
       setOutput(result)
     } catch (err: any) {
-      setOutput(`转换错误: ${err.message}`)
+      setOutput(`${t('转换错误:')} ${err.message}`)
     }
   }, [input, mode])
 
@@ -130,7 +132,7 @@ export default function HTMLEntityPage() {
   return (
     <ToolShell
       title="HTML ENTITY"
-      description="HTML 特殊字符与实体互转"
+      description={t('HTML 特殊字符与实体互转')}
       path="/tools/html-entity"
       icon={Code2}
       accent="amber"
@@ -139,30 +141,26 @@ export default function HTMLEntityPage() {
           <select
             value={mode}
             onChange={(e) => setMode(e.target.value as ModeType)}
-            aria-label="转换方向"
+            aria-label={t('转换方向')}
             className="tool-select"
           >
-            <option value="encode">编码 ENCODE</option>
-            <option value="decode">解码 DECODE</option>
+            <option value="encode">{t('编码 ENCODE')}</option>
+            <option value="decode">{t('解码 DECODE')}</option>
           </select>
 
           <div className="hidden h-5 w-px bg-border-dim sm:block" />
 
-          <button onClick={loadExample} className="tool-btn">
+          <button onClick={loadExample} className="tool-btn tool-btn-icon" title={t('示例')} aria-label={t('示例')}>
             <Sparkles className="h-3.5 w-3.5" />
-            示例
           </button>
-          <button onClick={copyToClipboard} disabled={!output} className="tool-btn tool-btn-accent">
+          <button onClick={copyToClipboard} disabled={!output} className="tool-btn tool-btn-icon tool-btn-accent" title={t('复制')} aria-label={t('复制')}>
             <Copy className="h-3.5 w-3.5" />
-            复制
           </button>
-          <button onClick={swapMode} className="tool-btn" title="互换模式">
+          <button onClick={swapMode} className="tool-btn tool-btn-icon" title={t('互换模式')} aria-label={t('互换')}>
             <ArrowLeftRight className="h-3.5 w-3.5" />
-            互换
           </button>
-          <button onClick={clearAll} className="tool-btn tool-btn-danger">
+          <button onClick={clearAll} className="tool-btn tool-btn-icon tool-btn-danger" title={t('清空')} aria-label={t('清空')}>
             <Trash2 className="h-3.5 w-3.5" />
-            清空
           </button>
         </>
       }
@@ -175,13 +173,13 @@ export default function HTMLEntityPage() {
               <span className="text-neon-amber">&gt;_</span>
               <span>INPUT</span>
               <span className="ml-auto normal-case tracking-normal">
-                {mode === 'encode' ? '原始文本' : 'HTML 实体'} · {input.length} 字符
+                {mode === 'encode' ? t('原始文本') : t('HTML 实体')} · {input.length} {t('字符')}
               </span>
             </div>
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={mode === 'encode' ? '输入包含特殊字符的文本...' : '输入 HTML 实体...'}
+              placeholder={mode === 'encode' ? t('输入包含特殊字符的文本...') : t('输入 HTML 实体...')}
               spellCheck={false}
               className="min-h-0 flex-1 resize-none bg-void-100 p-4 font-mono text-sm text-ink-primary caret-neon-amber placeholder:text-ink-muted focus:outline-none"
             />
@@ -192,13 +190,13 @@ export default function HTMLEntityPage() {
               <span className="text-neon-amber">&gt;_</span>
               <span>OUTPUT</span>
               <span className="ml-auto normal-case tracking-normal">
-                {mode === 'encode' ? 'HTML 实体' : '解码结果'} · {output.length} 字符
+                {mode === 'encode' ? t('HTML 实体') : t('解码结果')} · {output.length} {t('字符')}
               </span>
             </div>
             <textarea
               value={output}
               readOnly
-              placeholder={mode === 'encode' ? 'HTML 实体将显示在这里...' : '解码结果将显示在这里...'}
+              placeholder={mode === 'encode' ? t('HTML 实体将显示在这里...') : t('解码结果将显示在这里...')}
               className="min-h-0 flex-1 resize-none bg-void-100 p-4 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:outline-none"
             />
           </div>
@@ -207,7 +205,7 @@ export default function HTMLEntityPage() {
         {/* Common entities reference */}
         <div className="border-t border-border-dim pt-3">
           <div className="mb-2 font-mono text-[11px] text-ink-muted">
-            常用 HTML 实体 · 点击填入输入框
+            {t('常用 HTML 实体 · 点击填入输入框')}
           </div>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
             {commonEntities.map((entity) => (
@@ -216,7 +214,7 @@ export default function HTMLEntityPage() {
                 onClick={() => {
                   setInput(mode === 'encode' ? entity.char : entity.entity)
                 }}
-                title={entity.name}
+                title={t(entity.name)}
                 className="rounded-md border border-border-dim bg-void-200 px-2.5 py-1.5 text-left transition-colors hover:border-neon-amber/70"
               >
                 <div className="flex items-baseline justify-between gap-2">

@@ -4,10 +4,12 @@ import { useState, useEffect } from 'react'
 import { Minimize2, Copy, Trash2, Sparkles } from 'lucide-react'
 import { useTransferData } from '@/lib/useTransferData'
 import { ToolShell } from '@/components/ToolShell'
+import { useI18n } from '@/components/I18nProvider'
 
 type CodeType = 'javascript' | 'css' | 'html'
 
 export default function CodeMinifyPage() {
+  const { t, lang } = useI18n()
   const [input, setInput] = useState('')
   const [output, setOutput] = useState('')
   const [codeType, setCodeType] = useState<CodeType>('javascript')
@@ -138,7 +140,7 @@ console.log("Result:", result);`,
   return (
     <ToolShell
       title="CODE MINIFY"
-      description="压缩 JavaScript、CSS、HTML 代码"
+      description={t('压缩 JavaScript、CSS、HTML 代码')}
       path="/tools/minify"
       icon={Minimize2}
       accent="lime"
@@ -147,7 +149,7 @@ console.log("Result:", result);`,
           <select
             value={codeType}
             onChange={(e) => setCodeType(e.target.value as CodeType)}
-            aria-label="代码类型"
+            aria-label={t('代码类型')}
             className="tool-select"
           >
             {codeTypes.map((type) => (
@@ -156,17 +158,14 @@ console.log("Result:", result);`,
               </option>
             ))}
           </select>
-          <button onClick={loadExample} className="tool-btn">
+          <button onClick={loadExample} className="tool-btn tool-btn-icon" title={t('示例')} aria-label={t('示例')}>
             <Sparkles className="h-3.5 w-3.5" />
-            示例
           </button>
-          <button onClick={copyToClipboard} disabled={!output} className="tool-btn tool-btn-accent">
+          <button onClick={copyToClipboard} disabled={!output} className="tool-btn tool-btn-icon tool-btn-accent" title={t('复制')} aria-label={t('复制')}>
             <Copy className="h-3.5 w-3.5" />
-            复制
           </button>
-          <button onClick={clearAll} className="tool-btn tool-btn-danger">
+          <button onClick={clearAll} className="tool-btn tool-btn-icon tool-btn-danger" title={t('清空')} aria-label={t('清空')}>
             <Trash2 className="h-3.5 w-3.5" />
-            清空
           </button>
         </>
       }
@@ -179,13 +178,13 @@ console.log("Result:", result);`,
               <span className="text-neon-lime">&gt;_</span>
               <span>INPUT</span>
               <span className="ml-auto normal-case tracking-normal">
-                {input.length.toLocaleString()} 字符 · {input.split('\n').length} 行
+                {input.length.toLocaleString()} {t('字符')} · {input.split('\n').length} {t('行')}
               </span>
             </div>
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={`输入 ${codeType.toUpperCase()} 代码...`}
+              placeholder={lang === 'en' ? `Enter ${codeType.toUpperCase()} code...` : `输入 ${codeType.toUpperCase()} 代码...`}
               spellCheck={false}
               className="min-h-0 flex-1 resize-none bg-void-100 p-4 font-mono text-sm text-ink-primary caret-neon-lime placeholder:text-ink-muted focus:outline-none"
             />
@@ -200,7 +199,7 @@ console.log("Result:", result);`,
                   <span className="text-neon-red">ERROR</span>
                 ) : (
                   <>
-                    {output.length.toLocaleString()} 字符 · 减少 {getCompressionRatio()}%
+                    {output.length.toLocaleString()} {t('字符')} · {t('减少')} {getCompressionRatio()}%
                   </>
                 )}
               </span>
@@ -213,7 +212,7 @@ console.log("Result:", result);`,
               <textarea
                 value={output}
                 readOnly
-                placeholder="压缩后的代码将显示在这里..."
+                placeholder={t('压缩后的代码将显示在这里...')}
                 className="min-h-0 flex-1 resize-none bg-void-100 p-4 font-mono text-xs text-ink-primary placeholder:text-ink-muted focus:outline-none"
               />
             )}

@@ -5,6 +5,7 @@ import { Shield, Copy, Trash2, Eye, EyeOff, FileText } from 'lucide-react'
 import { jwtDecode } from 'jwt-decode'
 import { useTransferData } from '@/lib/useTransferData'
 import { ToolShell } from '@/components/ToolShell'
+import { useI18n } from '@/components/I18nProvider'
 
 interface JWTPayload {
   [key: string]: any
@@ -29,6 +30,7 @@ const EXAMPLE_TOKEN =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
 
 export default function JWTDecoderPage() {
+  const { t, lang } = useI18n()
   const [input, setInput] = useState('')
   const [decoded, setDecoded] = useState<DecodedToken | null>(null)
   const [showHeader, setShowHeader] = useState(true)
@@ -78,7 +80,7 @@ export default function JWTDecoderPage() {
   // Format date
   const formatDate = (timestamp?: number) => {
     if (!timestamp) return '-'
-    return new Date(timestamp * 1000).toLocaleString('zh-CN', {
+    return new Date(timestamp * 1000).toLocaleString(lang === 'en' ? 'en-US' : 'zh-CN', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
@@ -98,15 +100,15 @@ export default function JWTDecoderPage() {
   const getTimeRemaining = () => {
     if (!decoded || !decoded.isValid || !decoded.payload.exp) return null
     const remaining = decoded.payload.exp * 1000 - Date.now()
-    if (remaining <= 0) return '已过期'
+    if (remaining <= 0) return t('已过期')
 
     const days = Math.floor(remaining / (1000 * 60 * 60 * 24))
     const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
     const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60))
 
-    if (days > 0) return `${days}天 ${hours}小时`
-    if (hours > 0) return `${hours}小时 ${minutes}分钟`
-    return `${minutes}分钟`
+    if (days > 0) return `${days}${t('天')} ${hours}${t('小时')}`
+    if (hours > 0) return `${hours}${t('小时')} ${minutes}${t('分钟')}`
+    return `${minutes}${t('分钟')}`
   }
 
   // Copy to clipboard
@@ -136,7 +138,7 @@ export default function JWTDecoderPage() {
   return (
     <ToolShell
       title="JWT DECODE"
-      description="解码和验证 JSON Web Token"
+      description={t('解码和验证 JSON Web Token')}
       path="/tools/jwt"
       icon={Shield}
       accent="amber"
@@ -146,33 +148,29 @@ export default function JWTDecoderPage() {
             onClick={() => {
               setInput(EXAMPLE_TOKEN)
             }}
-            className="tool-btn"
-          >
+            className="tool-btn tool-btn-icon"
+           title={t('示例')} aria-label={t('示例')}>
             <FileText className="h-3.5 w-3.5" />
-            示例
           </button>
           {decoded && showHeader && decoded.header && (
             <button
               onClick={() => copyToClipboard(prettyJSON(decoded.header))}
-              className="tool-btn"
-            >
+              className="tool-btn tool-btn-icon"
+             title={t('复制 Header')} aria-label={t('复制 Header')}>
               <Copy className="h-3.5 w-3.5" />
-              复制 Header
             </button>
           )}
           {decoded && showPayload && (
             <button
               onClick={() => copyToClipboard(prettyJSON(decoded.payload))}
-              className="tool-btn"
-            >
+              className="tool-btn tool-btn-icon"
+             title={t('复制 Payload')} aria-label={t('复制 Payload')}>
               <Copy className="h-3.5 w-3.5" />
-              复制 Payload
             </button>
           )}
           {input && (
-            <button onClick={clearAll} className="tool-btn tool-btn-danger">
+            <button onClick={clearAll} className="tool-btn tool-btn-icon tool-btn-danger" title={t('清空')} aria-label={t('清空')}>
               <Trash2 className="h-3.5 w-3.5" />
-              清空
             </button>
           )}
         </>
@@ -185,12 +183,12 @@ export default function JWTDecoderPage() {
             <div className="tool-panel-head">
               <span className="text-neon-amber">&gt;_</span>
               <span>TOKEN</span>
-              <span className="ml-auto normal-case tracking-normal">{input.length} 字符</span>
+              <span className="ml-auto normal-case tracking-normal">{input.length} {t('字符')}</span>
             </div>
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value.trim())}
-              placeholder="粘贴 JWT Token..."
+              placeholder={t('粘贴 JWT Token...')}
               spellCheck={false}
               className="min-h-0 flex-1 resize-none bg-void-100 p-4 font-mono text-sm text-ink-primary caret-neon-amber placeholder:text-ink-muted focus:outline-none"
             />
@@ -206,10 +204,10 @@ export default function JWTDecoderPage() {
                 {decoded
                   ? decoded.isValid
                     ? isExpired()
-                      ? '已过期'
-                      : '有效'
-                    : '无效'
-                  : '待输入'}
+                      ? t('已过期')
+                      : t('有效')
+                    : t('无效')
+                  : t('待输入')}
               </span>
             </div>
 
@@ -217,7 +215,7 @@ export default function JWTDecoderPage() {
               {!decoded && (
                 <div className="flex h-full min-h-[280px] flex-col items-center justify-center gap-3 text-center">
                   <Shield className="h-12 w-12 text-ink-muted" />
-                  <p className="font-mono text-xs text-ink-muted">输入 JWT Token 开始解码</p>
+                  <p className="font-mono text-xs text-ink-muted">{t('输入 JWT Token 开始解码')}</p>
                 </div>
               )}
 
@@ -231,9 +229,9 @@ export default function JWTDecoderPage() {
                         <div className="font-mono text-sm font-semibold text-ink-primary">
                           {decoded.isValid
                             ? isExpired()
-                              ? 'Token 已过期'
-                              : 'Token 有效'
-                            : 'Token 无效'}
+                              ? t('Token 已过期')
+                              : t('Token 有效')
+                            : t('Token 无效')}
                         </div>
                         {!decoded.isValid && decoded.error && (
                           <div className="mt-1 font-mono text-xs text-neon-magenta">
@@ -242,7 +240,7 @@ export default function JWTDecoderPage() {
                         )}
                         {decoded.isValid && decoded.payload.exp && (
                           <div className="mt-1 font-mono text-xs text-ink-secondary">
-                            剩余时间: {getTimeRemaining()}
+                            {t('剩余时间:')} {getTimeRemaining()}
                           </div>
                         )}
                       </div>
@@ -255,7 +253,7 @@ export default function JWTDecoderPage() {
                       onClick={() => setShowHeader(!showHeader)}
                       className="flex w-full items-center justify-between font-mono text-xs text-ink-secondary transition-colors hover:text-neon-amber"
                     >
-                      <span>HEADER · 头部</span>
+                      <span>{t('HEADER · 头部')}</span>
                       {showHeader ? (
                         <EyeOff className="h-3.5 w-3.5" />
                       ) : (
@@ -276,7 +274,7 @@ export default function JWTDecoderPage() {
                       onClick={() => setShowPayload(!showPayload)}
                       className="flex w-full items-center justify-between font-mono text-xs text-ink-secondary transition-colors hover:text-neon-amber"
                     >
-                      <span>PAYLOAD · 载荷</span>
+                      <span>{t('PAYLOAD · 载荷')}</span>
                       {showPayload ? (
                         <EyeOff className="h-3.5 w-3.5" />
                       ) : (
@@ -289,7 +287,7 @@ export default function JWTDecoderPage() {
                         {/* Standard Claims */}
                         {decoded.isValid && (
                           <div className="space-y-2">
-                            <h4 className="font-mono text-[11px] text-ink-muted">标准声明</h4>
+                            <h4 className="font-mono text-[11px] text-ink-muted">{t('标准声明')}</h4>
 
                             {Object.entries({
                               'Issuer (iss)': decoded.payload.iss,
@@ -324,7 +322,7 @@ export default function JWTDecoderPage() {
 
                         {/* Full Payload JSON */}
                         <div>
-                          <h4 className="mb-2 font-mono text-[11px] text-ink-muted">完整数据</h4>
+                          <h4 className="mb-2 font-mono text-[11px] text-ink-muted">{t('完整数据')}</h4>
                           <pre className="overflow-x-auto rounded-md border border-border-dim bg-void p-3 font-mono text-xs leading-relaxed text-neon-lime">
                             <code>{prettyJSON(decoded.payload)}</code>
                           </pre>
@@ -335,7 +333,7 @@ export default function JWTDecoderPage() {
 
                   {/* Signature */}
                   <div className="rounded-lg border border-border-dim bg-void-100 p-4">
-                    <h4 className="mb-2 font-mono text-[11px] text-ink-muted">SIGNATURE · 签名</h4>
+                    <h4 className="mb-2 font-mono text-[11px] text-ink-muted">{t('SIGNATURE · 签名')}</h4>
                     <div className="rounded-md border border-border-dim bg-void p-3">
                       <p className="break-all font-mono text-xs text-neon-amber">
                         {decoded.signature}

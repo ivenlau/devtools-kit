@@ -11,6 +11,7 @@ import {
 } from '@/lib/timestamp'
 import { useTransferData } from '@/lib/useTransferData'
 import { ToolShell } from '@/components/ToolShell'
+import { useI18n } from '@/components/I18nProvider'
 
 interface TimestampOutput {
   seconds: string
@@ -18,6 +19,7 @@ interface TimestampOutput {
 }
 
 export default function TimestampToolPage() {
+  const { t } = useI18n()
   const [currentTimeMs, setCurrentTimeMs] = useState(0)
   const [inputTimestamp, setInputTimestamp] = useState('')
   const [outputDate, setOutputDate] = useState('')
@@ -49,7 +51,7 @@ export default function TimestampToolPage() {
     const parsed = parseTimestampInput(inputTimestamp)
     if (!parsed) {
       setOutputDate('')
-      setTimestampError('无效的时间戳，请输入秒级或毫秒级数字')
+      setTimestampError(t('无效的时间戳，请输入秒级或毫秒级数字'))
       return
     }
 
@@ -61,7 +63,7 @@ export default function TimestampToolPage() {
     const parsed = parseDateInput(inputDate)
     if (!parsed) {
       setOutputTimestamp(null)
-      setDateError('无法识别该时间格式，请检查日期、时间和时区')
+      setDateError(t('无法识别该时间格式，请检查日期、时间和时区'))
       return
     }
 
@@ -80,7 +82,7 @@ export default function TimestampToolPage() {
   return (
     <ToolShell
       title="TIMESTAMP"
-      description="Unix 时间戳与日期时间互转，支持毫秒级精度"
+      description={t('Unix 时间戳与日期时间互转，支持毫秒级精度')}
       path="/tools/timestamp"
       icon={Clock}
       accent="purple"
@@ -97,14 +99,14 @@ export default function TimestampToolPage() {
               onClick={() => copyToClipboard(formatTimestampSeconds(currentTimeMs))}
               className="mx-auto mt-2 block font-mono text-4xl font-bold tracking-wide text-ink-primary transition-opacity hover:opacity-80 sm:text-5xl md:text-6xl"
               style={{ textShadow: '0 0 28px rgba(168,85,247,0.4)' }}
-              title="复制秒级时间戳"
+              title={t('复制秒级时间戳')}
             >
               {formatTimestampSeconds(currentTimeMs)}
             </button>
             <button
               onClick={() => copyToClipboard(formatTimestampMilliseconds(currentTimeMs))}
               className="mt-1 font-mono text-base text-neon-purple transition-opacity hover:opacity-80 sm:text-lg"
-              title="复制毫秒级时间戳"
+              title={t('复制毫秒级时间戳')}
             >
               {formatTimestampMilliseconds(currentTimeMs)}
             </button>
@@ -140,12 +142,12 @@ export default function TimestampToolPage() {
                 value={inputTimestamp}
                 onChange={(e) => setInputTimestamp(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleTimestampToDate()}
-                placeholder="例如: 1706610000 或 1706610000123.456"
+                placeholder={t('例如: 1706610000 或 1706610000123.456')}
                 className="w-full rounded-md border border-border-dim bg-void-200 px-3 py-2 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:border-neon-cyan focus:outline-none"
               />
               <button onClick={handleTimestampToDate} className="tool-btn tool-btn-accent self-start">
                 <ArrowRight className="h-3.5 w-3.5" />
-                转换
+                {t('转换')}
               </button>
               {timestampError && (
                 <p className="font-mono text-xs text-neon-red">{timestampError}</p>
@@ -158,10 +160,9 @@ export default function TimestampToolPage() {
                   </div>
                   <button
                     onClick={() => copyToClipboard(outputDate)}
-                    className="tool-btn shrink-0"
-                  >
+                    className="tool-btn tool-btn-icon"
+                   title={t('复制')} aria-label={t('复制')}>
                     <Copy className="h-3.5 w-3.5" />
-                    复制
                   </button>
                 </div>
               )}
@@ -191,15 +192,15 @@ export default function TimestampToolPage() {
                 value={inputDate}
                 onChange={(e) => setInputDate(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleDateToTimestamp()}
-                placeholder="例如: 2024-01-30 12:00:00.123 或 2024年1月30日"
+                placeholder={t('例如: 2024-01-30 12:00:00.123 或 2024年1月30日')}
                 className="w-full rounded-md border border-border-dim bg-void-200 px-3 py-2 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:border-neon-cyan focus:outline-none"
               />
               <p className="font-mono text-[11px] text-ink-muted">
-                支持 ISO 8601、`YYYY-MM-DD HH:mm:ss`、斜杠日期、中文日期和带时区的日期格式
+                {t('支持 ISO 8601 等多种日期格式')}
               </p>
               <button onClick={handleDateToTimestamp} className="tool-btn tool-btn-accent self-start">
                 <ArrowLeft className="h-3.5 w-3.5" />
-                转换
+                {t('转换')}
               </button>
               {dateError && (
                 <p className="font-mono text-xs text-neon-red">{dateError}</p>
@@ -212,10 +213,9 @@ export default function TimestampToolPage() {
                     </code>
                     <button
                       onClick={() => copyToClipboard(outputTimestamp.seconds)}
-                      className="tool-btn shrink-0"
-                    >
+                      className="tool-btn tool-btn-icon"
+                     title={t('复制')} aria-label={t('复制')}>
                       <Copy className="h-3.5 w-3.5" />
-                      复制
                     </button>
                   </div>
                   <div className="flex items-center justify-between gap-4">
@@ -224,10 +224,9 @@ export default function TimestampToolPage() {
                     </code>
                     <button
                       onClick={() => copyToClipboard(outputTimestamp.milliseconds)}
-                      className="tool-btn shrink-0"
-                    >
+                      className="tool-btn tool-btn-icon"
+                     title={t('复制')} aria-label={t('复制')}>
                       <Copy className="h-3.5 w-3.5" />
-                      复制
                     </button>
                   </div>
                 </div>

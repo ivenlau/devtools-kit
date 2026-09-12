@@ -1,37 +1,42 @@
 'use client'
 
-import { useEffect } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
+
+export type Theme = 'dark' | 'light'
+
+interface ThemeContextValue {
+  theme: Theme
+  toggleTheme: () => void
+}
+
+const ThemeContext = createContext<ThemeContextValue>({
+  theme: 'dark',
+  toggleTheme: () => {},
+})
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setTheme] = useState<Theme>('dark')
+
+  // Hydrate from the boot script's choice (localStorage), then keep in sync.
   useEffect(() => {
-    // Apply theme on mount
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | 'system' | null
-    // Cyber terminal identity is dark-first; only honor explicit light choice.
-    const theme = savedTheme === 'light' ? 'light' : 'dark'
-
-    const applyTheme = (theme: 'light' | 'dark' | 'system') => {
-      const root = document.documentElement
-      if (theme === 'system') {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-        root.classList.toggle('dark', prefersDark)
-      } else {
-        root.classList.toggle('dark', theme === 'dark')
-      }
-    }
-
-    applyTheme(theme)
-
-    // Listen for system theme changes
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    const handleChange = () => {
-      if (localStorage.getItem('theme') === 'system') {
-        applyTheme('system')
-      }
-    }
-
-    mediaQuery.addEventListener('change', handleChange)
-    return () => mediaQuery.removeEventListener('change', handleChange)
+    setTheme(localStorage.getItem('theme') === 'light' ? 'light' : 'dark')
   }, [])
 
-  return <>{children}</>
+  useEffect(() => {
+    document.documentElement.classList.toggle('light', theme === 'light')
+  }, [theme])
+
+  const toggleTheme = () => {
+    setTheme((t) => {
+      const next: Theme = t === 'dark' ? 'light' : 'dark'
+      localStorage.setItem('theme', next)
+      return next
+    })
+  }
+
+  return <ThemeContext.Provider value={{ theme, toggleTheme }}>{children}</ThemeContext.Provider>
+}
+
+export function useTheme() {
+  return useContext(ThemeContext)
 }

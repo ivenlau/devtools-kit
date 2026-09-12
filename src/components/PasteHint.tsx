@@ -2,6 +2,7 @@
 
 import { X } from 'lucide-react'
 import type { DetectedTool } from '@/lib/detectTool'
+import { useI18n } from '@/components/I18nProvider'
 
 interface PasteHintProps {
   candidates: DetectedTool[]
@@ -10,6 +11,8 @@ interface PasteHintProps {
 }
 
 export function PasteHint({ candidates, onSelect, onClose }: PasteHintProps) {
+  const { t, lang } = useI18n()
+
   return (
     <div
       className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center"
@@ -31,7 +34,7 @@ export function PasteHint({ candidates, onSelect, onClose }: PasteHintProps) {
           </button>
         </div>
         <p className="text-sm text-ink-secondary mb-4">
-          检测到多种可能，请选择目标工具：
+          {t('检测到多种可能，请选择目标工具：')}
         </p>
         <div className="flex flex-col gap-2">
           {candidates.map((tool) => (
@@ -41,7 +44,7 @@ export function PasteHint({ candidates, onSelect, onClose }: PasteHintProps) {
               className="w-full text-left px-4 py-3 rounded-lg border border-border-dim bg-void-200 hover:border-neon-cyan hover:bg-void-300 transition-all group"
             >
               <span className="text-sm font-medium text-ink-primary group-hover:text-neon-cyan">
-                {tool.name}
+                {t(tool.name)}
               </span>
               <span className="mt-0.5 block font-mono text-[11px] text-ink-muted">
                 {tool.path}

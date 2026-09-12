@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Binary, Copy } from 'lucide-react'
+import { Binary, Copy, Type } from 'lucide-react'
 import { useTransferData } from '@/lib/useTransferData'
 import { ToolShell } from '@/components/ToolShell'
+import { useI18n } from '@/components/I18nProvider'
 
 /**
  * 十进制转二进制
@@ -78,6 +79,7 @@ const binToString = (bin: string): string => {
 }
 
 export default function BinaryConverterPage() {
+  const { t, lang } = useI18n()
   const [mode, setMode] = useState<'number' | 'text'>('number')
   const [inputType, setInputType] = useState<'dec' | 'bin' | 'hex'>('dec')
   const [input, setInput] = useState('')
@@ -134,14 +136,14 @@ export default function BinaryConverterPage() {
         const result = stringToBin(input)
         setTextResult(result)
       } catch (error) {
-        setTextResult('转换失败')
+        setTextResult(t('转换失败'))
       }
     } else if (mode === 'text' && inputType === 'bin') {
       try {
         const result = binToString(input)
         setTextResult(result)
       } catch (error) {
-        setTextResult('转换失败')
+        setTextResult(t('转换失败'))
       }
     }
   }, [input, inputType, mode])
@@ -153,7 +155,7 @@ export default function BinaryConverterPage() {
   return (
     <ToolShell
       title="RADIX"
-      description="二进制、十进制、十六进制互转"
+      description={t('二进制、十进制、十六进制互转')}
       path="/tools/binary"
       icon={Binary}
       accent="purple"
@@ -165,9 +167,12 @@ export default function BinaryConverterPage() {
               setInput('')
               setResults({ dec: '', bin: '', hex: '' })
             }}
-            className={`chip ${mode === 'number' ? 'border-neon-purple/60 bg-neon-purple/10 text-neon-purple' : ''}`}
+            aria-pressed={mode === 'number'}
+            title={t('数字转换')}
+            aria-label={t('数字转换')}
+            className={`tool-btn tool-btn-icon ${mode === 'number' ? 'tool-btn-accent' : ''}`}
           >
-            数字转换
+            <Binary className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={() => {
@@ -175,9 +180,12 @@ export default function BinaryConverterPage() {
               setInput('')
               setTextResult('')
             }}
-            className={`chip ${mode === 'text' ? 'border-neon-purple/60 bg-neon-purple/10 text-neon-purple' : ''}`}
+            aria-pressed={mode === 'text'}
+            title={t('文本转换')}
+            aria-label={t('文本转换')}
+            className={`tool-btn tool-btn-icon ${mode === 'text' ? 'tool-btn-accent' : ''}`}
           >
-            文本转换
+            <Type className="h-3.5 w-3.5" />
           </button>
           {mode === 'number' ? (
             <select
@@ -187,12 +195,12 @@ export default function BinaryConverterPage() {
                 setInput('')
                 setResults({ dec: '', bin: '', hex: '' })
               }}
-              aria-label="输入进制"
+              aria-label={t('输入进制')}
               className="tool-select"
             >
-              <option value="dec">十进制 (DEC)</option>
-              <option value="bin">二进制 (BIN)</option>
-              <option value="hex">十六进制 (HEX)</option>
+              <option value="dec">{t('十进制 (DEC)')}</option>
+              <option value="bin">{t('二进制 (BIN)')}</option>
+              <option value="hex">{t('十六进制 (HEX)')}</option>
             </select>
           ) : (
             <select
@@ -202,11 +210,11 @@ export default function BinaryConverterPage() {
                 setInput('')
                 setTextResult('')
               }}
-              aria-label="输入格式"
+              aria-label={t('输入格式')}
               className="tool-select"
             >
-              <option value="dec">文本 (字符串)</option>
-              <option value="bin">二进制字符串</option>
+              <option value="dec">{t('文本 (字符串)')}</option>
+              <option value="bin">{t('二进制字符串')}</option>
             </select>
           )}
 
@@ -230,9 +238,8 @@ export default function BinaryConverterPage() {
                 </>
               )
             : textResult && (
-                <button onClick={() => copyToClipboard(textResult)} className="tool-btn">
+                <button onClick={() => copyToClipboard(textResult)} className="tool-btn tool-btn-icon" title={t('复制')} aria-label={t('复制')}>
                   <Copy className="h-3.5 w-3.5" />
-                  复制
                 </button>
               )}
         </>
@@ -257,10 +264,10 @@ export default function BinaryConverterPage() {
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={
                   inputType === 'dec'
-                    ? '例如: 255'
+                    ? t('例如: 255')
                     : inputType === 'bin'
-                      ? '例如: 11111111'
-                      : '例如: FF'
+                      ? t('例如: 11111111')
+                      : t('例如: FF')
                 }
                 spellCheck={false}
                 className="h-12 w-full bg-void-100 px-4 font-mono text-sm text-ink-primary caret-neon-purple placeholder:text-ink-muted focus:outline-none"
@@ -272,7 +279,7 @@ export default function BinaryConverterPage() {
               <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
                 {/* DEC */}
                 <div className="rounded-lg border border-border-dim bg-void-100 p-4">
-                  <h4 className="mb-2 font-mono text-[11px] text-ink-muted">十进制</h4>
+                  <h4 className="mb-2 font-mono text-[11px] text-ink-muted">{t('十进制')}</h4>
                   <code className="break-all font-mono text-lg text-neon-purple">
                     {results.dec || '-'}
                   </code>
@@ -280,7 +287,7 @@ export default function BinaryConverterPage() {
 
                 {/* BIN */}
                 <div className="rounded-lg border border-border-dim bg-void-100 p-4">
-                  <h4 className="mb-2 font-mono text-[11px] text-ink-muted">二进制</h4>
+                  <h4 className="mb-2 font-mono text-[11px] text-ink-muted">{t('二进制')}</h4>
                   <code className="break-all font-mono text-lg text-neon-purple">
                     {results.bin || '-'}
                   </code>
@@ -288,7 +295,7 @@ export default function BinaryConverterPage() {
 
                 {/* HEX */}
                 <div className="rounded-lg border border-border-dim bg-void-100 p-4">
-                  <h4 className="mb-2 font-mono text-[11px] text-ink-muted">十六进制</h4>
+                  <h4 className="mb-2 font-mono text-[11px] text-ink-muted">{t('十六进制')}</h4>
                   <code className="break-all font-mono text-lg text-neon-purple">
                     {results.hex || '-'}
                   </code>
@@ -314,7 +321,7 @@ export default function BinaryConverterPage() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={
-                  inputType === 'dec' ? '输入文本...' : '输入二进制字符串（用空格分隔字节）...'
+                  inputType === 'dec' ? t('输入文本...') : t('输入二进制字符串（用空格分隔字节）...')
                 }
                 spellCheck={false}
                 className="h-36 w-full resize-none bg-void-100 p-4 font-mono text-sm text-ink-primary caret-neon-purple placeholder:text-ink-muted focus:outline-none"
@@ -324,7 +331,7 @@ export default function BinaryConverterPage() {
             {/* Result */}
             {textResult && (
               <div className="rounded-lg border border-border-dim bg-void-100 p-4">
-                <h3 className="mb-2 font-mono text-[11px] text-ink-muted">转换结果</h3>
+                <h3 className="mb-2 font-mono text-[11px] text-ink-muted">{t('转换结果')}</h3>
                 <div className="rounded-md bg-void-200 p-3">
                   <code className="break-all whitespace-pre-wrap font-mono text-sm text-neon-purple">
                     {textResult}
@@ -337,7 +344,7 @@ export default function BinaryConverterPage() {
 
         {/* Quick Reference */}
         <div className="rounded-lg border border-border-dim bg-void-100 p-4">
-          <h3 className="mb-3 font-mono text-[11px] text-ink-muted">快速参考 · 常用值对照表</h3>
+          <h3 className="mb-3 font-mono text-[11px] text-ink-muted">{t('快速参考 · 常用值对照表')}</h3>
 
           <div className="overflow-x-auto">
             <table className="w-full text-sm">

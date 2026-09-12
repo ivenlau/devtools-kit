@@ -5,8 +5,10 @@ import { QrCode, Copy, Download, Image as ImageIcon } from 'lucide-react'
 import { QRCodeSVG } from 'qrcode.react'
 import { useTransferData } from '@/lib/useTransferData'
 import { ToolShell } from '@/components/ToolShell'
+import { useI18n } from '@/components/I18nProvider'
 
 export default function QRCodeGeneratorPage() {
+  const { t } = useI18n()
   const [text, setText] = useState('https://github.com')
   const [size, setSize] = useState(256)
   const [color, setColor] = useState('#000000')
@@ -61,19 +63,17 @@ export default function QRCodeGeneratorPage() {
   return (
     <ToolShell
       title="QRCODE"
-      description="生成自定义二维码，支持多种格式"
+      description={t('生成自定义二维码，支持多种格式')}
       path="/tools/qrcode"
       icon={QrCode}
       accent="cyan"
       actions={
         <>
-          <button onClick={copyBase64} className="tool-btn">
+          <button onClick={copyBase64} className="tool-btn tool-btn-icon" title={t('复制B64')} aria-label={t('复制B64')}>
             <Copy className="h-3.5 w-3.5" />
-            复制B64
           </button>
-          <button onClick={downloadQRCode} className="tool-btn tool-btn-accent">
+          <button onClick={downloadQRCode} className="tool-btn tool-btn-icon tool-btn-accent" title={t('下载 PNG')} aria-label={t('下载 PNG')}>
             <Download className="h-3.5 w-3.5" />
-            下载 PNG
           </button>
         </>
       }
@@ -87,12 +87,12 @@ export default function QRCodeGeneratorPage() {
               <div className="tool-panel-head">
                 <span className="text-neon-cyan">&gt;_</span>
                 <span>INPUT</span>
-                <span className="ml-auto normal-case tracking-normal">{text.length} 字符</span>
+                <span className="ml-auto normal-case tracking-normal">{text.length} {t('字符')}</span>
               </div>
               <textarea
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                placeholder="输入文本或URL..."
+                placeholder={t('输入文本或URL...')}
                 spellCheck={false}
                 className="h-32 w-full min-h-0 resize-none bg-void-100 p-4 font-mono text-sm text-ink-primary caret-neon-cyan placeholder:text-ink-muted focus:outline-none"
               />
@@ -111,7 +111,7 @@ export default function QRCodeGeneratorPage() {
                 {/* Size */}
                 <div>
                   <label className="mb-2 block font-mono text-[11px] text-ink-muted">
-                    尺寸: {size}px × {size}px
+                    {t('尺寸:')} {size}px × {size}px
                   </label>
                   <input
                     type="range"
@@ -128,7 +128,7 @@ export default function QRCodeGeneratorPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="mb-2 block font-mono text-[11px] text-ink-muted">
-                      前景色
+                      {t('前景色')}
                     </label>
                     <div className="flex items-center gap-2">
                       <input
@@ -149,7 +149,7 @@ export default function QRCodeGeneratorPage() {
 
                   <div>
                     <label className="mb-2 block font-mono text-[11px] text-ink-muted">
-                      背景色
+                      {t('背景色')}
                     </label>
                     <div className="flex items-center gap-2">
                       <input
@@ -172,7 +172,7 @@ export default function QRCodeGeneratorPage() {
                 {/* Error Correction */}
                 <div>
                   <label className="mb-2 block font-mono text-[11px] text-ink-muted">
-                    容错率
+                    {t('容错率')}
                   </label>
                   <div className="flex gap-2">
                     {(['L', 'M', 'Q', 'H'] as const).map((level) => (
@@ -190,7 +190,7 @@ export default function QRCodeGeneratorPage() {
                 {/* Quick Sizes */}
                 <div>
                   <label className="mb-2 block font-mono text-[11px] text-ink-muted">
-                    快速尺寸
+                    {t('快速尺寸')}
                   </label>
                   <div className="flex flex-wrap gap-2">
                     {[128, 256, 384, 512].map((s) => (
@@ -234,11 +234,11 @@ export default function QRCodeGeneratorPage() {
               <div className="space-y-2 text-center text-sm">
                 <div className="flex items-center justify-center gap-2">
                   <span className="h-5 w-5 rounded border border-border-dim" style={{ backgroundColor: color }}></span>
-                  <span className="font-mono text-xs text-ink-secondary">前景色 {color.toUpperCase()}</span>
+                  <span className="font-mono text-xs text-ink-secondary">{t('前景色')} {color.toUpperCase()}</span>
                 </div>
                 <div className="flex items-center justify-center gap-2">
                   <span className="h-5 w-5 rounded border border-border-dim" style={{ backgroundColor: bgColor }}></span>
-                  <span className="font-mono text-xs text-ink-secondary">背景色 {bgColor.toUpperCase()}</span>
+                  <span className="font-mono text-xs text-ink-secondary">{t('背景色')} {bgColor.toUpperCase()}</span>
                 </div>
                 <div className="flex items-center justify-center gap-2">
                   <ImageIcon className="h-4 w-4 text-ink-muted" />

@@ -1,14 +1,16 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Clock, Copy, Calendar } from 'lucide-react'
+import { Clock, Copy, Calendar, PencilLine } from 'lucide-react'
 import cronstrue from 'cronstrue/i18n'
 import { useTransferData } from '@/lib/useTransferData'
 import { ToolShell } from '@/components/ToolShell'
+import { useI18n } from '@/components/I18nProvider'
 
 import { CronExpressionParser } from 'cron-parser'
 
 export default function CronGeneratorPage() {
+  const { t, lang } = useI18n()
   const defaultCron = '0 0 * * *'
   const [cron, setCron] = useState(defaultCron)
   const [description, setDescription] = useState('每天 0 点执行')
@@ -28,7 +30,7 @@ export default function CronGeneratorPage() {
   // Parse and explain cron
   useEffect(() => {
     if (!cron || cron.trim() === '') {
-      setError('请输入 Cron 表达式')
+      setError(t('请输入 Cron 表达式'))
       setDescription('')
       setNextRuns([])
       return
@@ -40,7 +42,11 @@ export default function CronGeneratorPage() {
       const parts = trimmedCron.split(/\s+/)
 
       if (parts.length !== 5) {
-        throw new Error(`格式错误: 需要 5 个部分，当前有 ${parts.length} 个`)
+        throw new Error(
+          lang === 'en'
+            ? `Invalid format: expected 5 parts, got ${parts.length}`
+            : `格式错误: 需要 5 个部分，当前有 ${parts.length} 个`
+        )
       }
 
       // Parse expression
@@ -48,12 +54,12 @@ export default function CronGeneratorPage() {
       try {
         interval = CronExpressionParser.parse(trimmedCron)
       } catch (parseError: any) {
-        throw new Error(parseError.message || '无法解析表达式')
+        throw new Error(parseError.message || t('无法解析表达式'))
       }
 
       // Get description using cronstrue
       try {
-        const desc = cronstrue.toString(trimmedCron, { locale: 'zh_CN' })
+        const desc = cronstrue.toString(trimmedCron, { locale: lang === 'en' ? 'en' : 'zh_CN' })
         setDescription(desc)
       } catch (e) {
         // If cronstrue fails, fallback to the raw expression
@@ -75,11 +81,11 @@ export default function CronGeneratorPage() {
       setError('')
     } catch (error: any) {
       console.error('Cron parse error:', error)
-      setError(`无效: ${error.message}`)
+      setError(`${t('无效:')} ${error.message}`)
       setDescription('')
       setNextRuns([])
     }
-  }, [cron])
+  }, [cron, lang])
 
   // Update cron from manual inputs
   useEffect(() => {
@@ -145,27 +151,26 @@ export default function CronGeneratorPage() {
   return (
     <ToolShell
       title="CRON EXPRESSION"
-      description="生成和解析 Cron 定时任务表达式"
+      description={t('生成和解析 Cron 定时任务表达式')}
       path="/tools/cron"
       icon={Clock}
       accent="amber"
       actions={
         <>
-          <label className="flex cursor-pointer select-none items-center gap-1.5 font-mono text-[11px] text-ink-secondary">
-            <input
-              type="checkbox"
-              checked={manualMode}
-              onChange={(e) => setManualMode(e.target.checked)}
-              className="accent-neon-amber"
-            />
-            手动模式
-          </label>
+          <button
+            onClick={() => setManualMode(!manualMode)}
+            aria-pressed={manualMode}
+            title={t('手动模式')}
+            aria-label={t('手动模式')}
+            className={`tool-btn tool-btn-icon ${manualMode ? 'tool-btn-accent' : ''}`}
+          >
+            <PencilLine className="h-3.5 w-3.5" />
+          </button>
 
           <div className="hidden h-5 w-px bg-border-dim sm:block" />
 
-          <button onClick={copyToClipboard} disabled={!cron} className="tool-btn tool-btn-accent">
+          <button onClick={copyToClipboard} disabled={!cron} className="tool-btn tool-btn-icon tool-btn-accent" title={t('复制')} aria-label={t('复制')}>
             <Copy className="h-3.5 w-3.5" />
-            复制
           </button>
         </>
       }
@@ -207,8 +212,8 @@ export default function CronGeneratorPage() {
                   error ? 'text-neon-red' : 'text-ink-secondary'
                 }`}
               >
-                <span className="text-ink-muted">{error ? '错误' : '说明'}:</span>{' '}
-                {error || description}
+                <span className="text-ink-muted">{error ? t('错误') : t('说明')}:</span>{' '}
+                {error || t(description)}
               </p>
             </div>
           </div>
@@ -227,7 +232,7 @@ export default function CronGeneratorPage() {
             {manualFields.map((field) => (
               <div key={field.label}>
                 <label className="mb-2 block font-mono text-[11px] text-ink-muted">
-                  {field.label}
+                  {t(field.label)}
                 </label>
                 <input
                   type="text"
@@ -258,7 +263,7 @@ export default function CronGeneratorPage() {
           <div className="tool-panel-head">
             <span className="text-neon-amber">&gt;_</span>
             <span>PRESETS</span>
-            <span className="ml-auto normal-case tracking-normal">{presets.length} 组常用</span>
+            <span className="ml-auto normal-case tracking-normal">{presets.length} {t('组常用')}</span>
           </div>
           <div className="grid grid-cols-2 gap-2 p-4 sm:grid-cols-3 lg:grid-cols-5">
             {presets.map((preset) => (
@@ -271,7 +276,7 @@ export default function CronGeneratorPage() {
                     : 'border-border-dim bg-void-200 text-ink-secondary hover:border-neon-amber/60'
                 }`}
               >
-                <div className="text-xs font-semibold">{preset.name}</div>
+                <div className="text-xs font-semibold">{t(preset.name)}</div>
                 <div className="font-mono text-[11px] opacity-80">{preset.cron}</div>
               </button>
             ))}
@@ -284,7 +289,7 @@ export default function CronGeneratorPage() {
             <div className="tool-panel-head">
               <span className="text-neon-amber">&gt;_</span>
               <span>NEXT RUNS</span>
-              <span className="ml-auto normal-case tracking-normal">接下来 {nextRuns.length} 次执行</span>
+              <span className="ml-auto normal-case tracking-normal">{lang === 'en' ? `Next ${nextRuns.length} runs` : `接下来 ${nextRuns.length} 次执行`}</span>
             </div>
             <div className="space-y-2 p-4">
               {nextRuns.map((run, index) => (
@@ -296,7 +301,7 @@ export default function CronGeneratorPage() {
                     {index + 1}
                   </span>
                   <span className="font-mono text-xs text-ink-primary">
-                    {new Date(run).toLocaleString('zh-CN', {
+                    {new Date(run).toLocaleString(lang === 'en' ? 'en-US' : 'zh-CN', {
                       year: 'numeric',
                       month: '2-digit',
                       day: '2-digit',

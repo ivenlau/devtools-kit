@@ -5,8 +5,10 @@ import { Image as ImageIcon, Upload, Download, X } from 'lucide-react'
 import imageCompression from 'browser-image-compression'
 import { useTransferStore } from '@/stores/transferStore'
 import { ToolShell } from '@/components/ToolShell'
+import { useI18n } from '@/components/I18nProvider'
 
 export default function ImageCompressPage() {
+  const { t } = useI18n()
   const [originalImage, setOriginalImage] = useState<string | null>(null)
   const [compressedImage, setCompressedImage] = useState<string | null>(null)
   const [originalSize, setOriginalSize] = useState(0)
@@ -46,7 +48,7 @@ export default function ImageCompressPage() {
     if (!selectedFile) return
 
     if (!selectedFile.type.startsWith('image/')) {
-      alert('请选择图片文件')
+      alert(t('请选择图片文件'))
       return
     }
 
@@ -87,7 +89,7 @@ export default function ImageCompressPage() {
       reader.readAsDataURL(compressedFile)
     } catch (error) {
       console.error('压缩失败:', error)
-      alert('图片压缩失败')
+      alert(t('图片压缩失败'))
     } finally {
       setCompressing(false)
     }
@@ -139,7 +141,7 @@ export default function ImageCompressPage() {
   return (
     <ToolShell
       title="IMAGE COMPRESS"
-      description="在线压缩图片，减小文件大小"
+      description={t('在线压缩图片，减小文件大小')}
       path="/tools/image-compress"
       icon={ImageIcon}
       accent="purple"
@@ -157,7 +159,7 @@ export default function ImageCompressPage() {
             className="tool-btn"
           >
             <Upload className="h-3.5 w-3.5" />
-            {originalImage ? '换图' : '选择图片'}
+            {originalImage ? t('换图') : t('选择图片')}
           </button>
           {originalImage && (
             <>
@@ -166,19 +168,17 @@ export default function ImageCompressPage() {
                 disabled={compressing}
                 className="tool-btn tool-btn-accent"
               >
-                {compressing ? '压缩中...' : '重新压缩'}
+                {compressing ? t('压缩中...') : t('重新压缩')}
               </button>
               <button
                 onClick={downloadCompressed}
                 disabled={!compressedImage}
-                className="tool-btn"
-              >
+                className="tool-btn tool-btn-icon"
+               title={t('下载')} aria-label={t('下载')}>
                 <Download className="h-3.5 w-3.5" />
-                下载
               </button>
-              <button onClick={clearAll} className="tool-btn tool-btn-danger">
+              <button onClick={clearAll} className="tool-btn tool-btn-icon tool-btn-danger" title={t('清空')} aria-label={t('清空')}>
                 <X className="h-3.5 w-3.5" />
-                清空
               </button>
             </>
           )}
@@ -214,7 +214,7 @@ export default function ImageCompressPage() {
                   {/* Quality */}
                   <div>
                     <label className="mb-2 block font-mono text-[11px] text-ink-muted">
-                      压缩质量: {(quality * 100).toFixed(0)}%
+                      {t('压缩质量:')} {(quality * 100).toFixed(0)}%
                     </label>
                     <input
                       type="range"
@@ -230,7 +230,7 @@ export default function ImageCompressPage() {
                   {/* Max Width */}
                   <div>
                     <label className="mb-2 block font-mono text-[11px] text-ink-muted">
-                      最大宽度: {maxWidth}px
+                      {t('最大宽度:')} {maxWidth}px
                     </label>
                     <input
                       type="range"
@@ -257,21 +257,21 @@ export default function ImageCompressPage() {
                   </div>
                   <div className="space-y-2 p-4">
                     <div className="flex items-center justify-between rounded-md bg-void-200 px-3 py-2">
-                      <span className="font-mono text-xs text-ink-secondary">原始大小</span>
+                      <span className="font-mono text-xs text-ink-secondary">{t('原始大小')}</span>
                       <span className="font-mono text-sm font-semibold text-ink-primary">
                         {formatSize(originalSize)}
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between rounded-md bg-void-200 px-3 py-2">
-                      <span className="font-mono text-xs text-ink-secondary">压缩后</span>
+                      <span className="font-mono text-xs text-ink-secondary">{t('压缩后')}</span>
                       <span className="font-mono text-sm font-semibold text-ink-primary">
                         {formatSize(compressedSize)}
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between rounded-md border border-neon-lime/30 bg-neon-lime/10 px-3 py-2">
-                      <span className="font-mono text-xs text-neon-lime">节省空间</span>
+                      <span className="font-mono text-xs text-neon-lime">{t('节省空间')}</span>
                       <span className="font-mono text-sm font-semibold text-neon-lime">
                         {getCompressionRatio()}%
                       </span>
@@ -324,14 +324,14 @@ export default function ImageCompressPage() {
               {!compressedImage && !compressing && (
                 <div className="panel flex min-h-[300px] flex-col items-center justify-center gap-4 p-12 text-center">
                   <div className="inline-block h-16 w-16 animate-spin rounded-full border-4 border-neon-purple border-t-transparent"></div>
-                  <p className="font-mono text-xs text-ink-secondary">准备压缩...</p>
+                  <p className="font-mono text-xs text-ink-secondary">{t('准备压缩...')}</p>
                 </div>
               )}
 
               {compressing && (
                 <div className="panel flex min-h-[300px] flex-col items-center justify-center gap-4 p-12 text-center">
                   <div className="inline-block h-16 w-16 animate-spin rounded-full border-4 border-neon-purple border-t-transparent"></div>
-                  <p className="font-mono text-xs text-ink-secondary">压缩中，请稍候...</p>
+                  <p className="font-mono text-xs text-ink-secondary">{t('压缩中，请稍候...')}</p>
                 </div>
               )}
             </div>

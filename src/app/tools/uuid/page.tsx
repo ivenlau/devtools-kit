@@ -1,11 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Hash, Copy, RefreshCw } from 'lucide-react'
+import { Hash, Copy, RefreshCw, Fingerprint } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 import CryptoJS from 'crypto-js'
 import { useTransferStore } from '@/stores/transferStore'
 import { ToolShell } from '@/components/ToolShell'
+import { useI18n } from '@/components/I18nProvider'
 
 /**
  * 生成UUID v4
@@ -37,6 +38,7 @@ const generateHash = (text: string, algorithm: 'md5' | 'sha1' | 'sha256' | 'sha5
 }
 
 export default function HashGeneratorPage() {
+  const { t, lang } = useI18n()
   const [activeTab, setActiveTab] = useState<'uuid' | 'hash'>('uuid')
 
   // UUID 状态
@@ -101,7 +103,7 @@ export default function HashGeneratorPage() {
   return (
     <ToolShell
       title="HASH & UUID"
-      description="MD5/SHA 哈希生成、UUID v4 生成"
+      description={t('MD5/SHA 哈希生成、UUID v4 生成')}
       path="/tools/uuid"
       icon={Hash}
       accent="amber"
@@ -109,25 +111,29 @@ export default function HashGeneratorPage() {
         <>
           <button
             onClick={() => setActiveTab('uuid')}
-            className={`tool-btn ${activeTab === 'uuid' ? 'tool-btn-accent' : ''}`}
+            aria-pressed={activeTab === 'uuid'}
+            title="UUID"
+            aria-label="UUID"
+            className={`tool-btn tool-btn-icon ${activeTab === 'uuid' ? 'tool-btn-accent' : ''}`}
           >
-            UUID
+            <Fingerprint className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={() => setActiveTab('hash')}
-            className={`tool-btn ${activeTab === 'hash' ? 'tool-btn-accent' : ''}`}
+            aria-pressed={activeTab === 'hash'}
+            title="HASH"
+            aria-label="HASH"
+            className={`tool-btn tool-btn-icon ${activeTab === 'hash' ? 'tool-btn-accent' : ''}`}
           >
-            HASH
+            <Hash className="h-3.5 w-3.5" />
           </button>
           {activeTab === 'uuid' && (
             <>
-              <button onClick={() => copyToClipboard(uuid)} className="tool-btn">
+              <button onClick={() => copyToClipboard(uuid)} className="tool-btn tool-btn-icon" title={t('复制')} aria-label={t('复制')}>
                 <Copy className="h-3.5 w-3.5" />
-                复制
               </button>
-              <button onClick={generateNewUUID} className="tool-btn tool-btn-accent">
+              <button onClick={generateNewUUID} className="tool-btn tool-btn-icon tool-btn-accent" title={t('重新生成')} aria-label={t('重新生成')}>
                 <RefreshCw className="h-3.5 w-3.5" />
-                重新生成
               </button>
             </>
           )}
@@ -150,7 +156,7 @@ export default function HashGeneratorPage() {
                   {uuid}
                 </code>
                 <p className="font-mono text-[11px] text-ink-muted">
-                  RFC 4122 v4 · 122-bit 随机 · 冲突概率可忽略
+                  {t('RFC 4122 v4 · 122-bit 随机 · 冲突概率可忽略')}
                 </p>
               </div>
             </div>
@@ -161,7 +167,7 @@ export default function HashGeneratorPage() {
                 <span className="text-neon-amber">&gt;_</span>
                 <span>BATCH</span>
                 <span className="ml-auto normal-case tracking-normal">
-                  {uuidList.length > 0 ? `${uuidList.length} 个` : 'idle'}
+                  {uuidList.length > 0 ? `${uuidList.length} ${t('个')}` : 'idle'}
                 </span>
               </div>
               <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-auto p-4">
@@ -174,9 +180,8 @@ export default function HashGeneratorPage() {
                     onChange={(e) => setUuidCount(Number(e.target.value))}
                     className="w-24 rounded-md border border-border-dim bg-void-200 px-3 py-2 font-mono text-sm text-ink-primary focus:border-neon-cyan focus:outline-none"
                   />
-                  <button onClick={generateBatchUUIDs} className="tool-btn tool-btn-accent">
+                  <button onClick={generateBatchUUIDs} className="tool-btn tool-btn-icon tool-btn-accent" title={t('生成')} aria-label={t('生成')}>
                     <RefreshCw className="h-3.5 w-3.5" />
-                    生成
                   </button>
                 </div>
 
@@ -184,14 +189,13 @@ export default function HashGeneratorPage() {
                   <div className="flex min-h-0 flex-1 flex-col gap-2">
                     <div className="flex items-center justify-between">
                       <span className="font-mono text-[11px] text-ink-secondary">
-                        已生成 {uuidList.length} 个 UUID
+                        {lang === 'en' ? `Generated ${uuidList.length} UUIDs` : `已生成 ${uuidList.length} 个 UUID`}
                       </span>
                       <button
                         onClick={() => copyToClipboard(uuidList.join('\n'))}
-                        className="tool-btn px-2 py-1 text-[11px]"
-                      >
+                        className="tool-btn tool-btn-icon"
+                       title={t('复制全部')} aria-label={t('复制全部')}>
                         <Copy className="h-3.5 w-3.5" />
-                        复制全部
                       </button>
                     </div>
                     <div className="max-h-64 space-y-1 overflow-y-auto">
@@ -236,7 +240,7 @@ export default function HashGeneratorPage() {
             <textarea
               value={hashInput}
               onChange={(e) => setHashInput(e.target.value)}
-              placeholder="输入要生成哈希的文本..."
+              placeholder={t('输入要生成哈希的文本...')}
               className="h-32 min-h-0 w-full flex-none resize-none bg-void-100 p-4 font-mono text-sm text-ink-primary caret-neon-amber placeholder:text-ink-muted focus:outline-none"
               spellCheck={false}
             />
@@ -248,17 +252,16 @@ export default function HashGeneratorPage() {
                       <span className="font-mono text-xs font-bold uppercase text-neon-amber">{algo}</span>
                       <button
                         onClick={() => copyToClipboard(hashOutput[algo])}
-                        className="tool-btn px-2 py-1 text-[11px]"
-                      >
+                        className="tool-btn tool-btn-icon"
+                       title={t('复制')} aria-label={t('复制')}>
                         <Copy className="h-3.5 w-3.5" />
-                        复制
                       </button>
                     </div>
-                    <code className="break-all font-mono text-sm text-ink-primary">{hashOutput[algo]}</code>
+                    <code className="break-all font-mono text-sm text-ink-primary">{t(hashOutput[algo])}</code>
                   </div>
                 ))
               ) : (
-                <p className="font-mono text-xs text-ink-muted">// 输入文本后实时计算四种哈希</p>
+                <p className="font-mono text-xs text-ink-muted">{t('// 输入文本后实时计算四种哈希')}</p>
               )}
             </div>
           </div>

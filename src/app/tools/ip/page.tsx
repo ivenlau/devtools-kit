@@ -5,6 +5,7 @@ import { Globe, MapPin, Copy, Info, Search } from 'lucide-react'
 import ipaddr from 'ipaddr.js'
 import { useTransferData } from '@/lib/useTransferData'
 import { ToolShell } from '@/components/ToolShell'
+import { useI18n } from '@/components/I18nProvider'
 
 interface IPInfo {
   version: 'IPv4' | 'IPv6' | null
@@ -31,6 +32,7 @@ interface GeoLocation {
 }
 
 export default function IPQueryPage() {
+  const { t, lang } = useI18n()
   const [input, setInput] = useState('')
   const [ipInfo, setIpInfo] = useState<IPInfo | null>(null)
   const [geoLocation, setGeoLocation] = useState<GeoLocation | null>(null)
@@ -84,7 +86,7 @@ export default function IPQueryPage() {
   // Query IP information
   const queryIP = async () => {
     if (!input.trim()) {
-      setError('请输入 IP 地址')
+      setError(t('请输入 IP 地址'))
       return
     }
 
@@ -97,7 +99,7 @@ export default function IPQueryPage() {
     setIpInfo(info)
 
     if (!info.isValid) {
-      setError('无效的 IP 地址格式')
+      setError(t('无效的 IP 地址格式'))
       setLoading(false)
       return
     }
@@ -105,7 +107,7 @@ export default function IPQueryPage() {
     // Query geolocation for public IPs
     if (!info.isPrivate && !info.isLoopback) {
       try {
-        const response = await fetch(`http://ip-api.com/json/${input.trim()}?lang=zh-CN`)
+        const response = await fetch(`http://ip-api.com/json/${input.trim()}?lang=${lang === 'en' ? 'en' : 'zh-CN'}`)
         const data = await response.json()
 
         if (data.status === 'success') {
@@ -123,10 +125,10 @@ export default function IPQueryPage() {
             lon: data.lon,
           })
         } else {
-          setError('无法获取地理位置信息')
+          setError(t('无法获取地理位置信息'))
         }
       } catch (err) {
-        setError('查询失败，请稍后重试')
+        setError(t('查询失败，请稍后重试'))
       }
     }
 
@@ -149,26 +151,28 @@ export default function IPQueryPage() {
   return (
     <ToolShell
       title="IP LOOKUP"
-      description="查询 IP 地址信息和地理位置"
+      description={t('查询 IP 地址信息和地理位置')}
       path="/tools/ip"
       icon={Globe}
       accent="lime"
       actions={
         <>
-          <button onClick={queryIP} disabled={loading} className="tool-btn tool-btn-accent">
+          <button onClick={queryIP} disabled={loading} className="tool-btn tool-btn-icon tool-btn-accent" title={t('查询')} aria-label={t('查询')}>
             <Search className="h-3.5 w-3.5" />
-            查询
           </button>
           {myIP && (
-            <button onClick={useMyIP} className="tool-btn">
+            <button
+              onClick={useMyIP}
+              className="tool-btn tool-btn-icon"
+              title={`${t('本机')} IP`}
+              aria-label={`${t('本机')} IP`}
+            >
               <Globe className="h-3.5 w-3.5" />
-              本机 IP
             </button>
           )}
           {geoLocation && (
-            <button onClick={() => copyToClipboard(geoLocation.ip)} className="tool-btn">
+            <button onClick={() => copyToClipboard(geoLocation.ip)} className="tool-btn tool-btn-icon" title={t('复制')} aria-label={t('复制')}>
               <Copy className="h-3.5 w-3.5" />
-              复制
             </button>
           )}
         </>
@@ -181,7 +185,7 @@ export default function IPQueryPage() {
             <span className="text-neon-lime">&gt;_</span>
             <span>TARGET</span>
             <span className="ml-auto normal-case tracking-normal">
-              {myIP ? `本机 ${myIP}` : 'IPv4 / IPv6'}
+              {myIP ? `${t('本机')} ${myIP}` : 'IPv4 / IPv6'}
             </span>
           </div>
           <input
@@ -189,7 +193,7 @@ export default function IPQueryPage() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && queryIP()}
-            placeholder="输入 IP 地址 (如: 8.8.8.8)"
+            placeholder={t('输入 IP 地址 (如: 8.8.8.8)')}
             spellCheck={false}
             className="h-12 w-full bg-void-100 px-4 font-mono text-sm text-ink-primary caret-neon-lime placeholder:text-ink-muted focus:outline-none"
           />
@@ -207,41 +211,41 @@ export default function IPQueryPage() {
           <div className="rounded-lg border border-border-dim bg-void-100 p-4">
             <h3 className="mb-3 flex items-center gap-2 font-mono text-[11px] text-ink-muted">
               <Info className="h-3.5 w-3.5 text-neon-lime" />
-              IP 信息
+              {t('IP 信息')}
             </h3>
 
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
               <div className="rounded-md bg-void-200 p-3">
-                <div className="mb-1 text-[11px] text-ink-muted">版本</div>
+                <div className="mb-1 text-[11px] text-ink-muted">{t('版本')}</div>
                 <div className="font-mono text-sm font-semibold text-ink-primary">
                   {ipInfo.version}
                 </div>
               </div>
 
               <div className="rounded-md bg-void-200 p-3">
-                <div className="mb-1 text-[11px] text-ink-muted">类型</div>
+                <div className="mb-1 text-[11px] text-ink-muted">{t('类型')}</div>
                 <div className="font-mono text-sm font-semibold text-ink-primary">
                   {ipInfo.type}
                 </div>
               </div>
 
               <div className="rounded-md bg-void-200 p-3">
-                <div className="mb-1 text-[11px] text-ink-muted">私有地址</div>
+                <div className="mb-1 text-[11px] text-ink-muted">{t('私有地址')}</div>
                 <div className="font-mono text-sm font-semibold text-ink-primary">
-                  {ipInfo.isPrivate ? '是' : '否'}
+                  {ipInfo.isPrivate ? t('是') : t('否')}
                 </div>
               </div>
 
               <div className="rounded-md bg-void-200 p-3">
-                <div className="mb-1 text-[11px] text-ink-muted">回环地址</div>
+                <div className="mb-1 text-[11px] text-ink-muted">{t('回环地址')}</div>
                 <div className="font-mono text-sm font-semibold text-ink-primary">
-                  {ipInfo.isLoopback ? '是' : '否'}
+                  {ipInfo.isLoopback ? t('是') : t('否')}
                 </div>
               </div>
 
               {ipInfo.range && (
                 <div className="col-span-2 rounded-md bg-void-200 p-3 md:col-span-4">
-                  <div className="mb-1 text-[11px] text-ink-muted">地址范围</div>
+                  <div className="mb-1 text-[11px] text-ink-muted">{t('地址范围')}</div>
                   <div className="font-mono text-sm font-semibold text-ink-primary">
                     {ipInfo.range}
                   </div>
@@ -256,40 +260,40 @@ export default function IPQueryPage() {
           <div className="rounded-lg border border-border-dim bg-void-100 p-4">
             <h3 className="mb-3 flex items-center gap-2 font-mono text-[11px] text-ink-muted">
               <MapPin className="h-3.5 w-3.5 text-neon-lime" />
-              地理位置
+              {t('地理位置')}
             </h3>
 
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <div className="rounded-md bg-void-200 p-3">
-                <div className="mb-1 text-[11px] text-ink-muted">IP 地址</div>
+                <div className="mb-1 text-[11px] text-ink-muted">{t('IP 地址')}</div>
                 <div className="font-mono text-sm font-semibold text-ink-primary">
                   {geoLocation.ip}
                 </div>
               </div>
 
               <div className="rounded-md bg-void-200 p-3">
-                <div className="mb-1 text-[11px] text-ink-muted">国家/地区</div>
+                <div className="mb-1 text-[11px] text-ink-muted">{t('国家/地区')}</div>
                 <div className="font-mono text-sm font-semibold text-ink-primary">
                   {geoLocation.country} ({geoLocation.countryCode})
                 </div>
               </div>
 
               <div className="rounded-md bg-void-200 p-3">
-                <div className="mb-1 text-[11px] text-ink-muted">省份/州</div>
+                <div className="mb-1 text-[11px] text-ink-muted">{t('省份/州')}</div>
                 <div className="font-mono text-sm font-semibold text-ink-primary">
                   {geoLocation.region}
                 </div>
               </div>
 
               <div className="rounded-md bg-void-200 p-3">
-                <div className="mb-1 text-[11px] text-ink-muted">城市</div>
+                <div className="mb-1 text-[11px] text-ink-muted">{t('城市')}</div>
                 <div className="font-mono text-sm font-semibold text-ink-primary">
                   {geoLocation.city}
                 </div>
               </div>
 
               <div className="rounded-md bg-void-200 p-3">
-                <div className="mb-1 text-[11px] text-ink-muted">时区</div>
+                <div className="mb-1 text-[11px] text-ink-muted">{t('时区')}</div>
                 <div className="font-mono text-sm font-semibold text-ink-primary">
                   {geoLocation.timezone}
                 </div>
@@ -304,7 +308,7 @@ export default function IPQueryPage() {
 
               {geoLocation.org && (
                 <div className="rounded-md bg-void-200 p-3">
-                  <div className="mb-1 text-[11px] text-ink-muted">组织</div>
+                  <div className="mb-1 text-[11px] text-ink-muted">{t('组织')}</div>
                   <div className="font-mono text-sm font-semibold text-ink-primary">
                     {geoLocation.org}
                   </div>
@@ -313,7 +317,7 @@ export default function IPQueryPage() {
 
               {geoLocation.as && (
                 <div className="rounded-md bg-void-200 p-3">
-                  <div className="mb-1 text-[11px] text-ink-muted">AS 号</div>
+                  <div className="mb-1 text-[11px] text-ink-muted">{t('AS 号')}</div>
                   <div className="font-mono text-xs text-ink-primary">{geoLocation.as}</div>
                 </div>
               )}
@@ -321,14 +325,14 @@ export default function IPQueryPage() {
               {geoLocation.lat && geoLocation.lon && (
                 <>
                   <div className="rounded-md bg-void-200 p-3">
-                    <div className="mb-1 text-[11px] text-ink-muted">纬度</div>
+                    <div className="mb-1 text-[11px] text-ink-muted">{t('纬度')}</div>
                     <div className="font-mono text-sm text-ink-primary">
                       {geoLocation.lat.toFixed(4)}
                     </div>
                   </div>
 
                   <div className="rounded-md bg-void-200 p-3">
-                    <div className="mb-1 text-[11px] text-ink-muted">经度</div>
+                    <div className="mb-1 text-[11px] text-ink-muted">{t('经度')}</div>
                     <div className="font-mono text-sm text-ink-primary">
                       {geoLocation.lon.toFixed(4)}
                     </div>
@@ -341,7 +345,7 @@ export default function IPQueryPage() {
 
         {/* Quick Examples */}
         <div className="rounded-lg border border-border-dim bg-void-100 p-4">
-          <h3 className="mb-3 font-mono text-[11px] text-ink-muted">常用 IP 示例</h3>
+          <h3 className="mb-3 font-mono text-[11px] text-ink-muted">{t('常用 IP 示例')}</h3>
 
           <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
             <button
@@ -374,7 +378,7 @@ export default function IPQueryPage() {
               className="rounded-md border border-border-dim bg-void-200 p-3 text-left transition-colors hover:border-neon-lime"
             >
               <div className="font-mono text-sm text-ink-primary">114.114.114.114</div>
-              <div className="text-[11px] text-ink-muted">国内 DNS</div>
+              <div className="text-[11px] text-ink-muted">{t('国内 DNS')}</div>
             </button>
           </div>
         </div>

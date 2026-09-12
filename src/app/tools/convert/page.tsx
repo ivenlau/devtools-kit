@@ -6,12 +6,14 @@ import yaml from 'js-yaml'
 import xmlFormat from 'xml-formatter'
 import { useTransferData } from '@/lib/useTransferData'
 import { ToolShell } from '@/components/ToolShell'
+import { useI18n } from '@/components/I18nProvider'
 // @ts-ignore
 const TOML = require('toml')
 
 type FormatType = 'json' | 'xml' | 'yaml' | 'toml'
 
 export default function DataConverterPage() {
+  const { t, lang } = useI18n()
   const [input, setInput] = useState('')
   const [inputFormat, setInputFormat] = useState<FormatType>('json')
   const [outputFormat, setOutputFormat] = useState<FormatType>('yaml')
@@ -66,12 +68,16 @@ export default function DataConverterPage() {
               // @ts-ignore
               data = TOML.parse(input)
             } catch {
-              throw new Error('TOML 解析暂不支持，请尝试其他格式')
+              throw new Error(lang === 'en' ? 'TOML parsing not supported yet — try another format' : 'TOML 解析暂不支持，请尝试其他格式')
             }
             break
         }
       } catch (err: any) {
-        throw new Error(`解析${inputFormat.toUpperCase()}失败: ${err.message}`)
+        throw new Error(
+        lang === 'en'
+          ? `Parse ${inputFormat.toUpperCase()} failed: ${err.message}`
+          : `解析${inputFormat.toUpperCase()}失败: ${err.message}`
+      )
       }
 
       // Stringify output
@@ -293,7 +299,7 @@ email = "jane@example.com"`,
   return (
     <ToolShell
       title="DATA CONVERT"
-      description="JSON、XML、YAML、TOML 格式互转"
+      description={t('JSON、XML、YAML、TOML 格式互转')}
       path="/tools/convert"
       icon={RefreshCw}
       accent="purple"
@@ -302,7 +308,7 @@ email = "jane@example.com"`,
           <select
             value={inputFormat}
             onChange={(e) => setInputFormat(e.target.value as FormatType)}
-            aria-label="输入格式"
+            aria-label={t('输入格式')}
             className="tool-select"
           >
             {formatConfig.map((format) => (
@@ -315,7 +321,7 @@ email = "jane@example.com"`,
           <select
             value={outputFormat}
             onChange={(e) => setOutputFormat(e.target.value as FormatType)}
-            aria-label="输出格式"
+            aria-label={t('输出格式')}
             className="tool-select"
           >
             {formatConfig.map((format) => (
@@ -327,26 +333,22 @@ email = "jane@example.com"`,
 
           <div className="hidden h-5 w-px bg-border-dim sm:block" />
 
-          <button onClick={loadExample} className="tool-btn">
+          <button onClick={loadExample} className="tool-btn tool-btn-icon" title={t('示例')} aria-label={t('示例')}>
             <Sparkles className="h-3.5 w-3.5" />
-            示例
           </button>
           <button
             onClick={swapFormats}
             disabled={!input || !output}
-            className="tool-btn tool-btn-accent"
-            title="互换输入输出格式"
-          >
+            className="tool-btn tool-btn-icon tool-btn-accent"
+            title={t('互换输入输出格式')}
+           aria-label={t('互换')}>
             <RefreshCw className="h-3.5 w-3.5" />
-            互换
           </button>
-          <button onClick={copyToClipboard} disabled={!output} className="tool-btn tool-btn-accent">
+          <button onClick={copyToClipboard} disabled={!output} className="tool-btn tool-btn-icon tool-btn-accent" title={t('复制')} aria-label={t('复制')}>
             <Copy className="h-3.5 w-3.5" />
-            复制
           </button>
-          <button onClick={clearAll} className="tool-btn tool-btn-danger">
+          <button onClick={clearAll} className="tool-btn tool-btn-icon tool-btn-danger" title={t('清空')} aria-label={t('清空')}>
             <Trash2 className="h-3.5 w-3.5" />
-            清空
           </button>
         </>
       }
@@ -359,13 +361,13 @@ email = "jane@example.com"`,
               <span className="text-neon-purple">&gt;_</span>
               <span>INPUT</span>
               <span className="ml-auto normal-case tracking-normal">
-                {inputFormat.toUpperCase()} · {input.length} 字符
+                {inputFormat.toUpperCase()} · {input.length} {t('字符')}
               </span>
             </div>
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={`输入 ${inputFormat.toUpperCase()} 数据...`}
+              placeholder={lang === 'en' ? `Enter ${inputFormat.toUpperCase()} data...` : `输入 ${inputFormat.toUpperCase()} 数据...`}
               spellCheck={false}
               className="min-h-0 flex-1 resize-none bg-void-100 p-4 font-mono text-sm text-ink-primary caret-neon-purple placeholder:text-ink-muted focus:outline-none"
             />
@@ -379,7 +381,7 @@ email = "jane@example.com"`,
                 {error ? (
                   <span className="text-neon-red">ERROR</span>
                 ) : (
-                  <>{outputFormat.toUpperCase()} · {output.length} 字符</>
+                  <>{outputFormat.toUpperCase()} · {output.length} {t('字符')}</>
                 )}
               </span>
             </div>
@@ -391,7 +393,11 @@ email = "jane@example.com"`,
               <textarea
                 value={output}
                 readOnly
-                placeholder={`转换后的 ${outputFormat.toUpperCase()} 将显示在这里...`}
+                placeholder={
+                lang === 'en'
+                  ? `Converted ${outputFormat.toUpperCase()} will appear here...`
+                  : `转换后的 ${outputFormat.toUpperCase()} 将显示在这里...`
+              }
                 className="min-h-0 flex-1 resize-none bg-void-100 p-4 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:outline-none"
               />
             )}

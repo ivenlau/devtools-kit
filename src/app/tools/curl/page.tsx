@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react'
 import { Terminal, Copy, Trash2 } from 'lucide-react'
 import { useTransferData } from '@/lib/useTransferData'
 import { ToolShell } from '@/components/ToolShell'
+import { useI18n } from '@/components/I18nProvider'
 
 export default function CurlGeneratorPage() {
+  const { t, lang } = useI18n()
   const [url, setUrl] = useState('https://api.example.com/users')
   const [method, setMethod] = useState<'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'>('GET')
   const [headers, setHeaders] = useState([{ key: 'Content-Type', value: 'application/json' }])
@@ -86,19 +88,17 @@ export default function CurlGeneratorPage() {
   return (
     <ToolShell
       title="CURL BUILDER"
-      description="可视化构建 HTTP 请求，生成 cURL 命令"
+      description={t('可视化构建 HTTP 请求，生成 cURL 命令')}
       path="/tools/curl"
       icon={Terminal}
       accent="cyan"
       actions={
         <>
-          <button onClick={copyToClipboard} className="tool-btn tool-btn-accent">
+          <button onClick={copyToClipboard} className="tool-btn tool-btn-icon tool-btn-accent" title={t('复制')} aria-label={t('复制')}>
             <Copy className="h-3.5 w-3.5" />
-            复制
           </button>
-          <button onClick={clearAll} className="tool-btn tool-btn-danger">
+          <button onClick={clearAll} className="tool-btn tool-btn-icon tool-btn-danger" title={t('清空')} aria-label={t('清空')}>
             <Trash2 className="h-3.5 w-3.5" />
-            清空
           </button>
         </>
       }
@@ -128,7 +128,7 @@ export default function CurlGeneratorPage() {
 
               {/* Method */}
               <div>
-                <label className="mb-2 block font-mono text-[11px] text-ink-muted">请求方法</label>
+                <label className="mb-2 block font-mono text-[11px] text-ink-muted">{t('请求方法')}</label>
                 <div className="flex flex-wrap gap-2">
                   {methods.map((m) => (
                     <button
@@ -145,9 +145,9 @@ export default function CurlGeneratorPage() {
               {/* Headers */}
               <div>
                 <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-                  <label className="block font-mono text-[11px] text-ink-muted">请求头</label>
+                  <label className="block font-mono text-[11px] text-ink-muted">{t('请求头')}</label>
                   <div className="flex items-center gap-1.5">
-                    <span className="font-mono text-[11px] text-ink-muted">预设:</span>
+                    <span className="font-mono text-[11px] text-ink-muted">{t('预设:')}</span>
                     {headerPresets.map((preset, index) => (
                       <button
                         key={index}
@@ -180,7 +180,7 @@ export default function CurlGeneratorPage() {
                       />
                       <button
                         onClick={() => removeHeader(index)}
-                        aria-label="删除请求头"
+                        aria-label={t('删除请求头')}
                         className="p-1 text-ink-muted transition-colors hover:text-neon-magenta"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -193,14 +193,14 @@ export default function CurlGeneratorPage() {
                   onClick={addHeader}
                   className="mt-2 w-full rounded-md border border-dashed border-border-dim py-2 font-mono text-xs text-ink-muted transition-colors hover:border-neon-cyan hover:text-neon-cyan"
                 >
-                  + 添加请求头
+                  + {t('添加请求头')}
                 </button>
               </div>
 
               {/* Body */}
               {(method === 'POST' || method === 'PUT' || method === 'PATCH') && (
                 <div>
-                  <label className="mb-2 block font-mono text-[11px] text-ink-muted">请求体</label>
+                  <label className="mb-2 block font-mono text-[11px] text-ink-muted">{t('请求体')}</label>
                   <textarea
                     value={body}
                     onChange={(e) => setBody(e.target.value)}
@@ -213,7 +213,7 @@ export default function CurlGeneratorPage() {
 
               {/* Examples */}
               <div>
-                <label className="mb-2 block font-mono text-[11px] text-ink-muted">常用示例</label>
+                <label className="mb-2 block font-mono text-[11px] text-ink-muted">{t('常用示例')}</label>
                 <div className="space-y-2">
                   <button
                     onClick={() => {
@@ -224,7 +224,7 @@ export default function CurlGeneratorPage() {
                     }}
                     className="w-full rounded-md border border-border-dim bg-void-200 px-3 py-2 text-left font-mono text-xs text-ink-secondary transition-colors hover:border-neon-cyan hover:text-neon-cyan"
                   >
-                    GET · API 调用
+                    {t('GET · API 调用')}
                   </button>
                   <button
                     onClick={() => {
@@ -235,7 +235,7 @@ export default function CurlGeneratorPage() {
                     }}
                     className="w-full rounded-md border border-border-dim bg-void-200 px-3 py-2 text-left font-mono text-xs text-ink-secondary transition-colors hover:border-neon-cyan hover:text-neon-cyan"
                   >
-                    POST · JSON 数据
+                    {t('POST · JSON 数据')}
                   </button>
                   <button
                     onClick={() => {
@@ -245,7 +245,7 @@ export default function CurlGeneratorPage() {
                     }}
                     className="w-full rounded-md border border-border-dim bg-void-200 px-3 py-2 text-left font-mono text-xs text-ink-secondary transition-colors hover:border-neon-cyan hover:text-neon-cyan"
                   >
-                    GET · 认证请求
+                    {t('GET · 认证请求')}
                   </button>
                 </div>
               </div>
@@ -258,7 +258,7 @@ export default function CurlGeneratorPage() {
               <span className="text-neon-cyan">&gt;_</span>
               <span>OUTPUT</span>
               <span className="ml-auto normal-case tracking-normal">
-                {curlCommand.length} 字符
+                {curlCommand.length} {t('字符')}
               </span>
             </div>
 
@@ -268,16 +268,16 @@ export default function CurlGeneratorPage() {
               </pre>
 
               <div className="rounded-lg border border-border-dim bg-void-100 p-4">
-                <h4 className="mb-2 font-mono text-[11px] text-ink-muted">语法速查</h4>
+                <h4 className="mb-2 font-mono text-[11px] text-ink-muted">{t('语法速查')}</h4>
                 <ul className="space-y-1 font-mono text-xs text-ink-secondary">
                   <li>
-                    <code className="text-neon-amber">-X METHOD</code> — 指定请求方法
+                    <code className="text-neon-amber">-X METHOD</code> — {t('指定请求方法')}
                   </li>
                   <li>
-                    <code className="text-neon-amber">-H &quot;Header&quot;</code> — 添加请求头
+                    <code className="text-neon-amber">-H &quot;Header&quot;</code> — {t('添加请求头')}
                   </li>
                   <li>
-                    <code className="text-neon-amber">-d &apos;data&apos;</code> — 添加请求体
+                    <code className="text-neon-amber">-d &apos;data&apos;</code> — {t('添加请求体')}
                   </li>
                 </ul>
               </div>
