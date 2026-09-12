@@ -388,7 +388,7 @@ export default function HomePage() {
         <div className="hero-footer flex w-full items-center gap-2.5 px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
           <span className="status-dot" />
           <span className="font-mono text-xs font-medium text-ink-secondary">
-            © 2025 DevToolsKit · MIT
+            © 2026 DevToolsKit · MIT
           </span>
         </div>
       </footer>
