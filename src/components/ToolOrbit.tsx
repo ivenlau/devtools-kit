@@ -145,7 +145,6 @@ export function ToolOrbit({
 
   const onPointerDown = useCallback((e: React.PointerEvent) => {
     if (e.button !== 0) return
-    ;(e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId)
     drag.current = { active: true, startX: e.clientX, startRot: rotRef.current, moved: 0 }
     setDragging(true)
   }, [])
@@ -154,6 +153,12 @@ export function ToolOrbit({
     if (!drag.current.active) return
     const dx = e.clientX - drag.current.startX
     drag.current.moved = Math.max(drag.current.moved, Math.abs(dx))
+    if (drag.current.moved > 4) {
+      // Capture only once the gesture turns into a drag — pointer capture
+      // retargets the browser click to the stage, which would swallow
+      // plain clicks on the card links.
+      ;(e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId)
+    }
     setRotation(drag.current.startRot + dx * 0.35)
   }, [])
 
@@ -213,10 +218,14 @@ export function ToolOrbit({
 
     const cardH = Math.round(cardW * 1.22)
     const perspective = Math.round(clamp(radius * 4.5, 1200, 2600))
-    return { cardW, cardH, radius, perspective }
+    // Decorative glow must stay inside the band, or its box extends the
+    // scrollable area of the hero (which computes overflow-y as auto).
+    const glowW = Math.round(radius * 2.2)
+    const glowH = Math.min(Math.round(radius * 1.4), Math.round(bandH))
+    return { cardW, cardH, radius, perspective, glowW, glowH }
   }, [vp, n])
 
-  const { cardW: cardWidth, cardH: cardHeight, radius, perspective } = geo
+  const { cardW: cardWidth, cardH: cardHeight, radius, perspective, glowW, glowH } = geo
 
   return (
     <div
@@ -228,8 +237,8 @@ export function ToolOrbit({
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 rounded-[50%] opacity-60"
         style={{
-          width: radius * 2.2,
-          height: radius * 1.4,
+          width: glowW,
+          height: glowH,
           background:
             'radial-gradient(ellipse at center, rgba(0,229,255,0.12) 0%, rgba(255,45,149,0.06) 40%, transparent 70%)',
           filter: 'blur(8px)',

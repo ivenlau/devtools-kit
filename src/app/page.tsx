@@ -6,7 +6,7 @@ import { useState, useCallback, useEffect, useMemo } from 'react'
 import {
   Braces, FileCode, Hash, Clock, Link2, Regex, FileText, Palette,
   Binary, Shield, Database, ArrowLeftRight, QrCode, Terminal, Globe,
-  RefreshCw, Image as ImageIcon, Minimize2, Code2, Monitor
+  RefreshCw, Image as ImageIcon, Minimize2, Code2, Monitor, CornerDownLeft
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useTransferStore } from '@/stores/transferStore'
@@ -230,7 +230,7 @@ export default function HomePage() {
         <MouseGlow />
 
         {/* Title — fixed top of hero; chrome above title hides on short viewports */}
-        <div className="relative z-20 mx-auto flex w-full shrink-0 flex-col items-center px-4 pt-4 text-center sm:px-6 sm:pt-8 lg:px-8 [@media(min-height:821px)]:pt-10">
+        <div className="hero-head relative z-20 mx-auto flex w-full shrink-0 flex-col items-center px-4 pt-4 text-center sm:px-6 sm:pt-8 lg:px-8 [@media(min-height:821px)]:pt-10">
           <div className="mb-3 hidden inline-flex items-center gap-2 rounded-full border border-neon-lime/60 bg-void-100/90 px-3 py-1 [@media(min-height:821px)]:inline-flex">
             <span className="status-dot" />
             <span className="font-mono text-[10px] tracking-wider text-neon-lime">
@@ -251,7 +251,7 @@ export default function HomePage() {
 
         {/* Orbit — explicit band height so measurement always works */}
         <div
-          className="relative z-10 w-full px-2"
+          className="hero-band relative z-10 w-full px-2"
           style={{ height: 'clamp(260px, 46vh, 680px)' }}
         >
           <ToolOrbit
@@ -262,7 +262,7 @@ export default function HomePage() {
         </div>
 
         {/* Bottom dock — pinned above footer */}
-        <div className="relative z-20 mx-auto mt-auto flex w-full shrink-0 flex-col items-center px-4 pb-5 pt-2 text-center sm:px-6 lg:px-8">
+        <div className="hero-dock relative z-20 mx-auto mt-auto flex w-full shrink-0 flex-col items-center px-4 pb-5 pt-2 text-center sm:px-6 lg:px-8">
           <div
             className={`panel-glow flex w-full max-w-xl items-center gap-3 px-4 py-3 text-left transition-all ${
               focusIndex !== null
@@ -286,8 +286,8 @@ export default function HomePage() {
                 {orbitTools[focusIndex].name}
               </span>
             ) : (
-              <kbd className="shrink-0 rounded border border-border-dim bg-void-300 px-2 py-0.5 font-mono text-[10px] text-ink-secondary">
-                ⌘K
+              <kbd className="flex shrink-0 items-center rounded border border-border-dim bg-void-300 px-1.5 py-1 text-ink-secondary">
+                <CornerDownLeft className="h-3.5 w-3.5" />
               </kbd>
             )}
           </div>
@@ -312,7 +312,7 @@ export default function HomePage() {
       </section>
 
       <footer className="w-full shrink-0 border-t border-border-dim bg-void-100">
-        <div className="flex w-full items-center gap-2.5 px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
+        <div className="hero-footer flex w-full items-center gap-2.5 px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
           <span className="status-dot" />
           <span className="font-mono text-[11px] text-ink-muted">
             © 2025 DevToolsKit · MIT · ivenlau@qq.com
