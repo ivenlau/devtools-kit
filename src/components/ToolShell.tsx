@@ -9,58 +9,82 @@ interface ToolShellProps {
   path: string
   icon: LucideIcon
   accent?: string
+  /** Compact action buttons rendered at the right edge of the header row. */
+  actions?: React.ReactNode
   children: React.ReactNode
 }
 
-const accentMap: Record<string, string> = {
-  cyan: 'text-neon-cyan border-neon-cyan shadow-neon-cyan',
-  magenta: 'text-neon-magenta border-neon-magenta shadow-neon-magenta',
-  lime: 'text-neon-lime border-neon-lime shadow-neon-lime',
-  purple: 'text-neon-purple border-neon-purple shadow-neon-purple',
-  amber: 'text-neon-amber border-neon-amber',
+const accentMap: Record<string, { box: string; line: string; raw: string }> = {
+  cyan: {
+    box: 'text-neon-cyan',
+    line: 'via-neon-cyan/60',
+    raw: '#00E5FF',
+  },
+  magenta: {
+    box: 'text-neon-magenta',
+    line: 'via-neon-magenta/60',
+    raw: '#FF2D95',
+  },
+  lime: {
+    box: 'text-neon-lime',
+    line: 'via-neon-lime/60',
+    raw: '#B8FF3C',
+  },
+  purple: {
+    box: 'text-neon-purple',
+    line: 'via-neon-purple/60',
+    raw: '#A855F7',
+  },
+  amber: {
+    box: 'text-neon-amber',
+    line: 'via-neon-amber/60',
+    raw: '#FFB020',
+  },
 }
 
 export function ToolShell({
   title,
   description,
-  path,
   icon: Icon,
   accent = 'cyan',
+  actions,
   children,
 }: ToolShellProps) {
-  const accentClass = accentMap[accent] ?? accentMap.cyan
+  const a = accentMap[accent] ?? accentMap.cyan
 
   return (
-    <div className="flex min-h-[calc(100dvh-3.5rem)] w-full flex-col bg-void">
-      <div className="w-full border-b border-border-dim bg-void-100">
-        <div className="w-full px-4 py-4 sm:px-6 lg:px-8">
-          <div className="mb-3 flex items-center gap-2 font-mono text-[11px] text-ink-muted">
-            <Link href="/" className="hover:text-neon-cyan transition-colors">
-              ← HOME
-            </Link>
-            <span className="text-border-glow">/</span>
-            <span className="text-ink-secondary">{path}</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <div
-              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border bg-void-200 ${accentClass}`}
-            >
-              <Icon className="h-5 w-5" />
-            </div>
-            <div className="min-w-0">
-              <h1 className="font-display text-2xl font-bold tracking-tight text-ink-primary">
-                {title}
-              </h1>
-              <p className="text-sm text-ink-secondary">{description}</p>
-            </div>
-            <div className="ml-auto hidden items-center gap-2 rounded-full border border-border-glow bg-void-100 px-3 py-1 sm:flex">
-              <span className="status-dot" />
-              <span className="font-mono text-[10px] tracking-wider text-neon-lime">LIVE</span>
-            </div>
-          </div>
+    <div
+      className="flex min-h-[calc(100dvh-3.5rem)] w-full flex-col bg-void"
+      style={{ '--accent': a.raw } as React.CSSProperties}
+    >
+      {/* Single compact strip: back · path · icon · title · description · actions */}
+      <div className="relative w-full border-b border-border-dim bg-void-100">
+        <div className="flex min-h-11 w-full flex-wrap items-center gap-x-2.5 gap-y-1.5 px-4 py-2 sm:px-6 lg:px-8">
+          <Link
+            href="/"
+            aria-label="返回主页"
+            className="font-mono text-[11px] text-ink-muted transition-colors hover:text-neon-cyan"
+          >
+            ←
+          </Link>
+          <Icon className={`ml-1 h-4 w-4 shrink-0 ${a.box}`} />
+          <h1 className="font-display text-base font-bold tracking-tight text-ink-primary">
+            {title}
+          </h1>
+          <span className="hidden min-w-0 truncate font-mono text-[11px] text-ink-muted lg:inline">
+            {description}
+          </span>
+          {actions && (
+            <div className="ml-auto flex flex-wrap items-center gap-2">{actions}</div>
+          )}
         </div>
+        {/* accent hairline — echoes the homepage neon accents */}
+        <div
+          aria-hidden
+          className={`h-px w-full bg-gradient-to-r from-transparent ${a.line} to-transparent`}
+        />
       </div>
-      <div className="w-full flex-1 px-4 py-6 sm:px-6 lg:px-8">{children}</div>
+      <div className="flex w-full flex-1 flex-col px-4 py-3 sm:px-6 lg:px-8">{children}</div>
     </div>
   )
 }

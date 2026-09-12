@@ -143,197 +143,202 @@ export default function ImageCompressPage() {
       path="/tools/image-compress"
       icon={ImageIcon}
       accent="purple"
-    >
-
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          {/* Upload Area */}
-          {!originalImage && (
-            <div className="panel p-12">
-              <div className="flex flex-col items-center">
-                <div className="w-20 h-20 bg-pink-100 dark:bg-pink-900/30 rounded-full flex items-center justify-center mb-4">
-                  <Upload className="h-10 w-10 text-pink-500" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2">上传图片</h3>
-                <p className="text-sm text-ink-secondary mb-6">
-                  支持 JPG、PNG、WebP 等格式
-                </p>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileSelect}
-                  className="hidden"
-                />
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="px-6 py-3 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-lg hover:shadow-lg transition-all"
-                >
-                  选择图片
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Compression Settings and Preview */}
+      actions={
+        <>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleFileSelect}
+            className="hidden"
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="tool-btn"
+          >
+            <Upload className="h-3.5 w-3.5" />
+            {originalImage ? '换图' : '选择图片'}
+          </button>
           {originalImage && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Left Column - Settings */}
-              <div className="space-y-4">
-                <div className="panel p-6">
-                  <h3 className="text-sm font-semibold mb-4">压缩设置</h3>
-
-                  <div className="space-y-6">
-                    {/* Quality */}
-                    <div>
-                      <label className="block text-sm text-ink-secondary mb-2">
-                        压缩质量: {(quality * 100).toFixed(0)}%
-                      </label>
-                      <input
-                        type="range"
-                        min="0.1"
-                        max="1"
-                        step="0.1"
-                        value={quality}
-                        onChange={(e) => setQuality(Number(e.target.value))}
-                        className="w-full accent-pink-500"
-                      />
-                    </div>
-
-                    {/* Max Width */}
-                    <div>
-                      <label className="block text-sm text-ink-secondary mb-2">
-                        最大宽度: {maxWidth}px
-                      </label>
-                      <input
-                        type="range"
-                        min="480"
-                        max="3840"
-                        step="240"
-                        value={maxWidth}
-                        onChange={(e) => setMaxWidth(Number(e.target.value))}
-                        className="w-full accent-pink-500"
-                      />
-                    </div>
-
-                    {/* Re-compress Button */}
-                    <button
-                      onClick={reCompress}
-                      disabled={compressing}
-                      className="w-full px-4 py-3 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-lg hover:shadow-lg transition-all disabled:opacity-50"
-                    >
-                      {compressing ? '压缩中...' : '重新压缩'}
-                    </button>
-
-                    {/* Clear Button */}
-                    <button
-                      onClick={clearAll}
-                      className="w-full px-4 py-3 border border-border-dim rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
-                    >
-                      <X className="h-4 w-4" />
-                      清空
-                    </button>
-                  </div>
+            <>
+              <button
+                onClick={reCompress}
+                disabled={compressing}
+                className="tool-btn tool-btn-accent"
+              >
+                {compressing ? '压缩中...' : '重新压缩'}
+              </button>
+              <button
+                onClick={downloadCompressed}
+                disabled={!compressedImage}
+                className="tool-btn"
+              >
+                <Download className="h-3.5 w-3.5" />
+                下载
+              </button>
+              <button onClick={clearAll} className="tool-btn tool-btn-danger">
+                <X className="h-3.5 w-3.5" />
+                清空
+              </button>
+            </>
+          )}
+        </>
+      }
+    >
+      <div className="flex min-h-0 flex-1 flex-col gap-3">
+        {!originalImage ? (
+          /* Upload Area */
+          <div className="panel flex min-h-[400px] flex-1 flex-col items-center justify-center gap-4 p-12">
+            <div className="flex h-16 w-16 items-center justify-center rounded-lg border border-neon-purple bg-void-200 shadow-neon-purple">
+              <Upload className="h-7 w-7 text-neon-purple" />
+            </div>
+            <p className="font-display text-xl font-semibold text-ink-primary">UPLOAD IMAGE</p>
+            <p className="font-mono text-xs text-ink-muted">
+              JPG · PNG · WebP — compressed locally in your browser
+            </p>
+          </div>
+        ) : (
+          /* Settings + Preview */
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+            {/* Left Column - Settings */}
+            <div className="flex min-h-0 flex-col gap-3">
+              <div className="tool-panel">
+                <div className="tool-panel-head">
+                  <span className="text-neon-purple">&gt;_</span>
+                  <span>SETTINGS</span>
+                  <span className="ml-auto normal-case tracking-normal">
+                    {(quality * 100).toFixed(0)}% · ≤{maxWidth}px
+                  </span>
                 </div>
-
-                {/* Stats */}
-                {compressedSize > 0 && (
-                  <div className="panel p-6">
-                    <h3 className="text-sm font-semibold mb-4">压缩统计</h3>
-
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between p-3 bg-void-200 rounded-lg">
-                        <span className="text-sm text-ink-secondary">原始大小</span>
-                        <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                          {formatSize(originalSize)}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center justify-between p-3 bg-void-200 rounded-lg">
-                        <span className="text-sm text-ink-secondary">压缩后</span>
-                        <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                          {formatSize(compressedSize)}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                        <span className="text-sm text-green-700 dark:text-green-400">节省空间</span>
-                        <span className="text-sm font-semibold text-green-700 dark:text-green-400">
-                          {getCompressionRatio()}%
-                        </span>
-                      </div>
-                    </div>
+                <div className="space-y-5 p-4">
+                  {/* Quality */}
+                  <div>
+                    <label className="mb-2 block font-mono text-[11px] text-ink-muted">
+                      压缩质量: {(quality * 100).toFixed(0)}%
+                    </label>
+                    <input
+                      type="range"
+                      min="0.1"
+                      max="1"
+                      step="0.1"
+                      value={quality}
+                      onChange={(e) => setQuality(Number(e.target.value))}
+                      className="w-full accent-neon-purple"
+                    />
                   </div>
-                )}
-              </div>
 
-              {/* Right Column - Preview */}
-              <div className="lg:col-span-2 space-y-4">
-                {/* Original Image */}
-                <div className="panel p-6">
-                  <h3 className="text-sm font-semibold mb-4">原始图片</h3>
-                  <div className="bg-void-200 rounded-lg p-4 flex items-center justify-center min-h-[300px]">
-                    <img
-                      src={originalImage}
-                      alt="Original"
-                      className="max-w-full max-h-[400px] object-contain"
+                  {/* Max Width */}
+                  <div>
+                    <label className="mb-2 block font-mono text-[11px] text-ink-muted">
+                      最大宽度: {maxWidth}px
+                    </label>
+                    <input
+                      type="range"
+                      min="480"
+                      max="3840"
+                      step="240"
+                      value={maxWidth}
+                      onChange={(e) => setMaxWidth(Number(e.target.value))}
+                      className="w-full accent-neon-purple"
                     />
                   </div>
                 </div>
-
-                {/* Compressed Image */}
-                {compressedImage && (
-                  <div className="panel p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-sm font-semibold">压缩后图片</h3>
-                      <button
-                        onClick={downloadCompressed}
-                        className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all flex items-center gap-2 text-sm"
-                      >
-                        <Download className="h-4 w-4" />
-                        下载
-                      </button>
-                    </div>
-                    <div className="bg-void-200 rounded-lg p-4 flex items-center justify-center min-h-[300px]">
-                      <img
-                        src={compressedImage}
-                        alt="Compressed"
-                        className="max-w-full max-h-[400px] object-contain"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {!compressedImage && !compressing && (
-                  <div className="panel p-12 text-center">
-                    <div className="inline-block w-16 h-16 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-                    <p className="text-ink-secondary">准备压缩...</p>
-                  </div>
-                )}
-
-                {compressing && (
-                  <div className="panel p-12 text-center">
-                    <div className="inline-block w-16 h-16 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-                    <p className="text-ink-secondary">压缩中，请稍候...</p>
-                  </div>
-                )}
               </div>
+
+              {/* Stats */}
+              {compressedSize > 0 && (
+                <div className="tool-panel">
+                  <div className="tool-panel-head">
+                    <span className="text-neon-purple">&gt;_</span>
+                    <span>STATS</span>
+                    <span className="ml-auto normal-case tracking-normal text-neon-lime">
+                      -{getCompressionRatio()}%
+                    </span>
+                  </div>
+                  <div className="space-y-2 p-4">
+                    <div className="flex items-center justify-between rounded-md bg-void-200 px-3 py-2">
+                      <span className="font-mono text-xs text-ink-secondary">原始大小</span>
+                      <span className="font-mono text-sm font-semibold text-ink-primary">
+                        {formatSize(originalSize)}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between rounded-md bg-void-200 px-3 py-2">
+                      <span className="font-mono text-xs text-ink-secondary">压缩后</span>
+                      <span className="font-mono text-sm font-semibold text-ink-primary">
+                        {formatSize(compressedSize)}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between rounded-md border border-neon-lime/30 bg-neon-lime/10 px-3 py-2">
+                      <span className="font-mono text-xs text-neon-lime">节省空间</span>
+                      <span className="font-mono text-sm font-semibold text-neon-lime">
+                        {getCompressionRatio()}%
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-          )}
 
-          {/* Usage Tips */}
-          <div className="mt-8 bg-pink-50 dark:bg-pink-900/20 border border-pink-200 dark:border-pink-800 rounded-xl p-4">
-            <h4 className="text-sm font-semibold text-pink-800 dark:text-pink-300 mb-2">使用提示</h4>
-            <ul className="text-xs text-pink-700 dark:text-pink-400 space-y-1">
-              <li>• 所有压缩在浏览器本地完成，图片不会上传到服务器</li>
-              <li>• 调整压缩质量可以在文件大小和图片质量之间取得平衡</li>
-              <li>• 设置最大宽度可以缩小图片尺寸，更适合网页使用</li>
-              <li>• 支持 JPG、PNG、WebP 等常见图片格式</li>
-            </ul>
+            {/* Right Column - Preview */}
+            <div className="flex min-h-0 flex-col gap-3 lg:col-span-2">
+              {/* Original Image */}
+              <div className="tool-panel">
+                <div className="tool-panel-head">
+                  <span className="text-neon-purple">&gt;_</span>
+                  <span>ORIGINAL</span>
+                  <span className="ml-auto normal-case tracking-normal">
+                    {file?.name} · {formatSize(originalSize)}
+                  </span>
+                </div>
+                <div className="flex min-h-[300px] items-center justify-center bg-void-100 p-4">
+                  <img
+                    src={originalImage!}
+                    alt="Original"
+                    className="max-h-[400px] max-w-full object-contain"
+                  />
+                </div>
+              </div>
+
+              {/* Compressed Image */}
+              {compressedImage && (
+                <div className="tool-panel">
+                  <div className="tool-panel-head">
+                    <span className="text-neon-purple">&gt;_</span>
+                    <span>COMPRESSED</span>
+                    <span className="ml-auto normal-case tracking-normal">
+                      {formatSize(compressedSize)}
+                    </span>
+                  </div>
+                  <div className="flex min-h-[300px] items-center justify-center bg-void-100 p-4">
+                    <img
+                      src={compressedImage}
+                      alt="Compressed"
+                      className="max-h-[400px] max-w-full object-contain"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {!compressedImage && !compressing && (
+                <div className="panel flex min-h-[300px] flex-col items-center justify-center gap-4 p-12 text-center">
+                  <div className="inline-block h-16 w-16 animate-spin rounded-full border-4 border-neon-purple border-t-transparent"></div>
+                  <p className="font-mono text-xs text-ink-secondary">准备压缩...</p>
+                </div>
+              )}
+
+              {compressing && (
+                <div className="panel flex min-h-[300px] flex-col items-center justify-center gap-4 p-12 text-center">
+                  <div className="inline-block h-16 w-16 animate-spin rounded-full border-4 border-neon-purple border-t-transparent"></div>
+                  <p className="font-mono text-xs text-ink-secondary">压缩中，请稍候...</p>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      </div>
+        )}
 
+      </div>
     </ToolShell>
   )
 }

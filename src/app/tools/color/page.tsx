@@ -172,39 +172,40 @@ export default function ColorConverterPage() {
       icon={Palette}
       accent="lime"
     >
-      {/* Color Preview */}
-      <div
-        className="mb-6 h-32 rounded-xl shadow-lg"
-        style={{ backgroundColor: hex }}
-      >
-        <div className="flex items-center justify-center h-full">
-          <span className="text-2xl font-bold" style={{ color: hsl.l > 50 ? '#000' : '#fff' }}>
+      <div className="flex min-h-0 flex-1 flex-col gap-3">
+        {/* Color Preview */}
+        <div
+          className="flex h-28 items-center justify-center rounded-lg border border-border-dim"
+          style={{ backgroundColor: hex }}
+        >
+          <span className="font-mono text-2xl font-bold" style={{ color: hsl.l > 50 ? '#000' : '#fff' }}>
             {hex.toUpperCase()}
           </span>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
           {/* HEX */}
-          <div className="panel-glow rounded-xl p-6">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="font-display text-lg font-semibold text-ink-primary">HEX</h3>
+          <div className="tool-panel">
+            <div className="tool-panel-head">
+              <span className="text-neon-lime">&gt;_</span>
+              <span>HEX</span>
               <button
                 onClick={() => copyToClipboard(hex)}
-                className="text-ink-muted hover:text-neon-lime"
+                aria-label="复制 HEX"
+                className="ml-auto text-ink-muted transition-colors hover:text-neon-lime"
               >
-                <Copy className="h-4 w-4" />
+                <Copy className="h-3.5 w-3.5" />
               </button>
             </div>
-
-            <div className="space-y-4">
+            <div className="space-y-4 p-4">
               <div>
                 <label className="mb-2 block font-mono text-[11px] text-ink-muted">颜色值</label>
                 <input
                   type="text"
                   value={hex}
                   onChange={(e) => setHex(e.target.value)}
-                  className="w-full rounded-lg border border-border-dim bg-void-200 px-4 py-3 font-mono text-sm uppercase text-ink-primary focus:border-neon-lime focus:outline-none"
+                  spellCheck={false}
+                  className="w-full rounded-md border border-border-dim bg-void-200 px-3 py-2 font-mono text-sm uppercase text-ink-primary placeholder:text-ink-muted focus:border-neon-lime focus:outline-none"
                 />
               </div>
 
@@ -226,18 +227,19 @@ export default function ColorConverterPage() {
           </div>
 
           {/* RGB */}
-          <div className="panel-glow rounded-xl p-6">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="font-display text-lg font-semibold text-ink-primary">RGB</h3>
+          <div className="tool-panel">
+            <div className="tool-panel-head">
+              <span className="text-neon-lime">&gt;_</span>
+              <span>RGB</span>
               <button
                 onClick={() => copyToClipboard(`rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`)}
-                className="text-ink-muted hover:text-neon-lime"
+                aria-label="复制 RGB"
+                className="ml-auto text-ink-muted transition-colors hover:text-neon-lime"
               >
-                <Copy className="h-4 w-4" />
+                <Copy className="h-3.5 w-3.5" />
               </button>
             </div>
-
-            <div className="space-y-4">
+            <div className="space-y-4 p-4">
               <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="mb-1 block font-mono text-[11px] text-ink-muted">R (红)</label>
@@ -247,7 +249,7 @@ export default function ColorConverterPage() {
                     max={255}
                     value={rgb.r}
                     onChange={(e) => handleRgbChange('r', Number(e.target.value))}
-                    className="w-full rounded-lg border border-border-dim bg-void-200 px-3 py-2 font-mono text-sm text-ink-primary focus:border-neon-lime focus:outline-none"
+                    className="w-full rounded-md border border-border-dim bg-void-200 px-3 py-2 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:border-neon-lime focus:outline-none"
                   />
                 </div>
                 <div>
@@ -258,7 +260,7 @@ export default function ColorConverterPage() {
                     max={255}
                     value={rgb.g}
                     onChange={(e) => handleRgbChange('g', Number(e.target.value))}
-                    className="w-full rounded-lg border border-border-dim bg-void-200 px-3 py-2 font-mono text-sm text-ink-primary focus:border-neon-lime focus:outline-none"
+                    className="w-full rounded-md border border-border-dim bg-void-200 px-3 py-2 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:border-neon-lime focus:outline-none"
                   />
                 </div>
                 <div>
@@ -269,7 +271,7 @@ export default function ColorConverterPage() {
                     max={255}
                     value={rgb.b}
                     onChange={(e) => handleRgbChange('b', Number(e.target.value))}
-                    className="w-full rounded-lg border border-border-dim bg-void-200 px-3 py-2 font-mono text-sm text-ink-primary focus:border-neon-lime focus:outline-none"
+                    className="w-full rounded-md border border-border-dim bg-void-200 px-3 py-2 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:border-neon-lime focus:outline-none"
                   />
                 </div>
               </div>
@@ -314,18 +316,19 @@ export default function ColorConverterPage() {
           </div>
 
           {/* HSL */}
-          <div className="panel-glow rounded-xl p-6">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="font-display text-lg font-semibold text-ink-primary">HSL</h3>
+          <div className="tool-panel">
+            <div className="tool-panel-head">
+              <span className="text-neon-lime">&gt;_</span>
+              <span>HSL</span>
               <button
                 onClick={() => copyToClipboard(`hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`)}
-                className="text-ink-muted hover:text-neon-lime"
+                aria-label="复制 HSL"
+                className="ml-auto text-ink-muted transition-colors hover:text-neon-lime"
               >
-                <Copy className="h-4 w-4" />
+                <Copy className="h-3.5 w-3.5" />
               </button>
             </div>
-
-            <div className="space-y-4">
+            <div className="space-y-4 p-4">
               <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="mb-1 block font-mono text-[11px] text-ink-muted">H (色相)</label>
@@ -335,7 +338,7 @@ export default function ColorConverterPage() {
                     max={360}
                     value={hsl.h}
                     onChange={(e) => handleHslChange('h', Number(e.target.value))}
-                    className="w-full rounded-lg border border-border-dim bg-void-200 px-3 py-2 font-mono text-sm text-ink-primary focus:border-neon-lime focus:outline-none"
+                    className="w-full rounded-md border border-border-dim bg-void-200 px-3 py-2 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:border-neon-lime focus:outline-none"
                   />
                 </div>
                 <div>
@@ -346,7 +349,7 @@ export default function ColorConverterPage() {
                     max={100}
                     value={hsl.s}
                     onChange={(e) => handleHslChange('s', Number(e.target.value))}
-                    className="w-full rounded-lg border border-border-dim bg-void-200 px-3 py-2 font-mono text-sm text-ink-primary focus:border-neon-lime focus:outline-none"
+                    className="w-full rounded-md border border-border-dim bg-void-200 px-3 py-2 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:border-neon-lime focus:outline-none"
                   />
                 </div>
                 <div>
@@ -357,7 +360,7 @@ export default function ColorConverterPage() {
                     max={100}
                     value={hsl.l}
                     onChange={(e) => handleHslChange('l', Number(e.target.value))}
-                    className="w-full rounded-lg border border-border-dim bg-void-200 px-3 py-2 font-mono text-sm text-ink-primary focus:border-neon-lime focus:outline-none"
+                    className="w-full rounded-md border border-border-dim bg-void-200 px-3 py-2 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:border-neon-lime focus:outline-none"
                   />
                 </div>
               </div>
@@ -401,8 +404,11 @@ export default function ColorConverterPage() {
               </div>
 
               {/* Color Preview for HSL */}
-              <div className="mt-4 rounded-lg border border-border-dim p-3" style={{ backgroundColor: `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)` }}>
-                <span className="text-sm font-medium" style={{ color: hsl.l > 50 ? '#000' : '#fff' }}>
+              <div
+                className="mt-4 rounded-md border border-border-dim p-3"
+                style={{ backgroundColor: `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)` }}
+              >
+                <span className="font-mono text-sm font-medium" style={{ color: hsl.l > 50 ? '#000' : '#fff' }}>
                   HSL({hsl.h}, {hsl.s}%, {hsl.l}%)
                 </span>
               </div>
@@ -411,61 +417,64 @@ export default function ColorConverterPage() {
         </div>
 
         {/* RGBA / Additional Formats */}
-        <div className="mt-4">
-          <div className="panel-glow rounded-xl p-6">
-            <h3 className="mb-4 font-display text-lg font-semibold text-ink-primary">其他格式</h3>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
-                <label className="mb-2 block font-mono text-[11px] text-ink-muted">RGBA</label>
-                <div className="flex items-center justify-between rounded bg-void-200 p-3 font-mono text-sm text-ink-primary">
-                  <code>{rgba}</code>
-                  <button
-                    onClick={() => copyToClipboard(rgba)}
-                    className="ml-2 text-ink-muted hover:text-neon-lime"
-                  >
-                    <Copy className="h-4 w-4" />
-                  </button>
-                </div>
+        <div className="tool-panel">
+          <div className="tool-panel-head">
+            <span className="text-neon-lime">&gt;_</span>
+            <span>FORMATS</span>
+            <span className="ml-auto normal-case tracking-normal">其他格式</span>
+          </div>
+          <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2">
+            <div>
+              <label className="mb-2 block font-mono text-[11px] text-ink-muted">RGBA</label>
+              <div className="flex items-center justify-between rounded-md bg-void-200 p-3 font-mono text-sm text-ink-primary">
+                <code className="break-all">{rgba}</code>
+                <button
+                  onClick={() => copyToClipboard(rgba)}
+                  aria-label="复制 RGBA"
+                  className="ml-2 shrink-0 text-ink-muted transition-colors hover:text-neon-lime"
+                >
+                  <Copy className="h-3.5 w-3.5" />
+                </button>
               </div>
+            </div>
 
-              <div>
-                <label className="mb-2 block font-mono text-[11px] text-ink-muted">RGB (逗号分隔)</label>
-                <div className="flex items-center justify-between rounded bg-void-200 p-3 font-mono text-sm text-ink-primary">
-                  <code>{rgb.r}, {rgb.g}, {rgb.b}</code>
-                  <button
-                    onClick={() => copyToClipboard(`${rgb.r}, ${rgb.g}, ${rgb.b}`)}
-                    className="ml-2 text-ink-muted hover:text-neon-lime"
-                  >
-                    <Copy className="h-4 w-4" />
-                  </button>
-                </div>
+            <div>
+              <label className="mb-2 block font-mono text-[11px] text-ink-muted">RGB (逗号分隔)</label>
+              <div className="flex items-center justify-between rounded-md bg-void-200 p-3 font-mono text-sm text-ink-primary">
+                <code>{rgb.r}, {rgb.g}, {rgb.b}</code>
+                <button
+                  onClick={() => copyToClipboard(`${rgb.r}, ${rgb.g}, ${rgb.b}`)}
+                  aria-label="复制 RGB"
+                  className="ml-2 shrink-0 text-ink-muted transition-colors hover:text-neon-lime"
+                >
+                  <Copy className="h-3.5 w-3.5" />
+                </button>
               </div>
+            </div>
 
-              <div>
-                <label className="mb-2 block font-mono text-[11px] text-ink-muted">RGB (十六进制)</label>
-                <div className="flex items-center justify-between rounded bg-void-200 p-3 font-mono text-sm text-ink-primary">
-                  <code>rgb(0x{rgb.r.toString(16).padStart(2, '0')}, 0x{rgb.g.toString(16).padStart(2, '0')}, 0x{rgb.b.toString(16).padStart(2, '0')})</code>
-                  <button
-                    onClick={() => copyToClipboard(`rgb(0x${rgb.r.toString(16).padStart(2, '0')}, 0x${rgb.g.toString(16).padStart(2, '0')}, 0x${rgb.b.toString(16).padStart(2, '0')})`)}
-                    className="ml-2 text-ink-muted hover:text-neon-lime"
-                  >
-                    <Copy className="h-4 w-4" />
-                  </button>
-                </div>
+            <div>
+              <label className="mb-2 block font-mono text-[11px] text-ink-muted">RGB (十六进制)</label>
+              <div className="flex items-center justify-between rounded-md bg-void-200 p-3 font-mono text-sm text-ink-primary">
+                <code className="break-all">rgb(0x{rgb.r.toString(16).padStart(2, '0')}, 0x{rgb.g.toString(16).padStart(2, '0')}, 0x{rgb.b.toString(16).padStart(2, '0')})</code>
+                <button
+                  onClick={() => copyToClipboard(`rgb(0x${rgb.r.toString(16).padStart(2, '0')}, 0x${rgb.g.toString(16).padStart(2, '0')}, 0x${rgb.b.toString(16).padStart(2, '0')})`)}
+                  aria-label="复制十六进制 RGB"
+                  className="ml-2 shrink-0 text-ink-muted transition-colors hover:text-neon-lime"
+                >
+                  <Copy className="h-3.5 w-3.5" />
+                </button>
               </div>
+            </div>
 
-              <div>
-                <label className="mb-2 block font-mono text-[11px] text-ink-muted">RGBA (百分比)</label>
-                <div className="flex items-center justify-between rounded bg-void-200 p-3 font-mono text-sm text-ink-primary">
-                  <code>rgba({Math.round((rgb.r / 255) * 100)}%, {Math.round((rgb.g / 255) * 100)}%, {Math.round((rgb.b / 255) * 100)}%, 1)</code>
-                </div>
+            <div>
+              <label className="mb-2 block font-mono text-[11px] text-ink-muted">RGBA (百分比)</label>
+              <div className="flex items-center justify-between rounded-md bg-void-200 p-3 font-mono text-sm text-ink-primary">
+                <code className="break-all">rgba({Math.round((rgb.r / 255) * 100)}%, {Math.round((rgb.g / 255) * 100)}%, {Math.round((rgb.b / 255) * 100)}%, 1)</code>
               </div>
             </div>
           </div>
         </div>
 
-      <div className="mt-4 font-mono text-[11px] text-ink-muted">
-        local only · HEX / RGB / HSL / RGBA 互转 · 实时预览 · 滑块调整
       </div>
     </ToolShell>
   )

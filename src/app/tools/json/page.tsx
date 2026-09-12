@@ -1,11 +1,42 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Braces, Copy, Trash2 } from 'lucide-react'
+import { Braces, Copy, Trash2, Wand2, Minimize2 } from 'lucide-react'
 import { formatJson, minifyJson } from '@/lib/parsers/json'
 import { useTransferData } from '@/lib/useTransferData'
-import Editor from '@monaco-editor/react'
+import Editor, { type Monaco } from '@monaco-editor/react'
 import { ToolShell } from '@/components/ToolShell'
+
+// Monaco theme matching the site palette (void panels + neon accents)
+function defineEditorTheme(monaco: Monaco) {
+  monaco.editor.defineTheme('devtools-dark', {
+    base: 'vs-dark',
+    inherit: true,
+    rules: [
+      { token: 'string.key.json', foreground: '00E5FF' },
+      { token: 'string.value.json', foreground: 'FFB86C' },
+      { token: 'number', foreground: 'A855F7' },
+      { token: 'keyword', foreground: 'FF2D95' },
+      { token: 'comment', foreground: '4E5A73' },
+    ],
+    colors: {
+      'editor.background': '#0B0D14',
+      'editor.foreground': '#E8ECF4',
+      'editorLineNumber.foreground': '#4E5A73',
+      'editorLineNumber.activeForeground': '#8B96AD',
+      'editorCursor.foreground': '#00E5FF',
+      'editor.selectionBackground': '#00E5FF33',
+      'editor.lineHighlightBackground': '#111522',
+      'editorIndentGuide.background1': '#1A2035',
+      'editorIndentGuide.activeBackground1': '#2A3558',
+      'editorWidget.background': '#111522',
+      'editorWidget.border': '#1A2035',
+      'editorGutter.background': '#0B0D14',
+      'scrollbarSlider.background': '#1A2035AA',
+      'scrollbarSlider.hoverBackground': '#2A3558AA',
+    },
+  })
+}
 
 export default function JsonToolPage() {
   const [input, setInput] = useState('')
@@ -13,31 +44,8 @@ export default function JsonToolPage() {
   const [error, setError] = useState<string | null>(null)
   const [indent, setIndent] = useState(2)
   const [sortKeys, setSortKeys] = useState(false)
-  const [editorTheme, setEditorTheme] = useState<'light' | 'vs-dark'>('vs-dark')
 
   useTransferData(setInput)
-
-  useEffect(() => {
-    const isDark = document.documentElement.classList.contains('dark')
-    setEditorTheme(isDark ? 'vs-dark' : 'light')
-
-    // Observe theme changes
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.attributeName === 'class') {
-          const isDark = document.documentElement.classList.contains('dark')
-          setEditorTheme(isDark ? 'vs-dark' : 'light')
-        }
-      })
-    })
-
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class'],
-    })
-
-    return () => observer.disconnect()
-  }, [])
 
   // 自动格式化
   useEffect(() => {
@@ -97,126 +105,123 @@ export default function JsonToolPage() {
       path="/tools/json"
       icon={Braces}
       accent="cyan"
-    >
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        <button onClick={handleFormat} className="btn-neon !px-4 !py-2">
-          FORMAT
-        </button>
-        <button onClick={handleMinify} className="chip chip-active !px-4 !py-2">
-          MINIFY
-        </button>
-        <button
-          onClick={handleCopy}
-          disabled={!output}
-          className="chip !px-4 !py-2 disabled:opacity-40"
-        >
-          <Copy className="mr-1.5 h-3.5 w-3.5" />
-          COPY
-        </button>
-        <button onClick={handleClear} className="chip !px-4 !py-2 hover:!border-neon-red hover:!text-neon-red">
-          <Trash2 className="mr-1.5 h-3.5 w-3.5" />
-          CLEAR
-        </button>
-
-        <div className="ml-auto flex items-center gap-4">
-          <label className="flex items-center gap-2 font-mono text-xs text-ink-secondary">
-            <span>INDENT</span>
+      actions={
+        <>
+          <label className="flex items-center gap-1.5 font-mono text-[11px] text-ink-muted">
+            INDENT
             <select
               value={indent}
               onChange={(e) => setIndent(Number(e.target.value))}
-              className="rounded-md border border-border-dim bg-void-200 px-2 py-1.5 font-mono text-xs text-ink-primary focus:border-neon-cyan focus:outline-none"
+              className="tool-select"
             >
               <option value={2}>2</option>
               <option value={4}>4</option>
             </select>
           </label>
-          <label className="flex cursor-pointer items-center gap-2 font-mono text-xs text-ink-secondary">
+          <label className="flex cursor-pointer items-center gap-1.5 font-mono text-[11px] text-ink-secondary">
             <input
               type="checkbox"
               checked={sortKeys}
               onChange={(e) => setSortKeys(e.target.checked)}
-              className="rounded accent-neon-cyan"
+              className="accent-neon-cyan"
             />
             SORT KEYS
           </label>
-          <span className="font-mono text-[11px] text-neon-lime">
-            {error ? 'invalid' : output ? 'valid' : 'idle'}
-            {output && !error ? ' · ok' : ''}
-          </span>
-        </div>
-      </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <div className="flex h-[600px] flex-col">
-          <div className="mb-2 flex items-center justify-between">
-            <div className="flex items-center gap-2 font-mono text-[11px] text-ink-secondary">
-              <span className="flex gap-1.5">
-                <i className="block h-2 w-2 rounded-full bg-[#FF5F56]" />
-                <i className="block h-2 w-2 rounded-full bg-[#FFBD2E]" />
-                <i className="block h-2 w-2 rounded-full bg-[#27C93F]" />
-              </span>
-              input.json
+          <div className="hidden h-5 w-px bg-border-dim sm:block" />
+
+          <button onClick={handleFormat} className="tool-btn tool-btn-accent">
+            <Wand2 className="h-3.5 w-3.5" />
+            格式化
+          </button>
+          <button onClick={handleMinify} className="tool-btn">
+            <Minimize2 className="h-3.5 w-3.5" />
+            压缩
+          </button>
+          <button onClick={handleCopy} disabled={!output} className="tool-btn">
+            <Copy className="h-3.5 w-3.5" />
+            复制
+          </button>
+          <button onClick={handleClear} className="tool-btn tool-btn-danger">
+            <Trash2 className="h-3.5 w-3.5" />
+            清空
+          </button>
+        </>
+      }
+    >
+      <div className="flex min-h-0 flex-1 flex-col">
+        {/* Workspace */}
+        <div className="grid flex-1 grid-cols-1 gap-3 lg:grid-cols-2 lg:h-[calc(100dvh-8rem)] lg:grid-rows-[minmax(0,1fr)]">
+          {/* Input */}
+          <div className="tool-panel h-full min-h-[400px]">
+            <div className="tool-panel-head">
+              <span className="text-neon-cyan">&gt;_</span>
+              <span>INPUT.JSON</span>
+              {error ? (
+                <span className="ml-auto max-w-[60%] truncate text-neon-red normal-case tracking-normal">
+                  ERR · {error}
+                </span>
+              ) : (
+                <span className="ml-auto normal-case tracking-normal">{input.length} 字符</span>
+              )}
             </div>
-            {error && (
-              <span className="font-mono text-[11px] text-neon-red">ERR · {error}</span>
-            )}
+            <div className="min-h-0 flex-1 overflow-hidden">
+              <Editor
+                height="100%"
+                defaultLanguage="json"
+                value={input}
+                theme="devtools-dark"
+                beforeMount={defineEditorTheme}
+                onChange={(value) => setInput(value || '')}
+                options={{
+                  minimap: { enabled: false },
+                  fontSize: 14,
+                  fontFamily: 'JetBrains Mono, monospace',
+                  wordWrap: 'on',
+                  formatOnPaste: true,
+                  automaticLayout: true,
+                  padding: { top: 12 },
+                }}
+              />
+            </div>
           </div>
-          <div className="panel-glow flex-1 overflow-hidden">
-            <Editor
-              height="100%"
-              defaultLanguage="json"
-              value={input}
-              theme={editorTheme}
-              onChange={(value) => setInput(value || '')}
-              options={{
-                minimap: { enabled: false },
-                fontSize: 14,
-                fontFamily: 'JetBrains Mono, monospace',
-                wordWrap: 'on',
-                formatOnPaste: true,
-                automaticLayout: true,
-                padding: { top: 12 },
-              }}
-            />
+
+          {/* Output */}
+          <div className="tool-panel h-full min-h-[400px]">
+            <div className="tool-panel-head">
+              <span className="text-neon-cyan">&gt;_</span>
+              <span>OUTPUT</span>
+              <span className="ml-auto flex items-center gap-1.5 normal-case tracking-normal">
+                {output && !error ? (
+                  <>
+                    <span className="status-dot" />valid
+                  </>
+                ) : (
+                  'idle'
+                )}
+              </span>
+            </div>
+            <div className="min-h-0 flex-1 overflow-hidden">
+              <Editor
+                height="100%"
+                defaultLanguage="json"
+                value={output}
+                theme="devtools-dark"
+                beforeMount={defineEditorTheme}
+                options={{
+                  readOnly: true,
+                  minimap: { enabled: false },
+                  fontSize: 14,
+                  fontFamily: 'JetBrains Mono, monospace',
+                  wordWrap: 'on',
+                  automaticLayout: true,
+                  folding: true,
+                  padding: { top: 12 },
+                }}
+              />
+            </div>
           </div>
         </div>
-
-        <div className="flex h-[600px] flex-col">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="font-mono text-[11px] text-ink-secondary">formatted</span>
-            {output && !error && (
-              <span className="font-mono text-[11px] text-neon-lime">✓ OK</span>
-            )}
-          </div>
-          <div className="panel-glow flex-1 overflow-hidden">
-            <Editor
-              height="100%"
-              defaultLanguage="json"
-              value={output}
-              theme={editorTheme}
-              options={{
-                readOnly: true,
-                minimap: { enabled: false },
-                fontSize: 14,
-                fontFamily: 'JetBrains Mono, monospace',
-                wordWrap: 'on',
-                automaticLayout: true,
-                folding: true,
-                padding: { top: 12 },
-              }}
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-4 flex items-center justify-between font-mono text-[11px] text-ink-muted">
-        <span>local only · no upload · paste JSON on home to auto-route</span>
-        <span>
-          <kbd className="rounded border border-border-dim bg-void-200 px-1.5 py-0.5">Ctrl</kbd>
-          {' + '}
-          <kbd className="rounded border border-border-dim bg-void-200 px-1.5 py-0.5">F</kbd>
-          {' find'}
-        </span>
       </div>
     </ToolShell>
   )

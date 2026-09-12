@@ -129,6 +129,19 @@ export default function CronGeneratorPage() {
     weekday: ['*', '1', '1-5', '0,6'],
   }
 
+  const fieldInputClass =
+    'w-full rounded-md border border-border-dim bg-void-200 px-3 py-2 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:border-neon-cyan focus:outline-none disabled:cursor-not-allowed disabled:opacity-40'
+  const chipClass =
+    'rounded border border-border-dim bg-void-200 px-1.5 py-0.5 font-mono text-[10px] text-ink-secondary transition-colors hover:border-neon-amber hover:text-neon-amber disabled:cursor-not-allowed disabled:opacity-40'
+
+  const manualFields = [
+    { label: '分钟 (0-59)', value: minute, setValue: setMinute, values: commonValues.minute },
+    { label: '小时 (0-23)', value: hour, setValue: setHour, values: commonValues.hour },
+    { label: '日期 (1-31)', value: day, setValue: setDay, values: commonValues.day },
+    { label: '月份 (1-12)', value: month, setValue: setMonth, values: commonValues.month },
+    { label: '星期 (0-6)', value: weekday, setValue: setWeekday, values: commonValues.weekday },
+  ]
+
   return (
     <ToolShell
       title="CRON EXPRESSION"
@@ -136,279 +149,169 @@ export default function CronGeneratorPage() {
       path="/tools/cron"
       icon={Clock}
       accent="amber"
+      actions={
+        <>
+          <label className="flex cursor-pointer select-none items-center gap-1.5 font-mono text-[11px] text-ink-secondary">
+            <input
+              type="checkbox"
+              checked={manualMode}
+              onChange={(e) => setManualMode(e.target.checked)}
+              className="accent-neon-amber"
+            />
+            手动模式
+          </label>
+
+          <div className="hidden h-5 w-px bg-border-dim sm:block" />
+
+          <button onClick={copyToClipboard} disabled={!cron} className="tool-btn tool-btn-accent">
+            <Copy className="h-3.5 w-3.5" />
+            复制
+          </button>
+        </>
+      }
     >
-
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto space-y-6">
-          {/* Cron Expression Display */}
-          <div className="panel p-6">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="flex-1">
-                <label className="block text-xs text-ink-secondary mb-2">
-                  Cron 表达式
-                </label>
-                <input
-                  type="text"
-                  value={cron}
-                  onChange={(e) => {
-                    setCron(e.target.value)
-                    const parts = e.target.value.split(' ')
-                    if (parts.length === 5) {
-                      setMinute(parts[0])
-                      setHour(parts[1])
-                      setDay(parts[2])
-                      setMonth(parts[3])
-                      setWeekday(parts[4])
-                    }
-                  }}
-                  className="w-full px-4 py-3 font-mono text-lg border border-border-dim rounded-lg bg-void-200 focus:outline-none focus:ring-2 focus:ring-rose-500"
-                  placeholder="* * * * *"
-                />
-              </div>
-              <button
-                onClick={copyToClipboard}
-                className="mt-6 px-4 py-3 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-all flex items-center gap-2"
+      <div className="flex min-h-0 flex-1 flex-col gap-3">
+        {/* Expression */}
+        <div className="tool-panel">
+          <div className="tool-panel-head">
+            <span className="text-neon-amber">&gt;_</span>
+            <span>EXPRESSION</span>
+            <span className="ml-auto normal-case tracking-normal">
+              {error ? <span className="text-neon-red">ERROR</span> : 'VALID'}
+            </span>
+          </div>
+          <div className="p-4">
+            <input
+              type="text"
+              value={cron}
+              onChange={(e) => {
+                setCron(e.target.value)
+                const parts = e.target.value.split(' ')
+                if (parts.length === 5) {
+                  setMinute(parts[0])
+                  setHour(parts[1])
+                  setDay(parts[2])
+                  setMonth(parts[3])
+                  setWeekday(parts[4])
+                }
+              }}
+              placeholder="* * * * *"
+              className="w-full rounded-md border border-border-dim bg-void-200 px-3 py-2.5 font-mono text-lg text-ink-primary caret-neon-amber placeholder:text-ink-muted focus:border-neon-cyan focus:outline-none"
+            />
+            <div className="mt-3 flex items-start gap-2">
+              <Calendar
+                className={`mt-0.5 h-3.5 w-3.5 shrink-0 ${error ? 'text-neon-red' : 'text-neon-amber'}`}
+              />
+              <p
+                className={`font-mono text-xs leading-relaxed ${
+                  error ? 'text-neon-red' : 'text-ink-secondary'
+                }`}
               >
-                <Copy className="h-4 w-4" />
-                复制
-              </button>
-            </div>
-
-            {/* Description */}
-            <div className={`p-4 rounded-lg border ${
-              error
-                ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
-                : 'bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-800'
-            }`}>
-              <div className="flex items-center gap-2 mb-1">
-                <Calendar className={`h-4 w-4 ${error ? 'text-red-500' : 'text-rose-500'}`} />
-                <span className="text-xs text-ink-secondary">
-                  {error ? '错误' : '说明'}
-                </span>
-              </div>
-              <p className={`text-sm font-semibold ${
-                error
-                  ? 'text-red-700 dark:text-red-400'
-                  : 'text-rose-700 dark:text-rose-400'
-              }`}>
+                <span className="text-ink-muted">{error ? '错误' : '说明'}:</span>{' '}
                 {error || description}
               </p>
             </div>
           </div>
+        </div>
 
-          {/* Manual Builder */}
-          <div className="panel p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold">手动配置</h3>
+        {/* Manual Builder */}
+        <div className="tool-panel">
+          <div className="tool-panel-head">
+            <span className="text-neon-amber">&gt;_</span>
+            <span>BUILDER</span>
+            <span className="ml-auto normal-case tracking-normal">
+              {manualMode ? 'MANUAL ON' : 'READ-ONLY'}
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-4 p-4 sm:grid-cols-3 lg:grid-cols-5">
+            {manualFields.map((field) => (
+              <div key={field.label}>
+                <label className="mb-2 block font-mono text-[11px] text-ink-muted">
+                  {field.label}
+                </label>
+                <input
+                  type="text"
+                  value={field.value}
+                  onChange={(e) => field.setValue(e.target.value)}
+                  disabled={!manualMode}
+                  className={fieldInputClass}
+                />
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {field.values.map((val) => (
+                    <button
+                      key={val}
+                      onClick={() => manualMode && field.setValue(val)}
+                      className={chipClass}
+                      disabled={!manualMode}
+                    >
+                      {val}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Presets */}
+        <div className="tool-panel">
+          <div className="tool-panel-head">
+            <span className="text-neon-amber">&gt;_</span>
+            <span>PRESETS</span>
+            <span className="ml-auto normal-case tracking-normal">{presets.length} 组常用</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2 p-4 sm:grid-cols-3 lg:grid-cols-5">
+            {presets.map((preset) => (
               <button
-                onClick={() => setManualMode(!manualMode)}
-                className={`px-3 py-1 text-xs rounded transition-all ${
-                  manualMode
-                    ? 'bg-rose-500 text-white'
-                    : 'bg-gray-100 dark:bg-gray-900 border border-border-dim'
+                key={preset.name}
+                onClick={() => loadPreset(preset.cron)}
+                className={`rounded-md border px-3 py-2 text-center transition-colors ${
+                  cron === preset.cron
+                    ? 'border-neon-amber bg-neon-amber/10 text-neon-amber'
+                    : 'border-border-dim bg-void-200 text-ink-secondary hover:border-neon-amber/60'
                 }`}
               >
-                {manualMode ? '已启用' : '点击启用'}
+                <div className="text-xs font-semibold">{preset.name}</div>
+                <div className="font-mono text-[11px] opacity-80">{preset.cron}</div>
               </button>
-            </div>
-
-            <div className="grid grid-cols-5 gap-3">
-              <div>
-                <label className="block text-xs text-ink-secondary mb-2">
-                  分钟 (0-59)
-                </label>
-                <input
-                  type="text"
-                  value={minute}
-                  onChange={(e) => setMinute(e.target.value)}
-                  disabled={!manualMode}
-                  className="w-full px-3 py-2 font-mono text-sm border border-border-dim rounded bg-void-200 focus:outline-none focus:ring-2 focus:ring-rose-500 disabled:opacity-50"
-                />
-                <div className="mt-2 flex flex-wrap gap-1">
-                  {commonValues.minute.map((val) => (
-                    <button
-                      key={val}
-                      onClick={() => manualMode && setMinute(val)}
-                      className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-900 rounded hover:bg-gray-200 dark:hover:bg-gray-800 disabled:opacity-50"
-                      disabled={!manualMode}
-                    >
-                      {val}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs text-ink-secondary mb-2">
-                  小时 (0-23)
-                </label>
-                <input
-                  type="text"
-                  value={hour}
-                  onChange={(e) => setHour(e.target.value)}
-                  disabled={!manualMode}
-                  className="w-full px-3 py-2 font-mono text-sm border border-border-dim rounded bg-void-200 focus:outline-none focus:ring-2 focus:ring-rose-500 disabled:opacity-50"
-                />
-                <div className="mt-2 flex flex-wrap gap-1">
-                  {commonValues.hour.map((val) => (
-                    <button
-                      key={val}
-                      onClick={() => manualMode && setHour(val)}
-                      className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-900 rounded hover:bg-gray-200 dark:hover:bg-gray-800 disabled:opacity-50"
-                      disabled={!manualMode}
-                    >
-                      {val}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs text-ink-secondary mb-2">
-                  日期 (1-31)
-                </label>
-                <input
-                  type="text"
-                  value={day}
-                  onChange={(e) => setDay(e.target.value)}
-                  disabled={!manualMode}
-                  className="w-full px-3 py-2 font-mono text-sm border border-border-dim rounded bg-void-200 focus:outline-none focus:ring-2 focus:ring-rose-500 disabled:opacity-50"
-                />
-                <div className="mt-2 flex flex-wrap gap-1">
-                  {commonValues.day.map((val) => (
-                    <button
-                      key={val}
-                      onClick={() => manualMode && setDay(val)}
-                      className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-900 rounded hover:bg-gray-200 dark:hover:bg-gray-800 disabled:opacity-50"
-                      disabled={!manualMode}
-                    >
-                      {val}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs text-ink-secondary mb-2">
-                  月份 (1-12)
-                </label>
-                <input
-                  type="text"
-                  value={month}
-                  onChange={(e) => setMonth(e.target.value)}
-                  disabled={!manualMode}
-                  className="w-full px-3 py-2 font-mono text-sm border border-border-dim rounded bg-void-200 focus:outline-none focus:ring-2 focus:ring-rose-500 disabled:opacity-50"
-                />
-                <div className="mt-2 flex flex-wrap gap-1">
-                  {commonValues.month.map((val) => (
-                    <button
-                      key={val}
-                      onClick={() => manualMode && setMonth(val)}
-                      className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-900 rounded hover:bg-gray-200 dark:hover:bg-gray-800 disabled:opacity-50"
-                      disabled={!manualMode}
-                    >
-                      {val}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs text-ink-secondary mb-2">
-                  星期 (0-6)
-                </label>
-                <input
-                  type="text"
-                  value={weekday}
-                  onChange={(e) => setWeekday(e.target.value)}
-                  disabled={!manualMode}
-                  className="w-full px-3 py-2 font-mono text-sm border border-border-dim rounded bg-void-200 focus:outline-none focus:ring-2 focus:ring-rose-500 disabled:opacity-50"
-                />
-                <div className="mt-2 flex flex-wrap gap-1">
-                  {commonValues.weekday.map((val) => (
-                    <button
-                      key={val}
-                      onClick={() => manualMode && setWeekday(val)}
-                      className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-900 rounded hover:bg-gray-200 dark:hover:bg-gray-800 disabled:opacity-50"
-                      disabled={!manualMode}
-                    >
-                      {val}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
+        </div>
 
-          {/* Presets */}
-          <div className="panel p-6">
-            <h3 className="text-sm font-semibold mb-4">常用预设</h3>
-
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
-              {presets.map((preset) => (
-                <button
-                  key={preset.name}
-                  onClick={() => loadPreset(preset.cron)}
-                  className={`p-3 rounded-lg border transition-all text-center ${
-                    cron === preset.cron
-                      ? 'bg-rose-500 text-white border-rose-500'
-                      : 'bg-void-200 border-border-dim hover:bg-gray-100 dark:hover:bg-gray-800'
-                  }`}
+        {/* Next Runs */}
+        {nextRuns.length > 0 && (
+          <div className="tool-panel">
+            <div className="tool-panel-head">
+              <span className="text-neon-amber">&gt;_</span>
+              <span>NEXT RUNS</span>
+              <span className="ml-auto normal-case tracking-normal">接下来 {nextRuns.length} 次执行</span>
+            </div>
+            <div className="space-y-2 p-4">
+              {nextRuns.map((run, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-3 rounded-md border border-border-dim bg-void-200 px-3 py-2"
                 >
-                  <div className="text-xs font-semibold mb-1">{preset.name}</div>
-                  <div className="font-mono text-xs opacity-80">{preset.cron}</div>
-                </button>
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-neon-amber/60 font-mono text-[10px] text-neon-amber">
+                    {index + 1}
+                  </span>
+                  <span className="font-mono text-xs text-ink-primary">
+                    {new Date(run).toLocaleString('zh-CN', {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',
+                    })}
+                  </span>
+                </div>
               ))}
             </div>
           </div>
+        )}
 
-          {/* Next Runs */}
-          {nextRuns.length > 0 && (
-            <div className="panel p-6">
-              <h3 className="text-sm font-semibold mb-4">接下来 5 次执行时间</h3>
-
-              <div className="space-y-2">
-                {nextRuns.map((run, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-3 p-3 bg-void-200 rounded-lg"
-                  >
-                    <div className="w-6 h-6 bg-rose-100 dark:bg-rose-900/30 rounded-full flex items-center justify-center">
-                      <span className="text-xs font-semibold text-rose-600 dark:text-rose-400">
-                        {index + 1}
-                      </span>
-                    </div>
-                    <div className="font-mono text-sm text-gray-900 dark:text-gray-100">
-                      {new Date(run).toLocaleString('zh-CN', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit',
-                      })}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Usage Tips */}
-          <div className="bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded-xl p-4">
-            <h4 className="text-sm font-semibold text-rose-800 dark:text-rose-300 mb-2">使用提示</h4>
-            <ul className="text-xs text-rose-700 dark:text-rose-400 space-y-1">
-              <li>• Cron 格式：分钟 小时 日期 月份 星期</li>
-              <li>• * : 匹配任意值</li>
-              <li>• */n : 每隔 n 个单位</li>
-              <li>• n-m : 从 n 到 m 的范围</li>
-              <li>• n,m,d : 多个值，用逗号分隔</li>
-              <li>• 星期：0=周日, 1=周一, ..., 6=周六</li>
-            </ul>
-          </div>
-        </div>
       </div>
-
     </ToolShell>
   )
 }

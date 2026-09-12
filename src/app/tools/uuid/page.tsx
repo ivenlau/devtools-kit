@@ -105,83 +105,92 @@ export default function HashGeneratorPage() {
       path="/tools/uuid"
       icon={Hash}
       accent="amber"
+      actions={
+        <>
+          <button
+            onClick={() => setActiveTab('uuid')}
+            className={`tool-btn ${activeTab === 'uuid' ? 'tool-btn-accent' : ''}`}
+          >
+            UUID
+          </button>
+          <button
+            onClick={() => setActiveTab('hash')}
+            className={`tool-btn ${activeTab === 'hash' ? 'tool-btn-accent' : ''}`}
+          >
+            HASH
+          </button>
+          {activeTab === 'uuid' && (
+            <>
+              <button onClick={() => copyToClipboard(uuid)} className="tool-btn">
+                <Copy className="h-3.5 w-3.5" />
+                复制
+              </button>
+              <button onClick={generateNewUUID} className="tool-btn tool-btn-accent">
+                <RefreshCw className="h-3.5 w-3.5" />
+                重新生成
+              </button>
+            </>
+          )}
+        </>
+      }
     >
-      {/* Tabs */}
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        <button
-          onClick={() => setActiveTab('uuid')}
-          className={`chip !px-4 !py-2 ${activeTab === 'uuid' ? 'chip-active' : ''}`}
-        >
-          UUID 生成器
-        </button>
-        <button
-          onClick={() => setActiveTab('hash')}
-          className={`chip !px-4 !py-2 ${activeTab === 'hash' ? 'chip-active' : ''}`}
-        >
-          哈希生成器
-        </button>
-      </div>
-
-      <div className="space-y-6">
+      <div className="flex min-h-0 flex-1 flex-col gap-3">
         {/* UUID Generator */}
         {activeTab === 'uuid' && (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 lg:h-[calc(100dvh-8rem)] lg:grid-rows-[minmax(0,1fr)]">
             {/* Single UUID */}
-            <div className="panel-glow rounded-xl p-6">
-              <h3 className="mb-4 font-display text-lg font-semibold text-ink-primary">单个 UUID</h3>
-              <div className="flex items-center justify-between rounded-lg bg-void-200 p-4">
-                <code className="font-mono text-lg text-ink-primary">{uuid}</code>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => copyToClipboard(uuid)}
-                    className="chip !px-4 !py-2"
-                  >
-                    <Copy className="mr-1.5 h-3.5 w-3.5" />
-                    复制
-                  </button>
-                  <button
-                    onClick={generateNewUUID}
-                    className="btn-neon !px-4 !py-2"
-                  >
-                    <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
-                    重新生成
-                  </button>
-                </div>
+            <div className="tool-panel h-full min-h-[400px]">
+              <div className="tool-panel-head">
+                <span className="text-neon-amber">&gt;_</span>
+                <span>UUID.V4</span>
+                <span className="ml-auto normal-case tracking-normal">crypto random</span>
+              </div>
+              <div className="flex min-h-0 flex-1 flex-col justify-center gap-3 p-4">
+                <code className="break-all rounded-md bg-void-200 p-4 font-mono text-lg text-ink-primary">
+                  {uuid}
+                </code>
+                <p className="font-mono text-[11px] text-ink-muted">
+                  RFC 4122 v4 · 122-bit 随机 · 冲突概率可忽略
+                </p>
               </div>
             </div>
 
             {/* Batch UUID */}
-            <div className="panel-glow rounded-xl p-6">
-              <h3 className="mb-4 font-display text-lg font-semibold text-ink-primary">批量生成 UUID</h3>
-              <div className="space-y-4">
-                <div className="flex items-center gap-4">
-                  <label className="font-mono text-xs text-ink-secondary">生成数量</label>
+            <div className="tool-panel h-full min-h-[400px]">
+              <div className="tool-panel-head">
+                <span className="text-neon-amber">&gt;_</span>
+                <span>BATCH</span>
+                <span className="ml-auto normal-case tracking-normal">
+                  {uuidList.length > 0 ? `${uuidList.length} 个` : 'idle'}
+                </span>
+              </div>
+              <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-auto p-4">
+                <div className="flex items-center gap-3">
                   <input
                     type="number"
                     min={1}
                     max={100}
                     value={uuidCount}
                     onChange={(e) => setUuidCount(Number(e.target.value))}
-                    className="w-24 rounded-lg border border-border-dim bg-void-200 px-3 py-2 font-mono text-sm text-ink-primary focus:border-neon-amber focus:outline-none"
+                    className="w-24 rounded-md border border-border-dim bg-void-200 px-3 py-2 font-mono text-sm text-ink-primary focus:border-neon-cyan focus:outline-none"
                   />
-                  <button
-                    onClick={generateBatchUUIDs}
-                    className="btn-neon !px-6 !py-2"
-                  >
+                  <button onClick={generateBatchUUIDs} className="tool-btn tool-btn-accent">
+                    <RefreshCw className="h-3.5 w-3.5" />
                     生成
                   </button>
                 </div>
 
                 {uuidList.length > 0 && (
-                  <div className="space-y-2">
+                  <div className="flex min-h-0 flex-1 flex-col gap-2">
                     <div className="flex items-center justify-between">
                       <span className="font-mono text-[11px] text-ink-secondary">
                         已生成 {uuidList.length} 个 UUID
                       </span>
                       <button
                         onClick={() => copyToClipboard(uuidList.join('\n'))}
-                        className="font-mono text-[11px] text-neon-amber hover:text-neon-cyan"
+                        className="tool-btn px-2 py-1 text-[11px]"
                       >
+                        <Copy className="h-3.5 w-3.5" />
                         复制全部
                       </button>
                     </div>
@@ -194,9 +203,9 @@ export default function HashGeneratorPage() {
                           <span className="flex-1 truncate">{u}</span>
                           <button
                             onClick={() => copyToClipboard(u)}
-                            className="ml-2 text-ink-muted opacity-0 hover:text-neon-amber group-hover:opacity-100"
+                            className="ml-2 text-ink-muted opacity-0 transition-opacity hover:text-neon-amber group-hover:opacity-100"
                           >
-                            <Copy className="h-4 w-4" />
+                            <Copy className="h-3.5 w-3.5" />
                           </button>
                         </div>
                       ))}
@@ -210,46 +219,51 @@ export default function HashGeneratorPage() {
 
         {/* Hash Generator */}
         {activeTab === 'hash' && (
-          <div className="panel-glow rounded-xl p-6">
-            <h3 className="mb-4 font-display text-lg font-semibold text-ink-primary">哈希生成</h3>
-            <div className="space-y-6">
-              <div>
-                <label className="mb-2 block font-mono text-[11px] text-ink-secondary">输入文本</label>
-                <textarea
-                  value={hashInput}
-                  onChange={(e) => setHashInput(e.target.value)}
-                  placeholder="输入要生成哈希的文本..."
-                  className="h-32 w-full resize-none rounded-lg border border-border-dim bg-void-200 p-4 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:border-neon-amber focus:outline-none"
-                  spellCheck={false}
-                />
-              </div>
-
-              {hashInput && Object.keys(hashOutput).length > 0 && (
-                <div className="space-y-3">
-                  {(['md5', 'sha1', 'sha256', 'sha512'] as const).map((algo) => (
-                    <div key={algo} className="rounded-lg bg-void-200 p-4">
-                      <div className="mb-2 flex items-center justify-between">
-                        <span className="font-mono text-xs font-bold uppercase text-neon-amber">{algo}</span>
-                        <button
-                          onClick={() => copyToClipboard(hashOutput[algo])}
-                          className="chip !px-3 !py-1 !text-xs"
-                        >
-                          <Copy className="mr-1 h-3 w-3" />
-                          复制
-                        </button>
-                      </div>
-                      <code className="break-all font-mono text-sm text-ink-primary">{hashOutput[algo]}</code>
+          <div className="tool-panel min-h-[400px] lg:h-[calc(100dvh-8rem)]">
+            <div className="tool-panel-head">
+              <span className="text-neon-amber">&gt;_</span>
+              <span>HASH.MD5·SHA1·SHA256·SHA512</span>
+              <span className="ml-auto flex items-center gap-1.5 normal-case tracking-normal">
+                {hashInput ? (
+                  <>
+                    <span className="status-dot" />live
+                  </>
+                ) : (
+                  'idle'
+                )}
+              </span>
+            </div>
+            <textarea
+              value={hashInput}
+              onChange={(e) => setHashInput(e.target.value)}
+              placeholder="输入要生成哈希的文本..."
+              className="h-32 min-h-0 w-full flex-none resize-none bg-void-100 p-4 font-mono text-sm text-ink-primary caret-neon-amber placeholder:text-ink-muted focus:outline-none"
+              spellCheck={false}
+            />
+            <div className="min-h-0 flex-1 space-y-3 overflow-auto border-t border-border-dim p-4">
+              {hashInput && Object.keys(hashOutput).length > 0 ? (
+                (['md5', 'sha1', 'sha256', 'sha512'] as const).map((algo) => (
+                  <div key={algo} className="rounded-md bg-void-200 p-4">
+                    <div className="mb-2 flex items-center justify-between">
+                      <span className="font-mono text-xs font-bold uppercase text-neon-amber">{algo}</span>
+                      <button
+                        onClick={() => copyToClipboard(hashOutput[algo])}
+                        className="tool-btn px-2 py-1 text-[11px]"
+                      >
+                        <Copy className="h-3.5 w-3.5" />
+                        复制
+                      </button>
                     </div>
-                  ))}
-                </div>
+                    <code className="break-all font-mono text-sm text-ink-primary">{hashOutput[algo]}</code>
+                  </div>
+                ))
+              ) : (
+                <p className="font-mono text-xs text-ink-muted">// 输入文本后实时计算四种哈希</p>
               )}
             </div>
           </div>
         )}
-      </div>
 
-      <div className="mt-4 font-mono text-[11px] text-ink-muted">
-        local only · UUID v4 随机唯一标识符 · 哈希函数用于数据完整性校验
       </div>
     </ToolShell>
   )

@@ -72,12 +72,12 @@ export default function UserAgentPage() {
 
   // Get device icon
   const getDeviceIcon = () => {
-    if (!parsed) return <Monitor className="h-5 w-5" />
+    if (!parsed) return <Monitor className="h-4 w-4" />
 
     const type = parsed.device.type?.toLowerCase()
-    if (type === 'mobile') return <Smartphone className="h-5 w-5" />
-    if (type === 'tablet') return <Tablet className="h-5 w-5" />
-    return <Monitor className="h-5 w-5" />
+    if (type === 'mobile') return <Smartphone className="h-4 w-4" />
+    if (type === 'tablet') return <Tablet className="h-4 w-4" />
+    return <Monitor className="h-4 w-4" />
   }
 
   // Example User Agents
@@ -107,174 +107,150 @@ export default function UserAgentPage() {
       path="/tools/useragent"
       icon={Monitor}
       accent="cyan"
-    >
-
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto space-y-6">
-          {/* Input */}
-          <div className="panel p-6">
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm text-ink-secondary mb-2">
-                  User-Agent 字符串
-                </label>
-                <textarea
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="粘贴 User-Agent 字符串..."
-                  className="w-full h-32 p-4 font-mono text-xs border border-border-dim rounded-lg bg-void-200 resize-none focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  spellCheck={false}
-                />
-              </div>
-
-              {/* My UA Button */}
-              {myUA && (
-                <button
-                  onClick={useMyUA}
-                  className="w-full p-3 bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-800 rounded-lg hover:bg-cyan-100 dark:hover:bg-cyan-900/30 transition-colors text-left"
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-xs text-ink-secondary mb-1">当前浏览器</div>
-                      <div className="font-mono text-xs text-gray-900 dark:text-gray-100 truncate">
-                        {myUA}
-                      </div>
-                    </div>
-                    <Globe className="h-5 w-5 text-cyan-500" />
-                  </div>
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Parsed Result */}
-          {parsed && (
-            <div className="panel p-6">
-              <h3 className="text-sm font-semibold mb-4">解析结果</h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Browser */}
-                <div className="p-4 bg-void-200 rounded-lg">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-                      <Globe className="h-4 w-4 text-blue-500" />
-                    </div>
-                    <h4 className="text-sm font-semibold">浏览器</h4>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-xs">
-                      <span className="text-ink-secondary">名称</span>
-                      <span className="font-semibold text-gray-900 dark:text-gray-100">{parsed.browser.name}</span>
-                    </div>
-                    <div className="flex justify-between text-xs">
-                      <span className="text-ink-secondary">版本</span>
-                      <span className="font-mono text-gray-900 dark:text-gray-100">{parsed.browser.version}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* OS */}
-                <div className="p-4 bg-void-200 rounded-lg">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-                      <Monitor className="h-4 w-4 text-green-500" />
-                    </div>
-                    <h4 className="text-sm font-semibold">操作系统</h4>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-xs">
-                      <span className="text-ink-secondary">名称</span>
-                      <span className="font-semibold text-gray-900 dark:text-gray-100">{parsed.os.name}</span>
-                    </div>
-                    <div className="flex justify-between text-xs">
-                      <span className="text-ink-secondary">版本</span>
-                      <span className="font-mono text-gray-900 dark:text-gray-100">{parsed.os.version}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Device */}
-                <div className="p-4 bg-void-200 rounded-lg">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
-                      {getDeviceIcon()}
-                    </div>
-                    <h4 className="text-sm font-semibold">设备</h4>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-xs">
-                      <span className="text-ink-secondary">类型</span>
-                      <span className="font-semibold text-gray-900 dark:text-gray-100 capitalize">{parsed.device.type}</span>
-                    </div>
-                    <div className="flex justify-between text-xs">
-                      <span className="text-ink-secondary">厂商</span>
-                      <span className="text-gray-900 dark:text-gray-100">{parsed.device.vendor}</span>
-                    </div>
-                    <div className="flex justify-between text-xs">
-                      <span className="text-ink-secondary">型号</span>
-                      <span className="text-gray-900 dark:text-gray-100">{parsed.device.model}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Engine */}
-                <div className="p-4 bg-void-200 rounded-lg">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
-                      <Monitor className="h-4 w-4 text-orange-500" />
-                    </div>
-                    <h4 className="text-sm font-semibold">渲染引擎</h4>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-xs">
-                      <span className="text-ink-secondary">名称</span>
-                      <span className="font-semibold text-gray-900 dark:text-gray-100">{parsed.engine.name}</span>
-                    </div>
-                    <div className="flex justify-between text-xs">
-                      <span className="text-ink-secondary">版本</span>
-                      <span className="font-mono text-gray-900 dark:text-gray-100">{parsed.engine.version}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+      actions={
+        <>
+          {myUA && (
+            <button onClick={useMyUA} className="tool-btn">
+              <Globe className="h-3.5 w-3.5" />
+              本机 UA
+            </button>
           )}
+          {input && (
+            <button onClick={() => copyToClipboard(input)} className="tool-btn">
+              <Copy className="h-3.5 w-3.5" />
+              复制
+            </button>
+          )}
+        </>
+      }
+    >
+      <div className="flex min-h-0 flex-1 flex-col gap-3">
+        {/* Input */}
+        <div className="tool-panel">
+          <div className="tool-panel-head">
+            <span className="text-neon-cyan">&gt;_</span>
+            <span>USER-AGENT</span>
+            <span className="ml-auto normal-case tracking-normal">{input.length} 字符</span>
+          </div>
+          <textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="粘贴 User-Agent 字符串..."
+            spellCheck={false}
+            className="h-36 w-full resize-none bg-void-100 p-4 font-mono text-sm text-ink-primary caret-neon-cyan placeholder:text-ink-muted focus:outline-none"
+          />
+        </div>
 
-          {/* Examples */}
-          <div className="panel p-6">
-            <h3 className="text-sm font-semibold mb-4">常用 User-Agent</h3>
+        {/* Parsed Result */}
+        {parsed && (
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            {/* Browser */}
+            <div className="rounded-lg border border-border-dim bg-void-100 p-4">
+              <div className="mb-3 flex items-center gap-2">
+                <div className="flex h-7 w-7 items-center justify-center rounded-md border border-border-dim bg-void-200">
+                  <Globe className="h-4 w-4 text-neon-cyan" />
+                </div>
+                <h4 className="font-mono text-xs text-ink-secondary">浏览器</h4>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between gap-3 text-xs">
+                  <span className="text-ink-muted">名称</span>
+                  <span className="font-semibold text-ink-primary">{parsed.browser.name}</span>
+                </div>
+                <div className="flex justify-between gap-3 text-xs">
+                  <span className="text-ink-muted">版本</span>
+                  <span className="font-mono text-ink-primary">{parsed.browser.version}</span>
+                </div>
+              </div>
+            </div>
 
-            <div className="space-y-2">
-              {examples.map((example, index) => (
-                <button
-                  key={index}
-                  onClick={() => setInput(example.ua)}
-                  className="w-full p-3 bg-void-200 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left"
-                >
-                  <div className="text-xs font-semibold text-gray-900 dark:text-gray-100 mb-1">
-                    {example.name}
-                  </div>
-                  <div className="font-mono text-xs text-ink-secondary truncate">
-                    {example.ua}
-                  </div>
-                </button>
-              ))}
+            {/* OS */}
+            <div className="rounded-lg border border-border-dim bg-void-100 p-4">
+              <div className="mb-3 flex items-center gap-2">
+                <div className="flex h-7 w-7 items-center justify-center rounded-md border border-border-dim bg-void-200">
+                  <Monitor className="h-4 w-4 text-neon-cyan" />
+                </div>
+                <h4 className="font-mono text-xs text-ink-secondary">操作系统</h4>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between gap-3 text-xs">
+                  <span className="text-ink-muted">名称</span>
+                  <span className="font-semibold text-ink-primary">{parsed.os.name}</span>
+                </div>
+                <div className="flex justify-between gap-3 text-xs">
+                  <span className="text-ink-muted">版本</span>
+                  <span className="font-mono text-ink-primary">{parsed.os.version}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Device */}
+            <div className="rounded-lg border border-border-dim bg-void-100 p-4">
+              <div className="mb-3 flex items-center gap-2">
+                <div className="flex h-7 w-7 items-center justify-center rounded-md border border-border-dim bg-void-200">
+                  {getDeviceIcon()}
+                </div>
+                <h4 className="font-mono text-xs text-ink-secondary">设备</h4>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between gap-3 text-xs">
+                  <span className="text-ink-muted">类型</span>
+                  <span className="font-semibold capitalize text-ink-primary">
+                    {parsed.device.type}
+                  </span>
+                </div>
+                <div className="flex justify-between gap-3 text-xs">
+                  <span className="text-ink-muted">厂商</span>
+                  <span className="text-ink-primary">{parsed.device.vendor}</span>
+                </div>
+                <div className="flex justify-between gap-3 text-xs">
+                  <span className="text-ink-muted">型号</span>
+                  <span className="text-ink-primary">{parsed.device.model}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Engine */}
+            <div className="rounded-lg border border-border-dim bg-void-100 p-4">
+              <div className="mb-3 flex items-center gap-2">
+                <div className="flex h-7 w-7 items-center justify-center rounded-md border border-border-dim bg-void-200">
+                  <Monitor className="h-4 w-4 text-neon-cyan" />
+                </div>
+                <h4 className="font-mono text-xs text-ink-secondary">渲染引擎</h4>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between gap-3 text-xs">
+                  <span className="text-ink-muted">名称</span>
+                  <span className="font-semibold text-ink-primary">{parsed.engine.name}</span>
+                </div>
+                <div className="flex justify-between gap-3 text-xs">
+                  <span className="text-ink-muted">版本</span>
+                  <span className="font-mono text-ink-primary">{parsed.engine.version}</span>
+                </div>
+              </div>
             </div>
           </div>
+        )}
 
-          {/* Usage Tips */}
-          <div className="bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-800 rounded-xl p-4">
-            <h4 className="text-sm font-semibold text-cyan-800 dark:text-cyan-300 mb-2">使用提示</h4>
-            <ul className="text-xs text-cyan-700 dark:text-cyan-400 space-y-1">
-              <li>• User-Agent 是浏览器发送给服务器的标识字符串</li>
-              <li>• 可以从中提取浏览器、操作系统、设备类型等信息</li>
-              <li>• 常用于统计分析、兼容性检测、爬虫模拟等场景</li>
-              <li>• 点击"当前浏览器"可快速获取您当前的 UA</li>
-            </ul>
+        {/* Examples */}
+        <div className="rounded-lg border border-border-dim bg-void-100 p-4">
+          <h3 className="mb-3 font-mono text-[11px] text-ink-muted">常用 User-Agent</h3>
+
+          <div className="space-y-2">
+            {examples.map((example, index) => (
+              <button
+                key={index}
+                onClick={() => setInput(example.ua)}
+                className="w-full rounded-md border border-border-dim bg-void-200 px-3 py-2 text-left transition-colors hover:border-neon-cyan"
+              >
+                <div className="mb-1 text-xs font-semibold text-ink-primary">{example.name}</div>
+                <div className="truncate font-mono text-[11px] text-ink-muted">{example.ua}</div>
+              </button>
+            ))}
           </div>
         </div>
-      </div>
 
+      </div>
     </ToolShell>
   )
 }

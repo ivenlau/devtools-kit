@@ -65,31 +65,52 @@ export default function QRCodeGeneratorPage() {
       path="/tools/qrcode"
       icon={QrCode}
       accent="cyan"
+      actions={
+        <>
+          <button onClick={copyBase64} className="tool-btn">
+            <Copy className="h-3.5 w-3.5" />
+            复制B64
+          </button>
+          <button onClick={downloadQRCode} className="tool-btn tool-btn-accent">
+            <Download className="h-3.5 w-3.5" />
+            下载 PNG
+          </button>
+        </>
+      }
     >
-
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Settings */}
-          <div className="space-y-6">
+      <div className="flex min-h-0 flex-1 flex-col gap-3">
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+          {/* Input + Options */}
+          <div className="flex min-h-0 flex-col gap-3">
             {/* Content */}
-            <div className="panel p-6">
-              <h3 className="text-sm font-semibold mb-4">二维码内容</h3>
+            <div className="tool-panel">
+              <div className="tool-panel-head">
+                <span className="text-neon-cyan">&gt;_</span>
+                <span>INPUT</span>
+                <span className="ml-auto normal-case tracking-normal">{text.length} 字符</span>
+              </div>
               <textarea
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 placeholder="输入文本或URL..."
-                className="w-full h-32 p-4 text-sm border border-border-dim rounded-lg bg-void-200 resize-none focus:outline-none focus:ring-2 focus:ring-violet-500"
+                spellCheck={false}
+                className="h-32 w-full min-h-0 resize-none bg-void-100 p-4 font-mono text-sm text-ink-primary caret-neon-cyan placeholder:text-ink-muted focus:outline-none"
               />
             </div>
 
             {/* Options */}
-            <div className="panel p-6">
-              <h3 className="text-sm font-semibold mb-4">生成选项</h3>
-
-              <div className="space-y-4">
+            <div className="tool-panel">
+              <div className="tool-panel-head">
+                <span className="text-neon-cyan">&gt;_</span>
+                <span>OPTIONS</span>
+                <span className="ml-auto normal-case tracking-normal">
+                  {size}px · level {errorCorrection}
+                </span>
+              </div>
+              <div className="space-y-4 p-4">
                 {/* Size */}
                 <div>
-                  <label className="block text-sm text-ink-secondary mb-2">
+                  <label className="mb-2 block font-mono text-[11px] text-ink-muted">
                     尺寸: {size}px × {size}px
                   </label>
                   <input
@@ -99,14 +120,14 @@ export default function QRCodeGeneratorPage() {
                     step={32}
                     value={size}
                     onChange={(e) => setSize(Number(e.target.value))}
-                    className="w-full accent-violet-500"
+                    className="w-full accent-neon-cyan"
                   />
                 </div>
 
                 {/* Colors */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm text-ink-secondary mb-2">
+                    <label className="mb-2 block font-mono text-[11px] text-ink-muted">
                       前景色
                     </label>
                     <div className="flex items-center gap-2">
@@ -114,19 +135,20 @@ export default function QRCodeGeneratorPage() {
                         type="color"
                         value={color}
                         onChange={(e) => setColor(e.target.value)}
-                        className="w-10 h-10 rounded cursor-pointer"
+                        className="h-9 w-9 shrink-0 cursor-pointer rounded-md border border-border-dim bg-void-200 p-1"
                       />
                       <input
                         type="text"
                         value={color}
                         onChange={(e) => setColor(e.target.value)}
-                        className="flex-1 px-3 py-2 text-sm border border-border-dim rounded font-mono bg-void-200"
+                        spellCheck={false}
+                        className="w-full min-w-0 rounded-md border border-border-dim bg-void-200 px-3 py-2 font-mono text-sm uppercase text-ink-primary placeholder:text-ink-muted focus:border-neon-cyan focus:outline-none"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm text-ink-secondary mb-2">
+                    <label className="mb-2 block font-mono text-[11px] text-ink-muted">
                       背景色
                     </label>
                     <div className="flex items-center gap-2">
@@ -134,13 +156,14 @@ export default function QRCodeGeneratorPage() {
                         type="color"
                         value={bgColor}
                         onChange={(e) => setBgColor(e.target.value)}
-                        className="w-10 h-10 rounded cursor-pointer"
+                        className="h-9 w-9 shrink-0 cursor-pointer rounded-md border border-border-dim bg-void-200 p-1"
                       />
                       <input
                         type="text"
                         value={bgColor}
                         onChange={(e) => setBgColor(e.target.value)}
-                        className="flex-1 px-3 py-2 text-sm border border-border-dim rounded font-mono bg-void-200"
+                        spellCheck={false}
+                        className="w-full min-w-0 rounded-md border border-border-dim bg-void-200 px-3 py-2 font-mono text-sm uppercase text-ink-primary placeholder:text-ink-muted focus:border-neon-cyan focus:outline-none"
                       />
                     </div>
                   </div>
@@ -148,7 +171,7 @@ export default function QRCodeGeneratorPage() {
 
                 {/* Error Correction */}
                 <div>
-                  <label className="block text-sm text-ink-secondary mb-2">
+                  <label className="mb-2 block font-mono text-[11px] text-ink-muted">
                     容错率
                   </label>
                   <div className="flex gap-2">
@@ -156,11 +179,7 @@ export default function QRCodeGeneratorPage() {
                       <button
                         key={level}
                         onClick={() => setErrorCorrection(level)}
-                        className={`flex-1 px-3 py-2 text-sm font-medium rounded-lg transition-all ${
-                          errorCorrection === level
-                            ? 'bg-violet-500 text-white'
-                            : 'bg-gray-100 dark:bg-gray-900 border border-border-dim hover:bg-gray-200 dark:hover:bg-gray-800'
-                        }`}
+                        className={`chip flex-1 justify-center ${errorCorrection === level ? 'chip-active' : ''}`}
                       >
                         {level} ({level === 'L' ? '7%' : level === 'M' ? '15%' : level === 'Q' ? '25%' : '30%'})
                       </button>
@@ -170,19 +189,15 @@ export default function QRCodeGeneratorPage() {
 
                 {/* Quick Sizes */}
                 <div>
-                  <label className="block text-sm text-ink-secondary mb-2">
+                  <label className="mb-2 block font-mono text-[11px] text-ink-muted">
                     快速尺寸
-                </label>
+                  </label>
                   <div className="flex flex-wrap gap-2">
                     {[128, 256, 384, 512].map((s) => (
                       <button
                         key={s}
                         onClick={() => setSize(s)}
-                        className={`px-3 py-2 text-sm rounded-lg transition-all ${
-                          size === s
-                            ? 'bg-violet-500 text-white'
-                            : 'bg-gray-100 dark:bg-gray-900 border border-border-dim hover:bg-gray-200 dark:hover:bg-gray-800'
-                        }`}
+                        className={`chip ${size === s ? 'chip-active' : ''}`}
                       >
                         {s}px
                       </button>
@@ -191,79 +206,50 @@ export default function QRCodeGeneratorPage() {
                 </div>
               </div>
             </div>
-
-            {/* Actions */}
-            <div className="panel p-6">
-              <h3 className="text-sm font-semibold mb-4">操作</h3>
-              <div className="flex flex-wrap gap-3">
-                <button
-                  onClick={downloadQRCode}
-                  className="flex-1 px-4 py-3 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-lg hover:shadow-lg transition-all text-sm flex items-center justify-center gap-2"
-                >
-                  <Download className="h-4 w-4" />
-                  下载 PNG
-                </button>
-                <button
-                  onClick={copyBase64}
-                  className="flex-1 px-4 py-3 border border-border-dim rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all text-sm flex items-center justify-center gap-2"
-                >
-                  <Copy className="h-4 w-4" />
-                  复制 Base64
-                </button>
-              </div>
-            </div>
-
-            {/* Usage Tips */}
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
-              <h4 className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-2">使用提示</h4>
-              <ul className="text-xs text-blue-700 dark:text-blue-400 space-y-1">
-                <li>• 内容越多，二维码越密集，建议保持简短</li>
-                <li>• 使用高容错率可以提高识别成功率</li>
-                <li>• 前景色和背景色需要有足够对比度</li>
-                <li>• 生成的二维码可离线扫描</li>
-              </ul>
-            </div>
           </div>
 
           {/* Preview */}
-          <div className="flex flex-col items-center justify-center">
-            <div className="panel p-8 sticky top-6">
-              <h3 className="text-sm font-semibold mb-4 text-center">预览</h3>
-
-              {/* QR Code */}
-              <div className="flex justify-center mb-6">
-                <div className="p-4 bg-white rounded-lg shadow-lg">
-                  <QRCodeSVG
-                    id="qrcode-svg"
-                    value={text}
-                    size={size}
-                    fgColor={color}
-                    bgColor={bgColor}
-                    level={errorCorrection}
-                  />
-                </div>
+          <div className="tool-panel">
+            <div className="tool-panel-head">
+              <span className="text-neon-cyan">&gt;_</span>
+              <span>PREVIEW</span>
+              <span className="ml-auto normal-case tracking-normal">
+                {size} × {size}px
+              </span>
+            </div>
+            <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-5 p-6">
+              {/* QR Code — white plate kept for scannability */}
+              <div className="rounded-lg border border-border-glow bg-white p-4 shadow-panel">
+                <QRCodeSVG
+                  id="qrcode-svg"
+                  value={text}
+                  size={size}
+                  fgColor={color}
+                  bgColor={bgColor}
+                  level={errorCorrection}
+                />
               </div>
 
               {/* Color Info */}
-              <div className="text-center text-sm space-y-2">
+              <div className="space-y-2 text-center text-sm">
                 <div className="flex items-center justify-center gap-2">
-                  <span className="w-6 h-6 rounded" style={{ backgroundColor: color }}></span>
-                  <span className="text-ink-secondary">前景色</span>
+                  <span className="h-5 w-5 rounded border border-border-dim" style={{ backgroundColor: color }}></span>
+                  <span className="font-mono text-xs text-ink-secondary">前景色 {color.toUpperCase()}</span>
                 </div>
                 <div className="flex items-center justify-center gap-2">
-                  <span className="w-6 h-6 rounded border border-border-dim" style={{ backgroundColor: bgColor }}></span>
-                  <span className="text-ink-secondary">背景色</span>
+                  <span className="h-5 w-5 rounded border border-border-dim" style={{ backgroundColor: bgColor }}></span>
+                  <span className="font-mono text-xs text-ink-secondary">背景色 {bgColor.toUpperCase()}</span>
                 </div>
                 <div className="flex items-center justify-center gap-2">
-                  <ImageIcon className="w-6 h-6 text-gray-400" />
-                  <span className="text-ink-secondary">{size} × {size}px</span>
+                  <ImageIcon className="h-4 w-4 text-ink-muted" />
+                  <span className="font-mono text-xs text-ink-secondary">{size} × {size}px · PNG / Base64</span>
                 </div>
               </div>
 
               {/* Content Preview */}
               {text && text.length <= 50 && (
-                <div className="mt-4 p-3 bg-void-200 rounded-lg">
-                  <p className="text-xs text-ink-secondary break-all">
+                <div className="w-full rounded-md bg-void-200 p-3">
+                  <p className="break-all font-mono text-xs text-ink-secondary">
                     {text}
                   </p>
                 </div>
@@ -271,8 +257,8 @@ export default function QRCodeGeneratorPage() {
             </div>
           </div>
         </div>
-      </div>
 
+      </div>
     </ToolShell>
   )
 }

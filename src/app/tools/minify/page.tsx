@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Minimize2, Copy, Trash2, FileCode } from 'lucide-react'
+import { Minimize2, Copy, Trash2, Sparkles } from 'lucide-react'
 import { useTransferData } from '@/lib/useTransferData'
 import { ToolShell } from '@/components/ToolShell'
 
@@ -130,9 +130,9 @@ console.log("Result:", result);`,
   }
 
   const codeTypes = [
-    { value: 'javascript', label: 'JavaScript', icon: 'JS', color: 'from-yellow-500 to-amber-500' },
-    { value: 'css', label: 'CSS', icon: 'CSS', color: 'from-blue-500 to-indigo-500' },
-    { value: 'html', label: 'HTML', icon: 'HTML', color: 'from-orange-500 to-red-500' },
+    { value: 'javascript', label: 'JavaScript' },
+    { value: 'css', label: 'CSS' },
+    { value: 'html', label: 'HTML' },
   ]
 
   return (
@@ -142,189 +142,85 @@ console.log("Result:", result);`,
       path="/tools/minify"
       icon={Minimize2}
       accent="lime"
+      actions={
+        <>
+          <select
+            value={codeType}
+            onChange={(e) => setCodeType(e.target.value as CodeType)}
+            aria-label="代码类型"
+            className="tool-select"
+          >
+            {codeTypes.map((type) => (
+              <option key={type.value} value={type.value}>
+                {type.label}
+              </option>
+            ))}
+          </select>
+          <button onClick={loadExample} className="tool-btn">
+            <Sparkles className="h-3.5 w-3.5" />
+            示例
+          </button>
+          <button onClick={copyToClipboard} disabled={!output} className="tool-btn tool-btn-accent">
+            <Copy className="h-3.5 w-3.5" />
+            复制
+          </button>
+          <button onClick={clearAll} className="tool-btn tool-btn-danger">
+            <Trash2 className="h-3.5 w-3.5" />
+            清空
+          </button>
+        </>
+      }
     >
-
-      <div className="container mx-auto px-4 py-8">
-        {/* Code Type Selector */}
-        <div className="panel p-6 mb-6">
-          <div className="flex items-center justify-center gap-3">
-            <span className="text-sm text-ink-secondary">代码类型:</span>
-            <div className="flex gap-2">
-              {codeTypes.map((type) => (
-                <button
-                  key={type.value}
-                  onClick={() => setCodeType(type.value as CodeType)}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
-                    codeType === type.value
-                      ? `bg-gradient-to-r ${type.color} text-white`
-                      : 'bg-gray-100 dark:bg-gray-900 border border-border-dim hover:bg-gray-200 dark:hover:bg-gray-800'
-                  }`}
-                >
-                  {type.label}
-                </button>
-              ))}
+      <div className="flex min-h-0 flex-1 flex-col gap-3">
+        {/* Workspace */}
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 lg:h-[calc(100dvh-8rem)] lg:grid-rows-[minmax(0,1fr)]">
+          <div className="tool-panel h-full min-h-[400px]">
+            <div className="tool-panel-head">
+              <span className="text-neon-lime">&gt;_</span>
+              <span>INPUT</span>
+              <span className="ml-auto normal-case tracking-normal">
+                {input.length.toLocaleString()} 字符 · {input.split('\n').length} 行
+              </span>
             </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left Column - Input */}
-          <div className="space-y-4">
-            <div className="panel p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold flex items-center gap-2">
-                  <FileCode className="h-4 w-4 text-slate-500" />
-                  原始代码
-                </h3>
-                <div className="flex gap-2">
-                  <button
-                    onClick={loadExample}
-                    className="px-3 py-1 text-xs border border-border-dim rounded hover:bg-gray-100 dark:hover:bg-gray-800"
-                  >
-                    加载示例
-                  </button>
-                  {input && (
-                    <button
-                      onClick={clearAll}
-                      className="px-3 py-1 text-xs border border-border-dim rounded hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-1"
-                    >
-                      <Trash2 className="h-3 w-3" />
-                      清空
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder={`输入 ${codeType.toUpperCase()} 代码...`}
-                className="w-full h-96 p-4 font-mono text-sm border border-border-dim rounded-lg bg-void-200 resize-none focus:outline-none focus:ring-2 focus:ring-slate-500"
-                spellCheck={false}
-              />
-
-              {/* Input Stats */}
-              {input && (
-                <div className="mt-3 flex items-center gap-4 text-xs text-ink-muted">
-                  <span>字符数: {input.length.toLocaleString()}</span>
-                  <span>行数: {input.split('\n').length}</span>
-                </div>
-              )}
-            </div>
+            <textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={`输入 ${codeType.toUpperCase()} 代码...`}
+              spellCheck={false}
+              className="min-h-0 flex-1 resize-none bg-void-100 p-4 font-mono text-sm text-ink-primary caret-neon-lime placeholder:text-ink-muted focus:outline-none"
+            />
           </div>
 
-          {/* Right Column - Output */}
-          <div className="space-y-4">
-            <div className="panel p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold flex items-center gap-2">
-                  <Minimize2 className="h-4 w-4 text-slate-500" />
-                  压缩结果
-                </h3>
-                {output && (
-                  <button
-                    onClick={copyToClipboard}
-                    className="px-3 py-1 text-xs bg-slate-700 text-white rounded hover:bg-slate-800 flex items-center gap-1"
-                  >
-                    <Copy className="h-3 w-3" />
-                    复制
-                  </button>
+          <div className="tool-panel h-full min-h-[400px]">
+            <div className="tool-panel-head">
+              <span className="text-neon-lime">&gt;_</span>
+              <span>OUTPUT</span>
+              <span className="ml-auto normal-case tracking-normal">
+                {error ? (
+                  <span className="text-neon-red">ERROR</span>
+                ) : (
+                  <>
+                    {output.length.toLocaleString()} 字符 · 减少 {getCompressionRatio()}%
+                  </>
                 )}
-              </div>
-
-              {error ? (
-                <div className="h-96 p-4 border border-red-300 dark:border-red-700 rounded-lg bg-red-50 dark:bg-red-900/20 overflow-auto">
-                  <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-                </div>
-              ) : (
-                <textarea
-                  value={output}
-                  readOnly
-                  placeholder="压缩后的代码将显示在这里..."
-                  className="w-full h-96 p-4 font-mono text-xs border border-border-dim rounded-lg bg-void-200 resize-none focus:outline-none"
-                />
-              )}
-
-              {/* Output Stats */}
-              {output && (
-                <>
-                  <div className="mt-3 flex items-center gap-4 text-xs text-ink-muted">
-                    <span>字符数: {output.length.toLocaleString()}</span>
-                    <span>减少: {getCompressionRatio()}%</span>
-                  </div>
-
-                  {/* Compression Stats */}
-                  <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-green-700 dark:text-green-400">压缩率</span>
-                      <span className="font-semibold text-green-700 dark:text-green-400">
-                        {getCompressionRatio()}%
-                      </span>
-                    </div>
-                    <div className="mt-2 w-full bg-green-200 dark:bg-green-800 rounded-full h-2">
-                      <div
-                        className="bg-green-500 h-2 rounded-full transition-all"
-                        style={{ width: `${getCompressionRatio()}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                </>
-              )}
+              </span>
             </div>
+            {error ? (
+              <div className="min-h-0 flex-1 overflow-auto p-4 font-mono text-sm text-neon-red">
+                {error}
+              </div>
+            ) : (
+              <textarea
+                value={output}
+                readOnly
+                placeholder="压缩后的代码将显示在这里..."
+                className="min-h-0 flex-1 resize-none bg-void-100 p-4 font-mono text-xs text-ink-primary placeholder:text-ink-muted focus:outline-none"
+              />
+            )}
           </div>
         </div>
 
-        {/* Features */}
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="panel p-4">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
-                <span className="text-yellow-600 dark:text-yellow-400 text-xs font-bold">JS</span>
-              </div>
-              <h4 className="text-sm font-semibold">JavaScript</h4>
-            </div>
-            <p className="text-xs text-ink-secondary">
-              移除注释、多余空格和换行，保留功能完整性
-            </p>
-          </div>
-
-          <div className="panel p-4">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-                <span className="text-blue-600 dark:text-blue-400 text-xs font-bold">CSS</span>
-              </div>
-              <h4 className="text-sm font-semibold">CSS</h4>
-            </div>
-            <p className="text-xs text-ink-secondary">
-              压缩选择器、属性，优化样式表体积
-            </p>
-          </div>
-
-          <div className="panel p-4">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
-                <span className="text-orange-600 dark:text-orange-400 text-xs font-bold">HTML</span>
-              </div>
-              <h4 className="text-sm font-semibold">HTML</h4>
-            </div>
-            <p className="text-xs text-ink-secondary">
-              移除注释、多余空白，缩小页面体积
-            </p>
-          </div>
-        </div>
-
-        {/* Usage Tips */}
-        <div className="mt-6 bg-slate-50 dark:bg-slate-900/20 border border-slate-200 dark:border-slate-800 rounded-xl p-4">
-          <h4 className="text-sm font-semibold text-slate-800 dark:text-slate-300 mb-2">使用提示</h4>
-          <ul className="text-xs text-slate-700 dark:text-slate-400 space-y-1">
-            <li>• 代码压缩仅移除不必要的字符，不会改变代码功能</li>
-            <li>• 压缩后的代码更难阅读，建议保存源代码用于维护</li>
-            <li>• 生产环境使用压缩代码可以减少文件大小，提升加载速度</li>
-            <li>• 支持实时预览压缩结果和压缩率统计</li>
-          </ul>
-        </div>
       </div>
-
     </ToolShell>
   )
 }

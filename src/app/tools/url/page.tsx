@@ -106,167 +106,200 @@ export default function UrlEncoderPage() {
       path="/tools/url"
       icon={Link2}
       accent="cyan"
-    >
-      {/* Toolbar */}
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        <button
-          onClick={() => setMode('encode')}
-          className={`chip !px-4 !py-2 ${mode === 'encode' ? 'chip-active' : ''}`}
-        >
-          编码模式
-        </button>
-        <button
-          onClick={() => setMode('decode')}
-          className={`chip !px-4 !py-2 ${mode === 'decode' ? 'chip-active' : ''}`}
-        >
-          解码模式
-        </button>
-        <button
-          onClick={() => setMode('parse')}
-          className={`chip !px-4 !py-2 ${mode === 'parse' ? 'chip-active' : ''}`}
-        >
-          URL 解析
-        </button>
-
-        <div className="ml-auto flex items-center gap-2">
+      actions={
+        <>
+          <button
+            onClick={() => setMode('encode')}
+            className={`tool-btn ${mode === 'encode' ? 'tool-btn-accent' : ''}`}
+          >
+            编码
+          </button>
+          <button
+            onClick={() => setMode('decode')}
+            className={`tool-btn ${mode === 'decode' ? 'tool-btn-accent' : ''}`}
+          >
+            解码
+          </button>
+          <button
+            onClick={() => setMode('parse')}
+            className={`tool-btn ${mode === 'parse' ? 'tool-btn-accent' : ''}`}
+          >
+            解析
+          </button>
           <button
             onClick={handleCopy}
             disabled={!output && mode !== 'parse'}
-            className="chip !px-4 !py-2 disabled:opacity-40"
+            className="tool-btn"
           >
-            <Copy className="mr-1.5 h-3.5 w-3.5" />
+            <Copy className="h-3.5 w-3.5" />
             复制
           </button>
-          <button
-            onClick={handleClear}
-            className="chip !px-4 !py-2 hover:!border-neon-red hover:!text-neon-red"
-          >
-            <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+          <button onClick={handleClear} className="tool-btn tool-btn-danger">
+            <Trash2 className="h-3.5 w-3.5" />
             清空
           </button>
-        </div>
-      </div>
-
-      {/* 编码/解码模式 */}
-      {mode !== 'parse' && (
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          {/* Input */}
-          <div className="flex flex-col">
-            <div className="mb-2 flex items-center justify-between">
-              <h3 className="font-mono text-[11px] text-ink-secondary">
-                {mode === 'encode' ? '输入文本' : '输入 URL 编码'}
-              </h3>
-              {error && <span className="font-mono text-[11px] text-neon-red">ERR · {error}</span>}
+        </>
+      }
+    >
+      <div className="flex min-h-0 flex-1 flex-col gap-3">
+        {/* 编码/解码模式 */}
+        {mode !== 'parse' && (
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 lg:h-[calc(100dvh-8rem)] lg:grid-rows-[minmax(0,1fr)]">
+            {/* Input */}
+            <div className="tool-panel h-full min-h-[400px]">
+              <div className="tool-panel-head">
+                <span className="text-neon-cyan">&gt;_</span>
+                <span>{mode === 'encode' ? 'INPUT.TEXT' : 'INPUT.URL'}</span>
+                {error ? (
+                  <span className="ml-auto max-w-[60%] truncate text-neon-red normal-case tracking-normal">
+                    ERR · {error}
+                  </span>
+                ) : (
+                  <span className="ml-auto normal-case tracking-normal">{input.length} 字符</span>
+                )}
+              </div>
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder={mode === 'encode' ? '输入要编码的文本...' : '输入要解码的 URL 编码...'}
+                className="min-h-0 flex-1 resize-none bg-void-100 p-4 font-mono text-sm text-ink-primary caret-neon-cyan placeholder:text-ink-muted focus:outline-none"
+                spellCheck={false}
+              />
             </div>
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder={mode === 'encode' ? '输入要编码的文本...' : '输入要解码的 URL 编码...'}
-              className="panel-glow min-h-[400px] flex-1 resize-none p-4 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:outline-none"
-              spellCheck={false}
-            />
-          </div>
 
-          {/* Output */}
-          <div className="flex flex-col">
-            <div className="mb-2 flex items-center justify-between">
-              <h3 className="font-mono text-[11px] text-ink-secondary">
-                {mode === 'encode' ? 'URL 编码结果' : '解码结果'}
-              </h3>
-              {output && !error && <span className="font-mono text-[11px] text-neon-lime">✓ OK</span>}
+            {/* Output */}
+            <div className="tool-panel h-full min-h-[400px]">
+              <div className="tool-panel-head">
+                <span className="text-neon-cyan">&gt;_</span>
+                <span>{mode === 'encode' ? 'OUTPUT.URL' : 'OUTPUT.TEXT'}</span>
+                <span className="ml-auto flex items-center gap-1.5 normal-case tracking-normal">
+                  {output && !error ? (
+                    <>
+                      <span className="status-dot" />ok
+                    </>
+                  ) : (
+                    'idle'
+                  )}
+                </span>
+              </div>
+              <textarea
+                value={output}
+                readOnly
+                placeholder="处理结果将显示在这里..."
+                className="min-h-0 flex-1 resize-none bg-void-100 p-4 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:outline-none"
+                spellCheck={false}
+              />
             </div>
-            <textarea
-              value={output}
-              readOnly
-              placeholder="处理结果将显示在这里..."
-              className="panel-glow min-h-[400px] flex-1 resize-none p-4 font-mono text-sm text-ink-primary placeholder:text-ink-muted"
-              spellCheck={false}
-            />
           </div>
-        </div>
-      )}
+        )}
 
-      {/* URL 解析模式 */}
-      {mode === 'parse' && (
-        <div className="mx-auto max-w-4xl space-y-4">
-          {/* Input */}
-          <div>
-            <label className="mb-2 block font-mono text-[11px] text-ink-secondary">输入 URL</label>
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="https://example.com:8080/path/to/page?param1=value1&param2=value2#section"
-              className="w-full rounded-lg border border-border-dim bg-void-200 px-4 py-3 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:border-neon-cyan focus:outline-none"
-              spellCheck={false}
-            />
-            {error && <p className="mt-2 font-mono text-[11px] text-neon-red">{error}</p>}
-          </div>
+        {/* URL 解析模式 */}
+        {mode === 'parse' && (
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 lg:h-[calc(100dvh-8rem)] lg:grid-rows-[minmax(0,1fr)]">
+            {/* Input */}
+            <div className="tool-panel h-full min-h-[400px]">
+              <div className="tool-panel-head">
+                <span className="text-neon-cyan">&gt;_</span>
+                <span>INPUT.URL</span>
+                {error && (
+                  <span className="ml-auto normal-case tracking-normal text-neon-red">
+                    ERR · {error}
+                  </span>
+                )}
+              </div>
+              <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-auto p-4">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="https://example.com:8080/path/to/page?param1=value1&param2=value2#section"
+                  className="w-full rounded-md border border-border-dim bg-void-200 px-3 py-2 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:border-neon-cyan focus:outline-none"
+                  spellCheck={false}
+                />
+                <p className="font-mono text-[11px] text-ink-muted">
+                  输入完整 URL，右侧实时分解 protocol / host / path / query 各组成部分
+                </p>
+              </div>
+            </div>
 
-          {/* Parsed Data */}
-          {urlData && (
-            <div className="panel-glow rounded-xl p-6">
-              <h3 className="mb-4 font-display text-lg font-semibold text-ink-primary">解析结果</h3>
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div>
-                    <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">Protocol</span>
-                    <p className="font-mono text-sm text-ink-primary">{urlData.protocol}</p>
-                  </div>
-                  <div>
-                    <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">Hostname</span>
-                    <p className="font-mono text-sm text-ink-primary">{urlData.hostname}</p>
-                  </div>
-                  <div>
-                    <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">Port</span>
-                    <p className="font-mono text-sm text-ink-primary">{urlData.port || '(默认)'}</p>
-                  </div>
-                  <div>
-                    <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">Pathname</span>
-                    <p className="break-all font-mono text-sm text-ink-primary">{urlData.pathname}</p>
-                  </div>
-                  <div>
-                    <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">Search</span>
-                    <p className="break-all font-mono text-sm text-ink-primary">{urlData.search || '(无)'}</p>
-                  </div>
-                  <div>
-                    <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">Hash</span>
-                    <p className="break-all font-mono text-sm text-ink-primary">{urlData.hash || '(无)'}</p>
-                  </div>
-                </div>
-
-                {/* Query Parameters */}
-                {Object.keys(urlData.params).length > 0 && (
-                  <div className="mt-6">
-                    <h4 className="mb-3 font-mono text-[11px] uppercase tracking-wider text-ink-secondary">Query Parameters</h4>
-                    <div className="space-y-2">
-                      {Object.entries(urlData.params).map(([key, value]) => (
-                        <div
-                          key={key}
-                          className="flex items-center gap-4 rounded-lg bg-void-200 p-3"
-                        >
-                          <code className="font-mono text-sm font-bold text-neon-cyan">{key}</code>
-                          <span className="text-ink-muted">=</span>
-                          <code className="flex-1 break-all font-mono text-sm text-ink-primary">{String(value)}</code>
-                          <button
-                            onClick={() => copyToClipboard(`${key}=${value}`)}
-                            className="text-ink-muted hover:text-neon-cyan"
-                          >
-                            <Copy className="h-4 w-4" />
-                          </button>
-                        </div>
-                      ))}
+            {/* Parsed Data */}
+            <div className="tool-panel h-full min-h-[400px]">
+              <div className="tool-panel-head">
+                <span className="text-neon-cyan">&gt;_</span>
+                <span>PARSED</span>
+                <span className="ml-auto flex items-center gap-1.5 normal-case tracking-normal">
+                  {urlData && !error ? (
+                    <>
+                      <span className="status-dot" />ok
+                    </>
+                  ) : (
+                    'idle'
+                  )}
+                </span>
+              </div>
+              <div className="min-h-0 flex-1 overflow-auto p-4">
+                {urlData ? (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                      <div>
+                        <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">Protocol</span>
+                        <p className="font-mono text-sm text-ink-primary">{urlData.protocol}</p>
+                      </div>
+                      <div>
+                        <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">Hostname</span>
+                        <p className="font-mono text-sm text-ink-primary">{urlData.hostname}</p>
+                      </div>
+                      <div>
+                        <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">Port</span>
+                        <p className="font-mono text-sm text-ink-primary">{urlData.port || '(默认)'}</p>
+                      </div>
+                      <div>
+                        <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">Pathname</span>
+                        <p className="break-all font-mono text-sm text-ink-primary">{urlData.pathname}</p>
+                      </div>
+                      <div>
+                        <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">Search</span>
+                        <p className="break-all font-mono text-sm text-ink-primary">{urlData.search || '(无)'}</p>
+                      </div>
+                      <div>
+                        <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">Hash</span>
+                        <p className="break-all font-mono text-sm text-ink-primary">{urlData.hash || '(无)'}</p>
+                      </div>
                     </div>
+
+                    {/* Query Parameters */}
+                    {Object.keys(urlData.params).length > 0 && (
+                      <div className="border-t border-border-dim pt-3">
+                        <h4 className="mb-3 font-mono text-[11px] uppercase tracking-wider text-ink-secondary">Query Parameters</h4>
+                        <div className="space-y-2">
+                          {Object.entries(urlData.params).map(([key, value]) => (
+                            <div
+                              key={key}
+                              className="flex items-center gap-4 rounded-md bg-void-200 p-3"
+                            >
+                              <code className="font-mono text-sm font-bold text-neon-cyan">{key}</code>
+                              <span className="text-ink-muted">=</span>
+                              <code className="flex-1 break-all font-mono text-sm text-ink-primary">{String(value)}</code>
+                              <button
+                                onClick={() => copyToClipboard(`${key}=${value}`)}
+                                className="text-ink-muted transition-colors hover:text-neon-cyan"
+                              >
+                                <Copy className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
+                ) : (
+                  <p className="font-mono text-xs text-ink-muted">// 等待输入有效的 URL</p>
                 )}
               </div>
             </div>
-          )}
-        </div>
-      )}
+          </div>
+        )}
 
-      <div className="mt-4 font-mono text-[11px] text-ink-muted">
-        local only · URL 编码处理特殊字符 · URL 解析可分解各组成部分
       </div>
     </ToolShell>
   )

@@ -289,7 +289,7 @@ function hello() {
 
   return (
     <div
-      className="min-h-screen bg-void"
+      className="bg-void"
       onDragEnter={handleDrag}
       onDragLeave={handleDrag}
       onDragOver={handleDrag}
@@ -301,40 +301,20 @@ function hello() {
         path="/tools/markdown"
         icon={FileText}
         accent="magenta"
-      >
-
-      {/* Toolbar */}
-      <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-3 flex flex-wrap items-center gap-3">
-          {!isPreviewMode ? (
+        actions={
+          !isPreviewMode ? (
             <>
-              <button
-                onClick={handleCopyMarkdown}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all text-sm flex items-center gap-2"
-              >
-                <Copy className="h-4 w-4" />
-                复制 Markdown
+              <button onClick={handleCopyMarkdown} className="tool-btn">
+                <Copy className="h-3.5 w-3.5" />
+                复制 MD
               </button>
-              <button
-                onClick={handleCopyHtml}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all text-sm flex items-center gap-2"
-              >
-                <Copy className="h-4 w-4" />
-                {copySuccess ? '✓ 已复制 HTML' : '复制 HTML'}
+              <button onClick={handleCopyHtml} className="tool-btn">
+                <Copy className="h-3.5 w-3.5" />
+                {copySuccess ? '✓ HTML' : '复制 HTML'}
               </button>
-              <button
-                onClick={handleClear}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-all text-sm flex items-center gap-2"
-              >
-                <Trash2 className="h-4 w-4" />
-                清空
-              </button>
-              <button
-                onClick={() => inputRef.current?.click()}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all text-sm flex items-center gap-2"
-              >
-                <Upload className="h-4 w-4" />
-                打开本地文件
+              <button onClick={() => inputRef.current?.click()} className="tool-btn">
+                <Upload className="h-3.5 w-3.5" />
+                打开
               </button>
               <input
                 ref={inputRef}
@@ -343,189 +323,121 @@ function hello() {
                 onChange={handleFileSelect}
                 className="hidden"
               />
-              <button
-                onClick={handleTogglePreview}
-                className="px-4 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition-all text-sm flex items-center gap-2"
-              >
-                <Eye className="h-4 w-4" />
-                预览模式
+              <button onClick={handleClear} className="tool-btn tool-btn-danger">
+                <Trash2 className="h-3.5 w-3.5" />
+                清空
               </button>
-              <button
-                onClick={exportAsMarkdown}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all text-sm flex items-center gap-2"
-              >
-                <Download className="h-4 w-4" />
-                导出 MD
+              <button onClick={exportAsMarkdown} className="tool-btn">
+                <Download className="h-3.5 w-3.5" />
+                MD
               </button>
-              <button
-                onClick={exportAsPDF}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all text-sm flex items-center gap-2"
-              >
-                <Download className="h-4 w-4" />
-                导出 PDF
+              <button onClick={exportAsPDF} className="tool-btn">
+                <Download className="h-3.5 w-3.5" />
+                PDF
               </button>
-
-              <div className="ml-auto text-sm text-gray-500 dark:text-gray-400">
-                自动保存已启用
-              </div>
+              <button onClick={handleTogglePreview} className="tool-btn tool-btn-accent">
+                <Eye className="h-3.5 w-3.5" />
+                预览
+              </button>
             </>
           ) : (
             <>
-              <button
-                onClick={handleBackToEdit}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all text-sm flex items-center gap-2"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                返回编辑模式
+              <button onClick={handleBackToEdit} className="tool-btn tool-btn-accent">
+                <ArrowLeft className="h-3.5 w-3.5" />
+                编辑
               </button>
-              <button
-                onClick={exportAsMarkdown}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all text-sm flex items-center gap-2"
-              >
-                <Download className="h-4 w-4" />
-                导出 MD
+              <button onClick={exportAsMarkdown} className="tool-btn">
+                <Download className="h-3.5 w-3.5" />
+                MD
               </button>
-              <button
-                onClick={exportAsPDF}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all text-sm flex items-center gap-2"
-              >
-                <Download className="h-4 w-4" />
-                导出 PDF
+              <button onClick={exportAsPDF} className="tool-btn">
+                <Download className="h-3.5 w-3.5" />
+                PDF
               </button>
-              <div className="ml-auto text-sm text-gray-500 dark:text-gray-400">
-                {localFileName ? `正在预览: ${localFileName}` : '预览模式'}
-              </div>
             </>
-          )}
-        </div>
-      </div>
-
-      {/* Drag Overlay */}
-      {dragActive && (
-        <div className="fixed inset-0 z-[101] bg-blue-500/10 dark:bg-blue-400/10 backdrop-blur-sm flex items-center justify-center pointer-events-none">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-12 border-2 border-dashed border-blue-400 dark:border-blue-500 flex flex-col items-center gap-4 animate-pulse">
-            <div className="w-20 h-20 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
-              <Upload className="h-10 w-10 text-blue-500" />
-            </div>
-            <p className="text-xl font-semibold text-gray-800 dark:text-gray-200">
-              拖放 Markdown 文件到这里预览
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Editor Area */}
-      <div className="container mx-auto px-4 py-6">
-        {!isPreviewMode ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Markdown Input */}
-            <div className="flex flex-col">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Markdown 输入 | 文件拖放
-                </h3>
-                <span className="text-xs text-gray-500">
-                  {markdown.length} 字符
-                </span>
+          )
+        }
+      >
+        <div className="flex min-h-0 flex-1 flex-col gap-3">
+          {/* Editor / Preview workspace */}
+          {!isPreviewMode ? (
+            <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 lg:h-[calc(100dvh-8rem)] lg:grid-rows-[minmax(0,1fr)]">
+              <div className="tool-panel h-full min-h-[400px]">
+                <div className="tool-panel-head">
+                  <span className="text-neon-magenta">&gt;_</span>
+                  <span>INPUT.MD</span>
+                  <span className="ml-auto normal-case tracking-normal">
+                    {markdown.length} 字符 · 支持拖放
+                  </span>
+                </div>
+                <textarea
+                  value={markdown}
+                  onChange={(e) => setMarkdown(e.target.value)}
+                  placeholder="输入 Markdown 内容..."
+                  spellCheck={false}
+                  className="min-h-0 flex-1 resize-none bg-void-100 p-4 font-mono text-sm leading-relaxed text-ink-primary caret-neon-magenta placeholder:text-ink-muted focus:outline-none"
+                />
               </div>
-              <textarea
-                value={markdown}
-                onChange={(e) => setMarkdown(e.target.value)}
-                placeholder="输入 Markdown 内容..."
-                className="flex-1 min-h-[600px] p-4 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 resize-none focus:outline-none focus:ring-2 focus:ring-pink-500"
-                spellCheck={false}
-              />
-            </div>
 
-            {/* Preview */}
-            <div className="flex flex-col">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  实时预览
-                </h3>
+              <div className="tool-panel h-full min-h-[400px]">
+                <div className="tool-panel-head">
+                  <span className="text-neon-magenta">&gt;_</span>
+                  <span>PREVIEW</span>
+                  <span className="ml-auto flex items-center gap-1.5 normal-case tracking-none">
+                    <span className="status-dot" />
+                    live
+                  </span>
+                </div>
+                <div className="min-h-0 flex-1 overflow-auto p-5">
+                  <div
+                    className="markdown-preview"
+                    dangerouslySetInnerHTML={{ __html: html }}
+                  />
+                </div>
               </div>
-              <div className="flex-1 min-h-[600px] p-6 border border-border-dim rounded-lg bg-void-200 overflow-auto">
-                {/* Preview Content */}
+            </div>
+          ) : (
+            /* Preview Mode — full width */
+            <div className="tool-panel min-h-[400px] lg:h-[calc(100dvh-8rem)]">
+              <div className="tool-panel-head">
+                <span className="text-neon-magenta">&gt;_</span>
+                <span>{localFileName ? localFileName.toUpperCase() : 'PREVIEW'}</span>
+                <span className="ml-auto normal-case tracking-normal">{markdown.length} 字符</span>
+              </div>
+              <div className="min-h-0 flex-1 overflow-auto px-8 py-6">
                 <div
-                  className="markdown-preview"
+                  className="markdown-preview mx-auto max-w-3xl"
                   dangerouslySetInnerHTML={{ __html: html }}
                 />
               </div>
             </div>
-          </div>
-        ) : (
-          /* Preview Mode - Full Width */
-          <div className="w-full">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300">
-                {localFileName ? '文件预览' : '预览模式'}
-              </h3>
-              <span className="text-sm text-gray-500">{markdown.length} 字符</span>
-            </div>
-            <div className="min-h-[700px] p-8 border border-border-dim rounded-lg bg-void-200 overflow-auto shadow-panel">
-              <div
-                className="markdown-preview max-w-none"
-                dangerouslySetInnerHTML={{ __html: html }}
-              />
+          )}
+
+        </div>
+
+        {/* Drag Overlay — same language as homepage DropZone */}
+        {dragActive && (
+          <div className="fixed inset-0 z-[150] flex items-center justify-center bg-void/80 backdrop-blur-sm">
+            <div className="panel-glow animate-fade-up flex flex-col items-center gap-4 px-12 py-10">
+              <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-neon-magenta bg-void-200 shadow-neon-magenta">
+                <Upload className="h-7 w-7 text-neon-magenta" />
+              </div>
+              <p className="font-display text-xl font-semibold text-ink-primary">DROP .MD</p>
+              <p className="font-mono text-xs text-ink-muted">release to load into the editor</p>
             </div>
           </div>
         )}
-      </div>
 
-      {/* Syntax Help */}
-      <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-6">
-          <h3 className="text-sm font-semibold mb-4">Markdown 语法参考</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-            <div>
-              <h4 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">标题</h4>
-              <pre className="p-2 bg-gray-100 dark:bg-gray-900 rounded font-mono">{`# 一级标题
-## 二级标题
-### 三级标题`}</pre>
-            </div>
-            <div>
-              <h4 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">文本样式</h4>
-              <pre className="p-2 bg-gray-100 dark:bg-gray-900 rounded font-mono">{`**粗体**
-*斜体*
-~~删除线~~
-\`行内代码\``}</pre>
-            </div>
-            <div>
-              <h4 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">列表</h4>
-              <pre className="p-2 bg-gray-100 dark:bg-gray-900 rounded font-mono">{`- 无序
-1. 有序
-  - 嵌套`}</pre>
-            </div>
-            <div>
-              <h4 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">其他</h4>
-              <pre className="p-2 bg-gray-100 dark:bg-gray-900 rounded font-mono">{`[链接](url)
-![图片](url)
-> 引用
-\`\`\`代码块\`\`\``}</pre>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Footer Info */}
-      <div className="border-t border-border-dim bg-void-100">
-        <div className="w-full px-4 py-3 sm:px-6 lg:px-8">
-          <div className="font-mono text-[11px] text-ink-muted">
-            GFM · autosave to localStorage · live preview
-          </div>
-        </div>
-      </div>
-
-      {/* Back to Top Button */}
-      {showBackToTop && (
-        <button
-          onClick={scrollToTop}
-          className="fixed bottom-8 right-8 w-12 h-12 bg-neon-magenta hover:opacity-90 text-white rounded-full shadow-neon-magenta flex items-center justify-center transition-all hover:scale-110 z-50"
-          aria-label="返回顶部"
-        >
-          <ChevronUp className="h-6 w-6" />
-        </button>
-      )}
+        {/* Back to Top Button */}
+        {showBackToTop && (
+          <button
+            onClick={scrollToTop}
+            className="fixed bottom-8 right-8 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-neon-magenta bg-void-200 text-neon-magenta shadow-neon-magenta transition-all hover:scale-110 hover:bg-neon-magenta/10"
+            aria-label="返回顶部"
+          >
+            <ChevronUp className="h-6 w-6" />
+          </button>
+        )}
       </ToolShell>
     </div>
   )

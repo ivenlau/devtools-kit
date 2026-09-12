@@ -81,84 +81,81 @@ export default function Base64ToolPage() {
       path="/tools/base64"
       icon={FileCode}
       accent="lime"
-    >
-      {/* Toolbar */}
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        <button
-          onClick={() => setMode('encode')}
-          className={`chip !px-4 !py-2 ${mode === 'encode' ? 'chip-active' : ''}`}
-        >
-          编码模式
-        </button>
-        <button
-          onClick={() => setMode('decode')}
-          className={`chip !px-4 !py-2 ${mode === 'decode' ? 'chip-active' : ''}`}
-        >
-          解码模式
-        </button>
-
-        <div className="ml-auto flex items-center gap-2">
+      actions={
+        <>
           <button
-            onClick={handleCopy}
-            disabled={!output}
-            className="chip !px-4 !py-2 disabled:opacity-40"
+            onClick={() => setMode('encode')}
+            className={`tool-btn ${mode === 'encode' ? 'tool-btn-accent' : ''}`}
           >
-            <Copy className="mr-1.5 h-3.5 w-3.5" />
+            编码
+          </button>
+          <button
+            onClick={() => setMode('decode')}
+            className={`tool-btn ${mode === 'decode' ? 'tool-btn-accent' : ''}`}
+          >
+            解码
+          </button>
+          <button onClick={handleCopy} disabled={!output} className="tool-btn">
+            <Copy className="h-3.5 w-3.5" />
             复制
           </button>
-          <button
-            onClick={handleClear}
-            className="chip !px-4 !py-2 hover:!border-neon-red hover:!text-neon-red"
-          >
-            <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+          <button onClick={handleClear} className="tool-btn tool-btn-danger">
+            <Trash2 className="h-3.5 w-3.5" />
             清空
           </button>
-        </div>
-      </div>
-
-      {/* Editor Area */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        {/* Input */}
-        <div className="flex flex-col">
-          <div className="mb-2 flex items-center justify-between">
-            <h3 className="font-mono text-[11px] text-ink-secondary">
-              {mode === 'encode' ? '输入文本' : '输入 Base64'}
-            </h3>
-            {error && (
-              <span className="font-mono text-[11px] text-neon-red">ERR · {error}</span>
-            )}
+        </>
+      }
+    >
+      <div className="flex min-h-0 flex-1 flex-col gap-3">
+        {/* Workspace */}
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 lg:h-[calc(100dvh-8rem)] lg:grid-rows-[minmax(0,1fr)]">
+          {/* Input */}
+          <div className="tool-panel h-full min-h-[400px]">
+            <div className="tool-panel-head">
+              <span className="text-neon-lime">&gt;_</span>
+              <span>{mode === 'encode' ? 'INPUT.TEXT' : 'INPUT.BASE64'}</span>
+              {error ? (
+                <span className="ml-auto max-w-[60%] truncate text-neon-red normal-case tracking-normal">
+                  ERR · {error}
+                </span>
+              ) : (
+                <span className="ml-auto normal-case tracking-normal">{input.length} 字符</span>
+              )}
+            </div>
+            <textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={mode === 'encode' ? '输入要编码的文本...' : '输入要解码的 Base64...'}
+              className="min-h-0 flex-1 resize-none bg-void-100 p-4 font-mono text-sm text-ink-primary caret-neon-lime placeholder:text-ink-muted focus:outline-none"
+              spellCheck={false}
+            />
           </div>
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder={mode === 'encode' ? '输入要编码的文本...' : '输入要解码的 Base64...'}
-            className="panel-glow min-h-[500px] flex-1 resize-none p-4 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:outline-none"
-            spellCheck={false}
-          />
-        </div>
 
-        {/* Output */}
-        <div className="flex flex-col">
-          <div className="mb-2 flex items-center justify-between">
-            <h3 className="font-mono text-[11px] text-ink-secondary">
-              {mode === 'encode' ? 'Base64 结果' : '解码结果'}
-            </h3>
-            {output && !error && (
-              <span className="font-mono text-[11px] text-neon-lime">✓ OK</span>
-            )}
+          {/* Output */}
+          <div className="tool-panel h-full min-h-[400px]">
+            <div className="tool-panel-head">
+              <span className="text-neon-lime">&gt;_</span>
+              <span>{mode === 'encode' ? 'OUTPUT.B64' : 'OUTPUT.TEXT'}</span>
+              <span className="ml-auto flex items-center gap-1.5 normal-case tracking-normal">
+                {output && !error ? (
+                  <>
+                    <span className="status-dot" />ok
+                  </>
+                ) : (
+                  'idle'
+                )}
+              </span>
+            </div>
+            <textarea
+              value={output}
+              readOnly
+              placeholder="转换结果将显示在这里..."
+              className="min-h-0 flex-1 resize-none bg-void-100 p-4 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:outline-none"
+              spellCheck={false}
+            />
           </div>
-          <textarea
-            value={output}
-            readOnly
-            placeholder="转换结果将显示在这里..."
-            className="panel-glow min-h-[500px] flex-1 resize-none p-4 font-mono text-sm text-ink-primary placeholder:text-ink-muted"
-            spellCheck={false}
-          />
         </div>
-      </div>
 
-      <div className="mt-4 font-mono text-[11px] text-ink-muted">
-        local only · no upload · 支持 UTF-8 编码
       </div>
     </ToolShell>
   )

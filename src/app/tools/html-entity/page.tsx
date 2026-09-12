@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Code2, Copy, Trash2, ArrowLeftRight } from 'lucide-react'
+import { Code2, Copy, Trash2, ArrowLeftRight, Sparkles } from 'lucide-react'
 import { useTransferData } from '@/lib/useTransferData'
 import { ToolShell } from '@/components/ToolShell'
 
@@ -121,7 +121,7 @@ export default function HTMLEntityPage() {
     { char: '©', entity: '&copy;', name: '版权' },
     { char: '®', entity: '&reg;', name: '注册商标' },
     { char: '™', entity: '&trade;', name: '商标' },
-    { char: ' ', entity: '&nbsp;', name: '不换行空格' },
+    { char: ' ', entity: '&nbsp;', name: '不换行空格' },
     { char: '€', entity: '&euro;', name: '欧元' },
     { char: '£', entity: '&pound;', name: '英镑' },
     { char: '¥', entity: '&yen;', name: '日元' },
@@ -134,162 +134,101 @@ export default function HTMLEntityPage() {
       path="/tools/html-entity"
       icon={Code2}
       accent="amber"
+      actions={
+        <>
+          <select
+            value={mode}
+            onChange={(e) => setMode(e.target.value as ModeType)}
+            aria-label="转换方向"
+            className="tool-select"
+          >
+            <option value="encode">编码 ENCODE</option>
+            <option value="decode">解码 DECODE</option>
+          </select>
+
+          <div className="hidden h-5 w-px bg-border-dim sm:block" />
+
+          <button onClick={loadExample} className="tool-btn">
+            <Sparkles className="h-3.5 w-3.5" />
+            示例
+          </button>
+          <button onClick={copyToClipboard} disabled={!output} className="tool-btn tool-btn-accent">
+            <Copy className="h-3.5 w-3.5" />
+            复制
+          </button>
+          <button onClick={swapMode} className="tool-btn" title="互换模式">
+            <ArrowLeftRight className="h-3.5 w-3.5" />
+            互换
+          </button>
+          <button onClick={clearAll} className="tool-btn tool-btn-danger">
+            <Trash2 className="h-3.5 w-3.5" />
+            清空
+          </button>
+        </>
+      }
     >
-
-      <div className="container mx-auto px-4 py-8">
-        {/* Mode Selector */}
-        <div className="panel p-6 mb-6">
-          <div className="flex items-center justify-center gap-4">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setMode('encode')}
-                className={`px-6 py-3 text-sm font-medium rounded-lg transition-all ${
-                  mode === 'encode'
-                    ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white'
-                    : 'bg-gray-100 dark:bg-gray-900 border border-border-dim hover:bg-gray-200 dark:hover:bg-gray-800'
-                }`}
-              >
-                编码
-              </button>
-              <button
-                onClick={() => setMode('decode')}
-                className={`px-6 py-3 text-sm font-medium rounded-lg transition-all ${
-                  mode === 'decode'
-                    ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white'
-                    : 'bg-gray-100 dark:bg-gray-900 border border-border-dim hover:bg-gray-200 dark:hover:bg-gray-800'
-                }`}
-              >
-                解码
-              </button>
+      <div className="flex min-h-0 flex-1 flex-col gap-3">
+        {/* Workspace */}
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 lg:h-[calc(100dvh-8rem)] lg:grid-rows-[minmax(0,1fr)]">
+          <div className="tool-panel h-full min-h-[400px]">
+            <div className="tool-panel-head">
+              <span className="text-neon-amber">&gt;_</span>
+              <span>INPUT</span>
+              <span className="ml-auto normal-case tracking-normal">
+                {mode === 'encode' ? '原始文本' : 'HTML 实体'} · {input.length} 字符
+              </span>
             </div>
-
-            <button
-              onClick={swapMode}
-              className="p-3 bg-gray-100 dark:bg-gray-900 border border-border-dim rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 transition-all"
-              title="互换模式"
-            >
-              <ArrowLeftRight className="h-5 w-5" />
-            </button>
+            <textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={mode === 'encode' ? '输入包含特殊字符的文本...' : '输入 HTML 实体...'}
+              spellCheck={false}
+              className="min-h-0 flex-1 resize-none bg-void-100 p-4 font-mono text-sm text-ink-primary caret-neon-amber placeholder:text-ink-muted focus:outline-none"
+            />
           </div>
 
-          <div className="mt-4 text-center">
-            <p className="text-xs text-ink-secondary">
-              {mode === 'encode' ? '将特殊字符转换为 HTML 实体' : '将 HTML 实体转换回原始字符'}
-            </p>
+          <div className="tool-panel h-full min-h-[400px]">
+            <div className="tool-panel-head">
+              <span className="text-neon-amber">&gt;_</span>
+              <span>OUTPUT</span>
+              <span className="ml-auto normal-case tracking-normal">
+                {mode === 'encode' ? 'HTML 实体' : '解码结果'} · {output.length} 字符
+              </span>
+            </div>
+            <textarea
+              value={output}
+              readOnly
+              placeholder={mode === 'encode' ? 'HTML 实体将显示在这里...' : '解码结果将显示在这里...'}
+              className="min-h-0 flex-1 resize-none bg-void-100 p-4 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:outline-none"
+            />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left Column - Input */}
-          <div className="space-y-4">
-            <div className="panel p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold">
-                  {mode === 'encode' ? '原始文本' : 'HTML 实体'}
-                </h3>
-                <div className="flex gap-2">
-                  <button
-                    onClick={loadExample}
-                    className="px-3 py-1 text-xs border border-border-dim rounded hover:bg-gray-100 dark:hover:bg-gray-800"
-                  >
-                    加载示例
-                  </button>
-                  {input && (
-                    <button
-                      onClick={clearAll}
-                      className="px-3 py-1 text-xs border border-border-dim rounded hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-1"
-                    >
-                      <Trash2 className="h-3 w-3" />
-                      清空
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder={mode === 'encode' ? '输入包含特殊字符的文本...' : '输入 HTML 实体...'}
-                className="w-full h-80 p-4 font-mono text-sm border border-border-dim rounded-lg bg-void-200 resize-none focus:outline-none focus:ring-2 focus:ring-orange-500"
-                spellCheck={false}
-              />
-            </div>
+        {/* Common entities reference */}
+        <div className="border-t border-border-dim pt-3">
+          <div className="mb-2 font-mono text-[11px] text-ink-muted">
+            常用 HTML 实体 · 点击填入输入框
           </div>
-
-          {/* Right Column - Output */}
-          <div className="space-y-4">
-            <div className="panel p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold">
-                  {mode === 'encode' ? 'HTML 实体' : '解码结果'}
-                </h3>
-                {output && (
-                  <button
-                    onClick={copyToClipboard}
-                    className="px-3 py-1 text-xs bg-orange-500 text-white rounded hover:bg-orange-600 flex items-center gap-1"
-                  >
-                    <Copy className="h-3 w-3" />
-                    复制
-                  </button>
-                )}
-              </div>
-
-              <textarea
-                value={output}
-                readOnly
-                placeholder={mode === 'encode' ? 'HTML 实体将显示在这里...' : '解码结果将显示在这里...'}
-                className="w-full h-80 p-4 font-mono text-sm border border-border-dim rounded-lg bg-void-200 resize-none focus:outline-none"
-              />
-
-              {/* Character count */}
-              {output && (
-                <div className="mt-3 text-xs text-ink-muted">
-                  {output.length} 个字符
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Common Entities Reference */}
-        <div className="mt-6 panel p-6">
-          <h3 className="text-sm font-semibold mb-4">常用 HTML 实体</h3>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
             {commonEntities.map((entity) => (
               <button
                 key={entity.char}
                 onClick={() => {
                   setInput(mode === 'encode' ? entity.char : entity.entity)
                 }}
-                className="p-3 bg-void-200 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left"
+                title={entity.name}
+                className="rounded-md border border-border-dim bg-void-200 px-2.5 py-1.5 text-left transition-colors hover:border-neon-amber/70"
               >
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-lg text-orange-600 dark:text-orange-400">{entity.char}</span>
-                </div>
-                <div className="font-mono text-xs text-ink-secondary mb-1">
-                  {entity.entity}
-                </div>
-                <div className="text-xs text-ink-muted">
-                  {entity.name}
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="text-sm text-neon-amber">{entity.char}</span>
+                  <span className="truncate font-mono text-[10px] text-ink-muted">{entity.entity}</span>
                 </div>
               </button>
             ))}
           </div>
         </div>
 
-        {/* Usage Tips */}
-        <div className="mt-6 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl p-4">
-          <h4 className="text-sm font-semibold text-orange-800 dark:text-orange-300 mb-2">使用提示</h4>
-          <ul className="text-xs text-orange-700 dark:text-orange-400 space-y-1">
-            <li>• HTML 实体用于在 HTML 中显示特殊字符（如 &lt; 表示 &lt;）</li>
-            <li>• 编码模式：将特殊字符转换为 HTML 实体，安全显示在网页中</li>
-            <li>• 解码模式：将 HTML 实体转换回原始字符</li>
-            <li>• 点击常用实体卡片可快速填入输入框</li>
-          </ul>
-        </div>
       </div>
-
     </ToolShell>
   )
 }

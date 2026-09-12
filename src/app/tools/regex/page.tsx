@@ -17,6 +17,14 @@ const commonRegex = [
   { name: '用户名', pattern: '^[a-zA-Z0-9_]{3,16}$', description: '匹配3-16位用户名（字母、数字、下划线）' },
 ]
 
+// flags 复选框选项
+const flagOptions = [
+  { flag: 'g', label: '全局' },
+  { flag: 'i', label: '忽略大小写' },
+  { flag: 'm', label: '多行' },
+  { flag: 's', label: '点匹配换行' },
+]
+
 export default function RegexTesterPage() {
   const [regex, setRegex] = useState('')
   const [flags, setFlags] = useState('gm')
@@ -64,6 +72,11 @@ export default function RegexTesterPage() {
     setTestString(preset.description)
   }
 
+  // 切换单个正则 flag（复选框）
+  const toggleFlag = (f: string) => {
+    setFlags(flags.includes(f) ? flags.replace(f, '') : flags + f)
+  }
+
   // 替换功能
   const [replacePattern, setReplacePattern] = useState('')
   const [replaceResult, setReplaceResult] = useState('')
@@ -90,160 +103,136 @@ export default function RegexTesterPage() {
       path="/tools/regex"
       icon={Regex}
       accent="magenta"
-    >
-      {/* Common Regex Presets */}
-      <div className="mb-4 flex items-center gap-3 overflow-x-auto">
-        <span className="whitespace-nowrap font-mono text-[11px] text-ink-muted">
-          PRESETS
-        </span>
-        <div className="flex gap-2">
+      actions={
+        <>
           {commonRegex.map((preset, index) => (
             <button
               key={index}
               onClick={() => applyPreset(preset, index)}
-              className={`chip whitespace-nowrap !px-3 !py-1.5 !text-xs ${selectedPreset === index ? 'chip-active' : ''}`}
+              className={`chip whitespace-nowrap ${selectedPreset === index ? 'chip-active' : ''}`}
             >
               {preset.name}
             </button>
           ))}
-        </div>
-      </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          {/* Left Column - Input */}
-          <div className="space-y-4">
-            {/* Regex Input */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-              <label className="block text-sm font-medium mb-2">正则表达式</label>
-              <div className="flex gap-2 mb-3">
-                <span className="text-2xl text-gray-400">/</span>
-                <input
-                  type="text"
-                  value={regex}
-                  onChange={(e) => setRegex(e.target.value)}
-                  placeholder="example: ^[a-z]+"
-                  className="flex-1 px-3 py-2 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  spellCheck={false}
-                />
-                <span className="text-2xl text-gray-400">/</span>
-                <input
-                  type="text"
-                  value={flags}
-                  onChange={(e) => setFlags(e.target.value)}
-                  placeholder="gim"
-                  className="w-16 px-3 py-2 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  spellCheck={false}
-                />
-              </div>
+          <div className="hidden h-5 w-px bg-border-dim sm:block" />
 
-              {/* Flags Explanation */}
-              <div className="flex flex-wrap gap-3 text-xs text-gray-600 dark:text-gray-400">
-                <span><code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">g</code> 全局</span>
-                <span><code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">i</code> 忽略大小写</span>
-                <span><code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">m</code> 多行</span>
-                <span><code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">s</code> 让.匹配换行</span>
-              </div>
-
-              {error && (
-                <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                  <p className="text-sm text-red-600 dark:text-red-400">❌ {error}</p>
-                </div>
-              )}
-            </div>
-
-            {/* Test String */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-              <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-medium">测试文本</label>
-                <button
-                  onClick={() => setTestString('')}
-                  className="text-sm text-gray-500 hover:text-red-500 flex items-center gap-1"
+          {replaceResult && (
+            <button
+              onClick={() => navigator.clipboard.writeText(replaceResult)}
+              className="tool-btn"
+            >
+              <Copy className="h-3.5 w-3.5" />
+              复制结果
+            </button>
+          )}
+          <button onClick={() => setTestString('')} className="tool-btn tool-btn-danger">
+            <Trash2 className="h-3.5 w-3.5" />
+            清空
+          </button>
+        </>
+      }
+    >
+      <div className="flex min-h-0 flex-1 flex-col gap-3">
+        {/* Pattern */}
+        {/* Pattern */}
+        <div className="tool-panel">
+          <div className="tool-panel-head">
+            <span className="text-neon-magenta">&gt;_</span>
+            <span>PATTERN</span>
+            <div className="ml-3 flex flex-wrap items-center gap-x-3 gap-y-1">
+              {flagOptions.map(({ flag, label }) => (
+                <label
+                  key={flag}
+                  title={label}
+                  className="flex cursor-pointer select-none items-center gap-1 font-mono text-[11px] text-ink-secondary"
                 >
-                  <Trash2 className="h-3 w-3" />
-                  清空
-                </button>
-              </div>
-              <textarea
-                value={testString}
-                onChange={(e) => setTestString(e.target.value)}
-                placeholder="输入要测试的文本..."
-                className="w-full h-64 p-4 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                spellCheck={false}
-              />
-
-              {/* Match Info */}
-              {matches.length > 0 && (
-                <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                  <p className="text-sm text-green-600 dark:text-green-400">
-                    ✅ 找到 {matches.length} 个匹配
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Replace */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-              <h3 className="text-sm font-semibold mb-3">替换功能</h3>
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">替换为</label>
                   <input
-                    type="text"
-                    value={replacePattern}
-                    onChange={(e) => setReplacePattern(e.target.value)}
-                    placeholder="替换文本（可以使用 $1, $2 等捕获组）"
-                    className="w-full px-3 py-2 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    type="checkbox"
+                    checked={flags.includes(flag)}
+                    onChange={() => toggleFlag(flag)}
+                    className="accent-neon-magenta"
                   />
-                </div>
-
-                {replaceResult && (
-                  <div>
-                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">替换结果</label>
-                    <div className="relative">
-                      <pre className="w-full p-3 font-mono text-sm bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 overflow-x-auto whitespace-pre-wrap break-all">
-                        {replaceResult}
-                      </pre>
-                      <button
-                        onClick={() => navigator.clipboard.writeText(replaceResult)}
-                        className="absolute top-2 right-2 p-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700"
-                      >
-                        <Copy className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
+                  <span className={flags.includes(flag) ? 'text-neon-magenta' : ''}>{flag}</span>
+                </label>
+              ))}
             </div>
+            {error ? (
+              <span className="ml-auto normal-case tracking-normal text-neon-red">
+                ✗ {error}
+              </span>
+            ) : (
+              <span className="ml-auto normal-case tracking-normal">
+                {matches.length} 个匹配 · 实时校验
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2 p-3">
+            <span className="font-mono text-lg text-neon-magenta">/</span>
+            <input
+              type="text"
+              value={regex}
+              onChange={(e) => setRegex(e.target.value)}
+              placeholder="example: ^[a-z]+"
+              className="min-w-0 flex-1 rounded-md border border-border-dim bg-void-200 px-3 py-2 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:border-neon-magenta focus:outline-none"
+              spellCheck={false}
+            />
+            <span className="font-mono text-lg text-neon-magenta">/</span>
+          </div>
+        </div>
+
+        {/* Test String + Matches */}
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 lg:h-[calc(100dvh-8rem)] lg:grid-rows-[minmax(0,1fr)]">
+          <div className="tool-panel h-full min-h-[400px]">
+            <div className="tool-panel-head">
+              <span className="text-neon-magenta">&gt;_</span>
+              <span>INPUT</span>
+              <span className="ml-auto normal-case tracking-normal">
+                {testString.length} 字符
+              </span>
+            </div>
+            <textarea
+              value={testString}
+              onChange={(e) => setTestString(e.target.value)}
+              placeholder="输入要测试的文本..."
+              spellCheck={false}
+              className="min-h-0 flex-1 resize-none bg-void-100 p-4 font-mono text-sm leading-relaxed text-ink-primary caret-neon-magenta placeholder:text-ink-muted focus:outline-none"
+            />
           </div>
 
-          {/* Right Column - Results */}
-          <div className="space-y-4">
-            {/* Match Details */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-              <h3 className="text-sm font-semibold mb-3">匹配结果</h3>
-
+          <div className="tool-panel h-full min-h-[400px]">
+            <div className="tool-panel-head">
+              <span className="text-neon-magenta">&gt;_</span>
+              <span>MATCHES</span>
+              <span className="ml-auto normal-case tracking-normal">
+                {matches.length} 个匹配
+              </span>
+            </div>
+            <div className="min-h-0 flex-1 overflow-auto p-4">
               {matches.length === 0 ? (
-                <div className="text-center py-12 text-gray-400 dark:text-gray-600">
+                <div className="py-12 text-center font-mono text-xs text-ink-muted">
                   {testString && regex ? '未找到匹配' : '输入正则表达式和测试文本开始匹配'}
                 </div>
               ) : (
-                <div className="space-y-2 max-h-[600px] overflow-y-auto">
+                <div className="space-y-2">
                   {matches.map((match, index) => (
                     <div
                       key={index}
-                      className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700"
+                      className="rounded-md border border-border-dim bg-void-200 p-3"
                     >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-semibold text-indigo-600">匹配 #{index + 1}</span>
-                        <span className="text-xs text-gray-500">
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="font-mono text-xs font-semibold text-neon-magenta">
+                          匹配 #{index + 1}
+                        </span>
+                        <span className="font-mono text-[11px] text-ink-muted">
                           位置: {match.index} - {match.index! + match[0].length}
                         </span>
                       </div>
 
                       {/* Matched Text */}
                       <div className="mb-2">
-                        <span className="text-xs text-gray-500">匹配文本:</span>
-                        <code className="ml-2 px-2 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded font-mono text-sm">
+                        <span className="text-xs text-ink-muted">匹配文本:</span>
+                        <code className="ml-2 rounded bg-neon-magenta/10 px-2 py-1 font-mono text-sm text-neon-magenta">
                           {match[0]}
                         </code>
                       </div>
@@ -251,12 +240,12 @@ export default function RegexTesterPage() {
                       {/* Capture Groups */}
                       {match.length > 1 && (
                         <div>
-                          <span className="text-xs text-gray-500">捕获组:</span>
+                          <span className="text-xs text-ink-muted">捕获组:</span>
                           <div className="mt-1 space-y-1">
                             {Array.from(match).slice(1).map((group, i) => (
                               <div key={i} className="flex items-center gap-2 text-sm">
-                                <span className="text-xs text-gray-400">${i + 1}</span>
-                                <code className="px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded font-mono text-xs">
+                                <span className="font-mono text-xs text-ink-muted">${i + 1}</span>
+                                <code className="rounded bg-neon-lime/10 px-2 py-0.5 font-mono text-xs text-neon-lime">
                                   {group || '(空)'}
                                 </code>
                               </div>
@@ -269,55 +258,39 @@ export default function RegexTesterPage() {
                 </div>
               )}
             </div>
-
-            {/* Quick Reference */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-              <h3 className="text-sm font-semibold mb-3">快捷参考</h3>
-              <div className="grid grid-cols-2 gap-3 text-xs">
-                <div>
-                  <span className="font-semibold text-gray-700 dark:text-gray-300">字符类</span>
-                  <ul className="mt-1 space-y-1 text-gray-600 dark:text-gray-400">
-                    <li><code>\d</code> 数字</li>
-                    <li><code>\w</code> 单词字符</li>
-                    <li><code>\s</code> 空白字符</li>
-                    <li><code>.</code> 任意字符</li>
-                  </ul>
-                </div>
-                <div>
-                  <span className="font-semibold text-gray-700 dark:text-gray-300">量词</span>
-                  <ul className="mt-1 space-y-1 text-gray-600 dark:text-gray-400">
-                    <li><code>*</code> 0次或多次</li>
-                    <li><code>+</code> 1次或多次</li>
-                    <li><code>?</code> 0次或1次</li>
-                    <li><code>{'{n,m}'}</code> n到m次</li>
-                  </ul>
-                </div>
-                <div>
-                  <span className="font-semibold text-gray-700 dark:text-gray-300">定位符</span>
-                  <ul className="mt-1 space-y-1 text-gray-600 dark:text-gray-400">
-                    <li><code>^</code> 行首</li>
-                    <li><code>$</code> 行尾</li>
-                    <li><code>\b</code> 单词边界</li>
-                    <li><code>\B</code> 非单词边界</li>
-                  </ul>
-                </div>
-                <div>
-                  <span className="font-semibold text-gray-700 dark:text-gray-300">字符集</span>
-                  <ul className="mt-1 space-y-1 text-gray-600 dark:text-gray-400">
-                    <li><code>[abc]</code> a或b或c</li>
-                    <li><code>[^abc]</code> 非abc</li>
-                    <li><code>[a-z]</code> a到z</li>
-                    <li><code>(a|b)</code> a或b</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
-      {/* Footer Info */}
-      <div className="mt-4 font-mono text-[11px] text-ink-muted">
-        local only · JavaScript 正则语法 · 点击预设快速应用 · 使用 $1, $2 引用捕获组
+        {/* Replace */}
+        <div className="tool-panel">
+          <div className="tool-panel-head">
+            <span className="text-neon-magenta">&gt;_</span>
+            <span>REPLACE</span>
+            <span className="ml-auto normal-case tracking-normal">使用 $1, $2 引用捕获组</span>
+          </div>
+          <div className="space-y-3 p-4">
+            <div>
+              <label className="mb-1 block font-mono text-[11px] text-ink-muted">替换为</label>
+              <input
+                type="text"
+                value={replacePattern}
+                onChange={(e) => setReplacePattern(e.target.value)}
+                placeholder="替换文本（可以使用 $1, $2 等捕获组）"
+                className="w-full rounded-md border border-border-dim bg-void-200 px-3 py-2 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:border-neon-magenta focus:outline-none"
+              />
+            </div>
+
+            {replaceResult && (
+              <div>
+                <label className="mb-1 block font-mono text-[11px] text-ink-muted">替换结果</label>
+                <pre className="w-full overflow-x-auto whitespace-pre-wrap break-all rounded-md border border-border-dim bg-void-200 p-3 font-mono text-sm text-ink-primary">
+                  {replaceResult}
+                </pre>
+              </div>
+            )}
+          </div>
+        </div>
+
       </div>
     </ToolShell>
   )

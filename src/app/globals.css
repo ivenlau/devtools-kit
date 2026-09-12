@@ -154,6 +154,91 @@
       inset 0 0 0 1px rgba(0, 229, 255, 0.06);
   }
 
+  /* ============================================
+     Tool pages — shared chrome
+     Every tool page: ToolShell head → .tool-toolbar →
+     .tool-panel workspace → meta footer. Keep consistent.
+     ============================================ */
+  .tool-toolbar {
+    @apply flex flex-wrap items-center gap-2 rounded-lg border border-border-dim bg-void-100 px-3 py-2.5;
+  }
+
+  .tool-btn {
+    @apply inline-flex items-center gap-2 rounded-md border border-border-dim bg-void-200 px-3 py-1.5 font-mono text-xs text-ink-secondary transition-all duration-150;
+  }
+  .tool-btn:hover {
+    @apply border-neon-cyan text-neon-cyan;
+    box-shadow: 0 0 12px rgba(0, 229, 255, 0.22);
+  }
+  .tool-btn:disabled {
+    @apply cursor-not-allowed opacity-40;
+  }
+  .tool-btn:disabled:hover {
+    @apply border-border-dim text-ink-secondary;
+    box-shadow: none;
+  }
+
+  /* Filled action (preview / convert / primary op) — inherits page accent via --accent */
+  .tool-btn-accent {
+    @apply border text-ink-primary;
+    border-color: color-mix(in srgb, var(--accent, #00e5ff) 55%, transparent);
+    background: color-mix(in srgb, var(--accent, #00e5ff) 12%, transparent);
+    color: var(--accent, #00e5ff);
+    box-shadow: 0 0 14px color-mix(in srgb, var(--accent, #00e5ff) 22%, transparent);
+  }
+  .tool-btn-accent:hover {
+    background: color-mix(in srgb, var(--accent, #00e5ff) 20%, transparent);
+    box-shadow: 0 0 22px color-mix(in srgb, var(--accent, #00e5ff) 38%, transparent);
+  }
+
+  .tool-btn-danger:hover {
+    @apply border-neon-magenta text-neon-magenta;
+    box-shadow: 0 0 12px rgba(255, 45, 149, 0.25);
+  }
+
+  /* Dropdown in the header actions — same box metrics as .tool-btn so they align */
+  .tool-select {
+    @apply cursor-pointer rounded-md border border-border-dim bg-void-200 px-2 py-1.5 font-mono text-xs text-ink-primary transition-all duration-150;
+  }
+  .tool-select:hover {
+    @apply border-border-glow;
+  }
+  .tool-select:focus {
+    border-color: var(--accent, #00e5ff);
+    @apply outline-none;
+  }
+
+  /* Workspace panel with terminal-style title bar */
+  .tool-panel {
+    @apply flex min-h-0 flex-col overflow-hidden rounded-lg border border-border-dim bg-void-100 transition-colors duration-200;
+  }
+  .tool-panel:focus-within {
+    border-color: color-mix(in srgb, var(--accent, #00e5ff) 45%, transparent);
+    box-shadow: 0 0 18px color-mix(in srgb, var(--accent, #00e5ff) 14%, transparent);
+  }
+  .tool-panel-head {
+    @apply flex h-9 shrink-0 items-center gap-2 border-b border-border-dim bg-void-200/60 px-3 font-mono text-[11px] tracking-wider text-ink-muted;
+  }
+
+  /* Short viewports (netbooks, small windows): compress hero chrome so the
+     homepage still fits without page scrollbars. !important beats the inline
+     height on .hero-band and the sm: padding utilities. */
+  @media (max-height: 559px) {
+    .hero-head {
+      padding-top: 1rem !important;
+    }
+    .hero-band {
+      height: 44vh !important;
+    }
+    .hero-dock {
+      padding-bottom: 0.75rem !important;
+    }
+    .hero-footer {
+      padding-top: 0.5rem !important;
+      padding-bottom: 0.5rem !important;
+    }
+  }
+
   .btn-neon {
     @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 font-mono text-xs font-bold tracking-wider transition-all duration-200;
     background: linear-gradient(90deg, var(--neon-cyan), #00b4d8);
