@@ -61,17 +61,13 @@ export function DropZone({ onFileDrop }: DropZoneProps) {
   if (!isDragging) return null
 
   return (
-    <div className="fixed inset-0 z-[101] bg-blue-500/10 dark:bg-blue-400/10 backdrop-blur-sm flex items-center justify-center pointer-events-none">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-12 border-2 border-dashed border-blue-400 dark:border-blue-500 flex flex-col items-center gap-4 animate-pulse">
-        <div className="w-20 h-20 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
-          <Upload className="h-10 w-10 text-blue-500" />
+    <div className="fixed inset-0 z-[150] flex items-center justify-center bg-void/80 backdrop-blur-sm">
+      <div className="panel-glow animate-fade-up flex flex-col items-center gap-4 px-12 py-10">
+        <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-neon-cyan bg-void-200 shadow-neon-cyan">
+          <Upload className="h-7 w-7 text-neon-cyan" />
         </div>
-        <p className="text-xl font-semibold text-gray-800 dark:text-gray-200">
-          释放文件以打开对应工具
-        </p>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          支持 JSON、Markdown、SQL、图片、代码等文件
-        </p>
+        <p className="font-display text-xl font-semibold text-ink-primary">DROP FILE</p>
+        <p className="font-mono text-xs text-ink-muted">release to auto-route to a tool</p>
       </div>
     </div>
   )

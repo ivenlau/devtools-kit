@@ -1,8 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { FileCode, Copy, Trash2 } from 'lucide-react'
+import { FileCode, Copy, Trash2, ArrowRight, ArrowLeft } from 'lucide-react'
 import { useTransferData } from '@/lib/useTransferData'
+import { ToolShell } from '@/components/ToolShell'
+import { useI18n } from '@/components/I18nProvider'
 
 /**
  * Base64 编码
@@ -36,6 +38,7 @@ const base64Decode = (base64: string): string => {
 }
 
 export default function Base64ToolPage() {
+  const { t } = useI18n()
   const [mode, setMode] = useState<'encode' | 'decode'>('encode')
   const [input, setInput] = useState('')
   const [output, setOutput] = useState('')
@@ -58,7 +61,7 @@ export default function Base64ToolPage() {
       }
       setError(null)
     } catch (err: any) {
-      setError(err.message || '转换失败')
+      setError(err.message === '无效的Base64字符串' ? t('无效的Base64字符串') : err.message || t('转换失败'))
       setOutput('')
     }
   }, [input, mode])
@@ -74,123 +77,92 @@ export default function Base64ToolPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
-      {/* Header */}
-      <header className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
-              <FileCode className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold font-display">Base64 编解码</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Base64 编码与解码，支持 UTF-8 文本
-              </p>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Toolbar */}
-      <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-3 flex flex-wrap items-center gap-3">
+    <ToolShell
+      title="BASE64"
+      description={t('Base64 编码与解码，支持 UTF-8 文本')}
+      path="/tools/base64"
+      icon={FileCode}
+      accent="lime"
+      actions={
+        <>
           <button
             onClick={() => setMode('encode')}
-            className={`px-4 py-2 rounded-lg font-medium transition-all text-sm ${
-              mode === 'encode'
-                ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white'
-                : 'border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
-            }`}
+            aria-pressed={mode === 'encode'}
+            title={t('编码')}
+            aria-label={t('编码')}
+            className={`tool-btn tool-btn-icon ${mode === 'encode' ? 'tool-btn-accent' : ''}`}
           >
-            编码模式
+            <ArrowRight className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={() => setMode('decode')}
-            className={`px-4 py-2 rounded-lg font-medium transition-all text-sm ${
-              mode === 'decode'
-                ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white'
-                : 'border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
-            }`}
+            aria-pressed={mode === 'decode'}
+            title={t('解码')}
+            aria-label={t('解码')}
+            className={`tool-btn tool-btn-icon ${mode === 'decode' ? 'tool-btn-accent' : ''}`}
           >
-            解码模式
+            <ArrowLeft className="h-3.5 w-3.5" />
           </button>
-
-          <div className="ml-auto flex items-center gap-3">
-            <button
-              onClick={handleCopy}
-              disabled={!output}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-all text-sm disabled:opacity-50 flex items-center gap-2"
-            >
-              <Copy className="h-4 w-4" />
-              复制
-            </button>
-            <button
-              onClick={handleClear}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg font-medium hover:bg-red-50 dark:hover:bg-red-900/20 transition-all text-sm flex items-center gap-2"
-            >
-              <Trash2 className="h-4 w-4" />
-              清空
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Editor Area */}
-      <div className="container mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <button onClick={handleCopy} disabled={!output} className="tool-btn tool-btn-icon" title={t('复制')} aria-label={t('复制')}>
+            <Copy className="h-3.5 w-3.5" />
+          </button>
+          <button onClick={handleClear} className="tool-btn tool-btn-icon tool-btn-danger" title={t('清空')} aria-label={t('清空')}>
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </>
+      }
+    >
+      <div className="flex min-h-0 flex-1 flex-col gap-3">
+        {/* Workspace */}
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 lg:h-[calc(100dvh-8rem)] lg:grid-rows-[minmax(0,1fr)]">
           {/* Input */}
-          <div className="flex flex-col">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {mode === 'encode' ? '输入文本' : '输入 Base64'}
-              </h3>
-              {error && (
-                <span className="text-sm text-red-500">❌ {error}</span>
+          <div className="tool-panel h-full min-h-[400px]">
+            <div className="tool-panel-head">
+              <span className="text-neon-lime">&gt;_</span>
+              <span>{mode === 'encode' ? 'INPUT.TEXT' : 'INPUT.BASE64'}</span>
+              {error ? (
+                <span className="ml-auto max-w-[60%] truncate text-neon-red normal-case tracking-normal">
+                  ERR · {error}
+                </span>
+              ) : (
+                <span className="ml-auto normal-case tracking-normal">{input.length} {t('字符')}</span>
               )}
             </div>
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={mode === 'encode' ? '输入要编码的文本...' : '输入要解码的 Base64...'}
-              className="flex-1 min-h-[500px] p-4 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 resize-none focus:outline-none focus:ring-2 focus:ring-green-500"
+              placeholder={mode === 'encode' ? t('输入要编码的文本...') : t('输入要解码的 Base64...')}
+              className="min-h-0 flex-1 resize-none bg-void-100 p-4 font-mono text-sm text-ink-primary caret-neon-lime placeholder:text-ink-muted focus:outline-none"
               spellCheck={false}
             />
           </div>
 
           {/* Output */}
-          <div className="flex flex-col">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {mode === 'encode' ? 'Base64 结果' : '解码结果'}
-              </h3>
-              {output && !error && (
-                <span className="text-sm text-green-500">✓ 转换成功</span>
-              )}
+          <div className="tool-panel h-full min-h-[400px]">
+            <div className="tool-panel-head">
+              <span className="text-neon-lime">&gt;_</span>
+              <span>{mode === 'encode' ? 'OUTPUT.B64' : 'OUTPUT.TEXT'}</span>
+              <span className="ml-auto flex items-center gap-1.5 normal-case tracking-normal">
+                {output && !error ? (
+                  <>
+                    <span className="status-dot" />ok
+                  </>
+                ) : (
+                  'idle'
+                )}
+              </span>
             </div>
             <textarea
               value={output}
               readOnly
-              placeholder="转换结果将显示在这里..."
-              className="flex-1 min-h-[500px] p-4 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 resize-none"
+              placeholder={t('转换结果将显示在这里...')}
+              className="min-h-0 flex-1 resize-none bg-void-100 p-4 font-mono text-sm text-ink-primary placeholder:text-ink-muted focus:outline-none"
               spellCheck={false}
             />
           </div>
         </div>
-      </div>
 
-      {/* Footer Info */}
-      <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
-            <div className="flex items-center gap-4">
-              <span>💡 支持 UTF-8 编码</span>
-              <span>•</span>
-              <span>所有处理在本地完成</span>
-            </div>
-          </div>
-        </div>
       </div>
-    </div>
+    </ToolShell>
   )
 }

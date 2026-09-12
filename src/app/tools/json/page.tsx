@@ -1,10 +1,71 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Braces, Copy, Trash2 } from 'lucide-react'
+import { Braces, Copy, Trash2, Wand2, Minimize2, ArrowDownAZ } from 'lucide-react'
 import { formatJson, minifyJson } from '@/lib/parsers/json'
 import { useTransferData } from '@/lib/useTransferData'
-import Editor from '@monaco-editor/react'
+import Editor, { type Monaco } from '@monaco-editor/react'
+import { ToolShell } from '@/components/ToolShell'
+import { useTheme } from '@/components/ThemeProvider'
+import { useI18n } from '@/components/I18nProvider'
+
+// Monaco themes matching the site palette (dark + light)
+function defineEditorTheme(monaco: Monaco) {
+  monaco.editor.defineTheme('devtools-dark', {
+    base: 'vs-dark',
+    inherit: true,
+    rules: [
+      { token: 'string.key.json', foreground: '00E5FF' },
+      { token: 'string.value.json', foreground: 'FFB86C' },
+      { token: 'number', foreground: 'A855F7' },
+      { token: 'keyword', foreground: 'FF2D95' },
+      { token: 'comment', foreground: '4E5A73' },
+    ],
+    colors: {
+      'editor.background': '#0B0D14',
+      'editor.foreground': '#E8ECF4',
+      'editorLineNumber.foreground': '#4E5A73',
+      'editorLineNumber.activeForeground': '#8B96AD',
+      'editorCursor.foreground': '#00E5FF',
+      'editor.selectionBackground': '#00E5FF33',
+      'editor.lineHighlightBackground': '#111522',
+      'editorIndentGuide.background1': '#1A2035',
+      'editorIndentGuide.activeBackground1': '#2A3558',
+      'editorWidget.background': '#111522',
+      'editorWidget.border': '#1A2035',
+      'editorGutter.background': '#0B0D14',
+      'scrollbarSlider.background': '#1A2035AA',
+      'scrollbarSlider.hoverBackground': '#2A3558AA',
+    },
+  })
+  monaco.editor.defineTheme('devtools-light', {
+    base: 'vs',
+    inherit: true,
+    rules: [
+      { token: 'string.key.json', foreground: '0084AD' },
+      { token: 'string.value.json', foreground: 'A85A00' },
+      { token: 'number', foreground: '7C3AED' },
+      { token: 'keyword', foreground: 'C81E6E' },
+      { token: 'comment', foreground: '8590A5' },
+    ],
+    colors: {
+      'editor.background': '#FFFFFF',
+      'editor.foreground': '#181E2C',
+      'editorLineNumber.foreground': '#8590A5',
+      'editorLineNumber.activeForeground': '#4E596E',
+      'editorCursor.foreground': '#0084AD',
+      'editor.selectionBackground': '#0084AD33',
+      'editor.lineHighlightBackground': '#F0F3F8',
+      'editorIndentGuide.background1': '#E1E5EE',
+      'editorIndentGuide.activeBackground1': '#BAC3D4',
+      'editorWidget.background': '#FFFFFF',
+      'editorWidget.border': '#DBE0EA',
+      'editorGutter.background': '#FFFFFF',
+      'scrollbarSlider.background': '#DBE0EAAA',
+      'scrollbarSlider.hoverBackground': '#BAC3D4AA',
+    },
+  })
+}
 
 export default function JsonToolPage() {
   const [input, setInput] = useState('')
@@ -12,32 +73,10 @@ export default function JsonToolPage() {
   const [error, setError] = useState<string | null>(null)
   const [indent, setIndent] = useState(2)
   const [sortKeys, setSortKeys] = useState(false)
-  const [editorTheme, setEditorTheme] = useState<'light' | 'vs-dark'>('light')
+  const { theme } = useTheme()
+  const { t, lang } = useI18n()
 
   useTransferData(setInput)
-
-  useEffect(() => {
-    // Check initial theme
-    const isDark = document.documentElement.classList.contains('dark')
-    setEditorTheme(isDark ? 'vs-dark' : 'light')
-
-    // Observe theme changes
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.attributeName === 'class') {
-          const isDark = document.documentElement.classList.contains('dark')
-          setEditorTheme(isDark ? 'vs-dark' : 'light')
-        }
-      })
-    })
-
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class'],
-    })
-
-    return () => observer.disconnect()
-  }, [])
 
   // 自动格式化
   useEffect(() => {
@@ -50,7 +89,11 @@ export default function JsonToolPage() {
     const { result, error: err } = formatJson(input, { indent, sortKeys })
 
     if (err) {
-      setError(`行 ${err.line}, 列 ${err.column}: ${err.message}`)
+      setError(
+        lang === 'en'
+          ? `Line ${err.line}, Col ${err.column}: ${err.message}`
+          : `行 ${err.line}, 列 ${err.column}: ${err.message}`
+      )
       // Keep the previous output or clear it?
       // If we clear it, the user loses the formatted view while typing.
       // But if we don't, it might be confusing.
@@ -91,157 +134,125 @@ export default function JsonToolPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
-      {/* Header */}
-      <header className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
-                <Braces className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold font-display">JSON 格式化</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  格式化、压缩、验证 JSON 数据
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Toolbar */}
-      <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-3 flex flex-wrap items-center gap-3">
-          <button
-            onClick={handleFormat}
-            className="px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-medium hover:shadow-lg transition-all text-sm"
+    <ToolShell
+      title="JSON FORMAT"
+      description={t('格式化、压缩、验证 JSON 数据')}
+      path="/tools/json"
+      icon={Braces}
+      accent="cyan"
+      actions={
+        <>
+          <select
+            value={indent}
+            onChange={(e) => setIndent(Number(e.target.value))}
+            aria-label={t('缩进')}
+            title={t('缩进')}
+            className="tool-select"
           >
-            格式化
-          </button>
+            <option value={2}>2</option>
+            <option value={4}>4</option>
+          </select>
           <button
-            onClick={handleMinify}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-all text-sm"
+            onClick={() => setSortKeys(!sortKeys)}
+            aria-pressed={sortKeys}
+            title={t('SORT KEYS')}
+            aria-label={t('SORT KEYS')}
+            className={`tool-btn tool-btn-icon ${sortKeys ? 'tool-btn-accent' : ''}`}
           >
-            压缩
-          </button>
-          <button
-            onClick={handleCopy}
-            disabled={!output}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-all text-sm disabled:opacity-50 flex items-center gap-2"
-          >
-            <Copy className="h-4 w-4" />
-            复制
-          </button>
-          <button
-            onClick={handleClear}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg font-medium hover:bg-red-50 dark:hover:bg-red-900/20 transition-all text-sm flex items-center gap-2"
-          >
-            <Trash2 className="h-4 w-4" />
-            清空
+            <ArrowDownAZ className="h-3.5 w-3.5" />
           </button>
 
-          <div className="ml-auto flex items-center gap-4">
-            <label className="flex items-center gap-2 text-sm">
-              <span className="text-gray-600 dark:text-gray-400">缩进:</span>
-              <select
-                value={indent}
-                onChange={(e) => setIndent(Number(e.target.value))}
-                className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-800"
-              >
-                <option value={2}>2 空格</option>
-                <option value={4}>4 空格</option>
-              </select>
-            </label>
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={sortKeys}
-                onChange={(e) => setSortKeys(e.target.checked)}
-                className="rounded"
-              />
-              <span className="text-gray-600 dark:text-gray-400">排序键</span>
-            </label>
-          </div>
-        </div>
-      </div>
+          <div className="hidden h-5 w-px bg-border-dim sm:block" />
 
-      {/* Editor Area */}
-      <div className="container mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <button onClick={handleFormat} className="tool-btn tool-btn-icon tool-btn-accent" title={t('格式化')} aria-label={t('格式化')}>
+            <Wand2 className="h-3.5 w-3.5" />
+          </button>
+          <button onClick={handleMinify} className="tool-btn tool-btn-icon" title={t('压缩')} aria-label={t('压缩')}>
+            <Minimize2 className="h-3.5 w-3.5" />
+          </button>
+          <button onClick={handleCopy} disabled={!output} className="tool-btn tool-btn-icon" title={t('复制')} aria-label={t('复制')}>
+            <Copy className="h-3.5 w-3.5" />
+          </button>
+          <button onClick={handleClear} className="tool-btn tool-btn-icon tool-btn-danger" title={t('清空')} aria-label={t('清空')}>
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </>
+      }
+    >
+      <div className="flex min-h-0 flex-1 flex-col">
+        {/* Workspace */}
+        <div className="grid flex-1 grid-cols-1 gap-3 lg:grid-cols-2 lg:h-[calc(100dvh-8rem)] lg:grid-rows-[minmax(0,1fr)]">
           {/* Input */}
-          <div className="flex flex-col h-[600px]">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">输入 JSON</h3>
-              {error && (
-                <span className="text-sm text-red-500">❌ {error}</span>
+          <div className="tool-panel h-full min-h-[400px]">
+            <div className="tool-panel-head">
+              <span className="text-neon-cyan">&gt;_</span>
+              <span>INPUT.JSON</span>
+              {error ? (
+                <span className="ml-auto max-w-[60%] truncate text-neon-red normal-case tracking-normal">
+                  ERR · {error}
+                </span>
+              ) : (
+                <span className="ml-auto normal-case tracking-normal">{input.length} {t('字符')}</span>
               )}
             </div>
-            <div className="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
+            <div className="min-h-0 flex-1 overflow-hidden">
               <Editor
                 height="100%"
                 defaultLanguage="json"
                 value={input}
-                theme={editorTheme}
+                theme={theme === "light" ? "devtools-light" : "devtools-dark"}
+                beforeMount={defineEditorTheme}
                 onChange={(value) => setInput(value || '')}
                 options={{
                   minimap: { enabled: false },
                   fontSize: 14,
+                  fontFamily: 'JetBrains Mono, monospace',
                   wordWrap: 'on',
                   formatOnPaste: true,
                   automaticLayout: true,
+                  padding: { top: 12 },
                 }}
               />
             </div>
           </div>
 
           {/* Output */}
-          <div className="flex flex-col h-[600px]">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">输出</h3>
-              {output && !error && (
-                <span className="text-sm text-green-500">✓ 格式化成功</span>
-              )}
+          <div className="tool-panel h-full min-h-[400px]">
+            <div className="tool-panel-head">
+              <span className="text-neon-cyan">&gt;_</span>
+              <span>OUTPUT</span>
+              <span className="ml-auto flex items-center gap-1.5 normal-case tracking-normal">
+                {output && !error ? (
+                  <>
+                    <span className="status-dot" />valid
+                  </>
+                ) : (
+                  'idle'
+                )}
+              </span>
             </div>
-            <div className="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
+            <div className="min-h-0 flex-1 overflow-hidden">
               <Editor
                 height="100%"
                 defaultLanguage="json"
                 value={output}
-                theme={editorTheme}
+                theme={theme === "light" ? "devtools-light" : "devtools-dark"}
+                beforeMount={defineEditorTheme}
                 options={{
                   readOnly: true,
                   minimap: { enabled: false },
                   fontSize: 14,
+                  fontFamily: 'JetBrains Mono, monospace',
                   wordWrap: 'on',
                   automaticLayout: true,
                   folding: true,
+                  padding: { top: 12 },
                 }}
               />
             </div>
           </div>
         </div>
       </div>
-
-      {/* Footer Info */}
-      <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
-            <div className="flex items-center gap-4">
-              <span>💡 支持 JSON 验证、格式化、压缩</span>
-              <span>•</span>
-              <span>所有处理在本地完成，不上传数据</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs">Ctrl</kbd>
-              <span>+</span>
-              <kbd className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs">F</kbd>
-              <span className="ml-2">查找</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    </ToolShell>
   )
 }

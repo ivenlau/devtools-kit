@@ -1,179 +1,81 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-import { 
-  Hash, Search, X, 
-  Braces, FileCode, Clock, Regex, Link2, FileText, Palette, 
-  QrCode, ArrowLeftRight, Terminal, Globe, Shield, Database, RefreshCw, 
-  Image, Minimize2, Code2, Monitor
-} from 'lucide-react'
-import { useState, useEffect, useRef } from 'react'
-import { tools } from '@/lib/constants/tools'
+import { usePathname } from 'next/navigation'
+import { Github, Languages, Moon, Sun } from 'lucide-react'
+import { useTheme } from '@/components/ThemeProvider'
+import { useI18n } from '@/components/I18nProvider'
 
-const iconMap: Record<string, any> = {
-  Braces, FileCode, Clock, Regex, Hash, Link2, FileText, Palette,
-  QrCode, ArrowLeftRight, Terminal, Globe, Shield, Database, RefreshCw,
-  Image, Minimize2, Code2, Monitor
-}
+const NAV_LINKS = [
+  { href: '/', label: '首页' },
+  { href: '/tools', label: '工具箱' },
+]
 
 export function Header() {
   const pathname = usePathname()
-  const router = useRouter()
-  const [isSearchOpen, setIsSearchOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [searchResults, setSearchResults] = useState(tools)
-  const searchRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const filtered = tools.filter(tool => 
-      tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tool.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tool.keywords.some(k => k.toLowerCase().includes(searchQuery.toLowerCase()))
-    )
-    setSearchResults(filtered)
-  }, [searchQuery])
-
-  // Close search when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setIsSearchOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
-
-  const handleSearchSelect = (path: string) => {
-    router.push(path)
-    setIsSearchOpen(false)
-    setSearchQuery('')
-  }
-
-  const getIcon = (iconName: string) => {
-    const Icon = iconMap[iconName] || Hash
-    return <Icon className="h-5 w-5 text-gray-600 dark:text-gray-300" />
-  }
+  const { theme, toggleTheme } = useTheme()
+  const { lang, setLang, t } = useI18n()
 
   return (
-    <header className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-0 z-50">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="flex items-center space-x-8">
-          <Link href="/" className="flex items-center space-x-2">
-            <Hash className="h-8 w-8 text-blue-500" />
-            <span className="text-xl font-bold font-display hidden sm:inline-block">DevToolsKit</span>
+    <header className="sticky top-0 z-50 bg-void-100/90 backdrop-blur-md">
+      {/* border lives on the inner box so the header totals exactly h-14 (3.5rem) — pages below use calc(100dvh - 3.5rem) */}
+      <div className="flex h-14 w-full items-center justify-between border-b border-border-dim px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-8">
+          <Link href="/" className="group flex items-center gap-2.5">
+            <span
+              aria-hidden
+              className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-neon-cyan to-neon-magenta font-mono text-[11px] font-bold leading-none text-white shadow-neon-cyan transition-shadow group-hover:shadow-neon-magenta"
+            >
+              &gt;_
+            </span>
+            <span className="font-display text-lg font-bold tracking-tight text-ink-primary">
+              DevToolsKit
+            </span>
           </Link>
-          
-          <nav className="hidden md:flex items-center space-x-6">
-            <Link 
-              href="/" 
-              className={`text-sm font-medium transition-colors hover:text-blue-500 ${
-                pathname === '/' ? 'text-blue-500' : 'text-gray-700 dark:text-gray-300'
-              }`}
-            >
-              首页
-            </Link>
-            <Link 
-              href="/tools" 
-              className={`text-sm font-medium transition-colors hover:text-blue-500 ${
-                pathname?.startsWith('/tools') ? 'text-blue-500' : 'text-gray-700 dark:text-gray-300'
-              }`}
-            >
-              工具
-            </Link>
-            <Link 
-              href="/settings" 
-              className={`text-sm font-medium transition-colors hover:text-blue-500 ${
-                pathname === '/settings' ? 'text-blue-500' : 'text-gray-700 dark:text-gray-300'
-              }`}
-            >
-              设置
-            </Link>
+
+          <nav className="hidden items-center gap-6 md:flex">
+            {NAV_LINKS.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                className={`font-mono text-[11px] tracking-[0.12em] transition-colors ${
+                  pathname === href || (href === '/tools' && pathname?.startsWith('/tools'))
+                    ? 'text-neon-cyan neon-text-cyan'
+                    : 'text-ink-secondary hover:text-ink-primary'
+                }`}
+              >
+                {t(label)}
+              </Link>
+            ))}
           </nav>
         </div>
 
-        <div className="flex items-center space-x-4" ref={searchRef}>
-          <div className="relative">
-            <div className={`flex items-center transition-all duration-300 ${
-              isSearchOpen ? 'w-64 md:w-80' : 'w-10 md:w-64'
-            }`}>
-              <div className={`absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 ${
-                !isSearchOpen && 'md:block hidden'
-              }`}>
-                <Search className="h-4 w-4" />
-              </div>
-              
-              {/* Mobile Search Icon Trigger */}
-              <button 
-                className={`md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 ${
-                  isSearchOpen ? 'hidden' : 'block'
-                }`}
-                onClick={() => {
-                  setIsSearchOpen(true)
-                  // Focus input after a small delay to allow render
-                  setTimeout(() => document.getElementById('tool-search')?.focus(), 50)
-                }}
-              >
-                <Search className="h-5 w-5 text-gray-600 dark:text-gray-300" />
-              </button>
-
-              <input
-                id="tool-search"
-                type="text"
-                placeholder="搜索工具..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => setIsSearchOpen(true)}
-                className={`w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
-                  isSearchOpen ? 'opacity-100 visible' : 'opacity-0 invisible md:opacity-100 md:visible'
-                }`}
-              />
-              
-              {isSearchOpen && (
-                <button 
-                  onClick={() => {
-                    setIsSearchOpen(false)
-                    setSearchQuery('')
-                  }}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
-            </div>
-
-            {/* Search Results Dropdown */}
-            {isSearchOpen && (
-              <div className="absolute top-full right-0 md:left-0 mt-2 w-72 md:w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl max-h-96 overflow-y-auto py-2 z-50">
-                {searchResults.length > 0 ? (
-                  searchResults.map((tool) => (
-                    <button
-                      key={tool.id}
-                      onClick={() => handleSearchSelect(tool.path)}
-                      className="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center space-x-3 group"
-                    >
-                      <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg group-hover:bg-white dark:group-hover:bg-gray-600 transition-colors">
-                        {getIcon(tool.icon)}
-                      </div>
-                      <div>
-                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                          {tool.name}
-                        </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
-                          {tool.description}
-                        </div>
-                      </div>
-                    </button>
-                  ))
-                ) : (
-                  <div className="px-4 py-8 text-center text-gray-500 dark:text-gray-400 text-sm">
-                    未找到相关工具
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
+            aria-label={lang === 'zh' ? 'Switch to English' : '切换到中文'}
+            title={lang === 'zh' ? 'Switch to English' : '切换到中文'}
+            className="flex h-9 w-9 items-center justify-center rounded-md border border-border-dim bg-void-200 text-ink-secondary transition-all hover:border-neon-cyan hover:text-neon-cyan hover:shadow-neon-cyan"
+          >
+            <Languages className="h-4 w-4" />
+          </button>
+          <button
+            onClick={toggleTheme}
+            aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+            title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+            className="flex h-9 w-9 items-center justify-center rounded-md border border-border-dim bg-void-200 text-ink-secondary transition-all hover:border-neon-cyan hover:text-neon-cyan hover:shadow-neon-cyan"
+          >
+            {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
+          <a
+            href="https://github.com/ivenlau/devtools-kit"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub"
+            className="flex h-9 w-9 items-center justify-center rounded-md border border-border-dim bg-void-200 text-ink-secondary transition-all hover:border-neon-cyan hover:text-neon-cyan hover:shadow-neon-cyan"
+          >
+            <Github className="h-4 w-4" />
+          </a>
         </div>
       </div>
     </header>
