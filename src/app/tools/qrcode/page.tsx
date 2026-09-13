@@ -77,7 +77,6 @@ export default function QRCodeGeneratorPage() {
       description={t('生成自定义二维码，支持多种格式')}
       path="/tools/qrcode"
       icon={QrCode}
-      accent="cyan"
       actions={
         <>
           <button onClick={copyBase64} className="tool-btn tool-btn-icon" title={t('复制B64')} aria-label={t('复制B64')}>

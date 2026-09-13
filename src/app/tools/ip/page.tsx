@@ -154,7 +154,6 @@ export default function IPQueryPage() {
       description={t('查询 IP 地址信息和地理位置')}
       path="/tools/ip"
       icon={Globe}
-      accent="lime"
       actions={
         <>
           <button onClick={queryIP} disabled={loading} className="tool-btn tool-btn-icon tool-btn-accent" title={t('查询')} aria-label={t('查询')}>

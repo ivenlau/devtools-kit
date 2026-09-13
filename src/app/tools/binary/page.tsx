@@ -158,7 +158,6 @@ export default function BinaryConverterPage() {
       description={t('二进制、十进制、十六进制互转')}
       path="/tools/binary"
       icon={Binary}
-      accent="purple"
       actions={
         <>
           <button

@@ -302,7 +302,6 @@ email = "jane@example.com"`,
       description={t('JSON、XML、YAML、TOML 格式互转')}
       path="/tools/convert"
       icon={RefreshCw}
-      accent="purple"
       actions={
         <>
           <select

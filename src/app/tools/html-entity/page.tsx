@@ -135,7 +135,6 @@ export default function HTMLEntityPage() {
       description={t('HTML 特殊字符与实体互转')}
       path="/tools/html-entity"
       icon={Code2}
-      accent="amber"
       actions={
         <>
           <select

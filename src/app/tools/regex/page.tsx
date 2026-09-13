@@ -104,7 +104,6 @@ export default function RegexTesterPage() {
       description={t('实时测试正则表达式，查看匹配结果')}
       path="/tools/regex"
       icon={Regex}
-      accent="magenta"
       actions={
         <>
           {commonRegex.map((preset, index) => (

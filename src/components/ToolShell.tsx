@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import type { LucideIcon } from 'lucide-react'
 import { useTheme } from '@/components/ThemeProvider'
+import { tools } from '@/lib/constants/tools'
 import { useI18n } from '@/components/I18nProvider'
 
 interface ToolShellProps {
@@ -17,6 +18,12 @@ interface ToolShellProps {
 }
 
 const accentMap: Record<string, { box: string; line: string; dark: string; light: string }> = {
+  pink: {
+    box: 'text-neon-pink',
+    line: 'via-neon-pink/60',
+    dark: '#FF79C6',
+    light: '#B0308C',
+  },
   cyan: {
     box: 'text-neon-cyan',
     line: 'via-neon-cyan/60',
@@ -52,6 +59,7 @@ const accentMap: Record<string, { box: string; line: string; dark: string; light
 export function ToolShell({
   title,
   description,
+  path,
   icon: Icon,
   accent = 'cyan',
   actions,
@@ -59,7 +67,11 @@ export function ToolShell({
 }: ToolShellProps) {
   const { theme } = useTheme()
   const { t } = useI18n()
-  const a = accentMap[accent] ?? accentMap.cyan
+  // The card color on the home orbit is the source of truth — derive the
+  // page accent from the tool registry so navigation between card and page
+  // keeps the same hue (explicit prop is only a fallback).
+  const accentName = tools.find((tool) => tool.path === path)?.accent ?? accent
+  const a = accentMap[accentName] ?? accentMap.cyan
 
   return (
     <div

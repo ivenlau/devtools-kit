@@ -154,7 +154,6 @@ export default function CronGeneratorPage() {
       description={t('生成和解析 Cron 定时任务表达式')}
       path="/tools/cron"
       icon={Clock}
-      accent="amber"
       actions={
         <>
           <button

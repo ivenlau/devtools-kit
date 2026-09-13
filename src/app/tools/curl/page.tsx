@@ -91,7 +91,6 @@ export default function CurlGeneratorPage() {
       description={t('可视化构建 HTTP 请求，生成 cURL 命令')}
       path="/tools/curl"
       icon={Terminal}
-      accent="cyan"
       actions={
         <>
           <button onClick={copyToClipboard} className="tool-btn tool-btn-icon tool-btn-accent" title={t('复制')} aria-label={t('复制')}>

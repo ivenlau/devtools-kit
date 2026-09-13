@@ -1,5 +1,6 @@
 export interface ToolConfig {
   id: string
+  accent: string
   name: string
   nameEn: string
   description: string
@@ -14,6 +15,7 @@ export interface ToolConfig {
 export const tools: ToolConfig[] = [
   {
     id: 'json-formatter',
+    accent: 'cyan',
     nameEn: 'JSON Formatter',
     name: 'JSON 格式化',
     description: '格式化、压缩、验证 JSON 数据',
@@ -26,6 +28,7 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'base64-encoder',
+    accent: 'lime',
     nameEn: 'Base64 Codec',
     name: 'Base64 编解码',
     description: 'Base64 编码与解码，支持文本和图片',
@@ -38,6 +41,7 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'timestamp-converter',
+    accent: 'purple',
     nameEn: 'Timestamp Converter',
     name: '时间戳转换',
     description: 'Unix 时间戳与日期时间互转',
@@ -50,6 +54,7 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'regex-tester',
+    accent: 'amber',
     nameEn: 'Regex Tester',
     name: '正则表达式测试',
     description: '实时测试正则表达式，查看匹配结果',
@@ -62,6 +67,7 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'hash-generator',
+    accent: 'magenta',
     nameEn: 'Hash & UUID',
     name: '哈希 & UUID 生成',
     description: 'MD5/SHA 哈希生成、UUID v4 生成',
@@ -74,6 +80,7 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'url-encoder',
+    accent: 'pink',
     nameEn: 'URL Codec',
     name: 'URL 编解码',
     description: 'URL 编码、解码与解析',
@@ -86,6 +93,7 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'markdown-editor',
+    accent: 'cyan',
     nameEn: 'Markdown Editor',
     name: 'Markdown 编辑器',
     description: '实时预览 Markdown，支持 GFM 语法',
@@ -98,6 +106,7 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'color-converter',
+    accent: 'lime',
     nameEn: 'Color Converter',
     name: '颜色转换器',
     description: 'HEX、RGB、HSL、RGBA 颜色格式互转',
@@ -110,6 +119,7 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'binary-converter',
+    accent: 'purple',
     nameEn: 'Radix Converter',
     name: '进制转换器',
     description: '二进制、十进制、十六进制互转',
@@ -122,6 +132,7 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'qrcode-generator',
+    accent: 'amber',
     nameEn: 'QR Code Generator',
     name: '二维码生成器',
     description: '生成自定义二维码，支持多种格式',
@@ -134,6 +145,7 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'diff-tool',
+    accent: 'magenta',
     nameEn: 'Text Diff',
     name: 'Diff 文本对比',
     description: '对比两段文本的差异',
@@ -146,6 +158,7 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'curl-generator',
+    accent: 'pink',
     nameEn: 'cURL Generator',
     name: 'cURL 命令生成',
     description: '可视化构建 HTTP 请求',
@@ -158,6 +171,7 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'ip-query',
+    accent: 'cyan',
     nameEn: 'IP Lookup',
     name: 'IP 地址查询',
     description: '查询 IP 地址信息和地理位置',
@@ -170,6 +184,7 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'jwt-decoder',
+    accent: 'lime',
     nameEn: 'JWT Decoder',
     name: 'JWT 解码器',
     description: '解码和验证 JSON Web Token',
@@ -182,6 +197,7 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'sql-formatter',
+    accent: 'purple',
     nameEn: 'SQL Formatter',
     name: 'SQL 格式化',
     description: '美化和格式化 SQL 语句',
@@ -194,6 +210,7 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'data-converter',
+    accent: 'amber',
     nameEn: 'Data Converter',
     name: '数据格式转换',
     description: 'JSON、XML、YAML、TOML 格式互转',
@@ -206,6 +223,7 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'image-compress',
+    accent: 'magenta',
     nameEn: 'Image Compress',
     name: '图片压缩',
     description: '在线压缩图片，减小文件大小',
@@ -218,6 +236,7 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'code-minify',
+    accent: 'pink',
     nameEn: 'Code Minifier',
     name: '代码压缩',
     description: '压缩 JavaScript、CSS、HTML 代码',
@@ -230,6 +249,7 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'html-entity',
+    accent: 'cyan',
     nameEn: 'HTML Entity',
     name: 'HTML 实体编解码',
     description: 'HTML 特殊字符与实体互转',
@@ -242,6 +262,7 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'useragent-parser',
+    accent: 'lime',
     nameEn: 'User-Agent Parser',
     name: 'User-Agent 解析',
     description: '解析浏览器和设备信息',
@@ -254,6 +275,7 @@ export const tools: ToolConfig[] = [
   },
   {
     id: 'cron-generator',
+    accent: 'purple',
     nameEn: 'Cron Builder',
     name: 'Cron 表达式生成',
     description: '生成和解析 Cron 定时任务表达式',

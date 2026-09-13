@@ -144,7 +144,6 @@ export default function ImageCompressPage() {
       description={t('在线压缩图片，减小文件大小')}
       path="/tools/image-compress"
       icon={ImageIcon}
-      accent="purple"
       actions={
         <>
           <input

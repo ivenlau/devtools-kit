@@ -143,7 +143,6 @@ console.log("Result:", result);`,
       description={t('压缩 JavaScript、CSS、HTML 代码')}
       path="/tools/minify"
       icon={Minimize2}
-      accent="lime"
       actions={
         <>
           <select

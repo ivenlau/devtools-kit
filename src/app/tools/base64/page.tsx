@@ -82,7 +82,6 @@ export default function Base64ToolPage() {
       description={t('Base64 编码与解码，支持 UTF-8 文本')}
       path="/tools/base64"
       icon={FileCode}
-      accent="lime"
       actions={
         <>
           <button

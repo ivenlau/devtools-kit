@@ -108,7 +108,6 @@ export default function UserAgentPage() {
       description={t('解析浏览器和设备信息')}
       path="/tools/useragent"
       icon={Monitor}
-      accent="cyan"
       actions={
         <>
           {myUA && (

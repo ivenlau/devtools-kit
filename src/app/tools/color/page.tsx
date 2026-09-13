@@ -172,7 +172,6 @@ export default function ColorConverterPage() {
       description={t('HEX、RGB、HSL、RGBA 颜色格式互转')}
       path="/tools/color"
       icon={Palette}
-      accent="lime"
     >
       <div className="flex min-h-0 flex-1 flex-col gap-3">
         {/* Color Preview */}

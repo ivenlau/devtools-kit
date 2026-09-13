@@ -25,6 +25,7 @@ module.exports = {
           purple: 'rgb(var(--c-purple) / <alpha-value>)',
           amber: 'rgb(var(--c-amber) / <alpha-value>)',
           red: 'rgb(var(--c-red) / <alpha-value>)',
+          pink: 'rgb(var(--c-pink) / <alpha-value>)',
         },
         border: {
           dim: 'rgb(var(--c-border-dim) / <alpha-value>)',

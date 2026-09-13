@@ -49,6 +49,115 @@ function pathToTag(path: string): string {
   return 'P0'
 }
 
+interface ZoomState {
+  href: string
+  rect: DOMRect
+  /** Untransformed card size (front-facing proportions) */
+  cardW: number
+  cardH: number
+  icon: LucideIcon
+  name: string
+  desc: string
+  accent: string
+}
+
+const ZOOM_MS = 650
+const ZOOM_CENTER_MS = 260
+const ZOOM_PUSH_MS = 420
+
+/** The selected card detaches from the 3D orbit with identical styling,
+ *  glides to the center of the screen, then pushes toward the viewer —
+ *  growing and blurring away — before the route navigation happens. */
+function CardZoomOverlay({ zoom }: { zoom: ZoomState }) {
+  const [stage, setStage] = useState<'detached' | 'centered' | 'pushed'>('detached')
+
+  useEffect(() => {
+    const t1 = window.setTimeout(() => setStage('centered'), 20)
+    const t2 = window.setTimeout(() => setStage('pushed'), 20 + ZOOM_CENTER_MS)
+    return () => {
+      window.clearTimeout(t1)
+      window.clearTimeout(t2)
+    }
+  }, [])
+
+  const w = zoom.cardW
+  // projected width of the tilted card (foreshortened by the 3D ring)
+  const projScale = zoom.rect.width / w
+  const cx = zoom.rect.left + zoom.rect.width / 2
+  const cy = zoom.rect.top + zoom.rect.height / 2
+  const dx = window.innerWidth / 2 - cx
+  const dy = window.innerHeight / 2 - cy
+  // push toward the viewer: grow to ~72% of the smaller viewport dim, x2
+  const pushScale = ((Math.min(window.innerWidth, window.innerHeight) * 0.72) / Math.max(w, zoom.cardH)) * 2
+
+  const transform =
+    stage === 'detached'
+      ? `scale(${projScale})` // still looks like the tilted card on the ring
+      : stage === 'centered'
+        ? `translate(${dx}px, ${dy}px)` // front-facing proportions at center
+        : `translate(${dx}px, ${dy}px) scale(${pushScale})` // toward the viewer
+
+  return (
+    <div className="fixed inset-0 z-[200] pointer-events-none" aria-hidden>
+      <div
+        className="orbit-card absolute overflow-hidden rounded-xl border bg-void-100/95 backdrop-blur-sm"
+        style={{
+          left: cx - w / 2,
+          top: cy - zoom.cardH / 2,
+          width: w,
+          height: zoom.cardH,
+          borderColor: stage === 'detached' ? 'rgb(var(--c-border-dim))' : zoom.accent,
+          boxShadow:
+            stage === 'detached'
+              ? '0 8px 32px rgba(0, 0, 0, 0.45)'
+              : `0 0 50px ${zoom.accent}66`,
+          transform,
+          transformOrigin: 'center',
+          filter: stage === 'pushed' ? 'blur(18px)' : 'none',
+          opacity: stage === 'pushed' ? 0 : 1,
+          transition:
+            stage === 'centered'
+              ? `transform ${ZOOM_CENTER_MS}ms cubic-bezier(0.2, 0.7, 0.3, 1), border-color 200ms, box-shadow 200ms`
+              : `transform ${ZOOM_PUSH_MS}ms cubic-bezier(0.3, 0.4, 0.4, 1), filter ${ZOOM_PUSH_MS}ms ease-in, opacity ${ZOOM_PUSH_MS}ms ease-in`,
+        }}
+      >
+        <div className="relative flex h-full flex-col" style={{ padding: Math.round(w * 0.1) }}>
+          <div
+            className="mb-2 flex items-center justify-center rounded-lg border bg-void-200"
+            style={{
+              width: Math.round(w * 0.24),
+              height: Math.round(w * 0.24),
+              borderColor: zoom.accent,
+              color: zoom.accent,
+              boxShadow: `0 0 14px ${zoom.accent}44`,
+            }}
+          >
+            <zoom.icon style={{ width: Math.round(w * 0.12), height: Math.round(w * 0.12) }} />
+          </div>
+          <div
+            className="font-display font-semibold leading-tight text-ink-primary"
+            style={{ fontSize: Math.max(12, Math.round(w * 0.09)) }}
+          >
+            {zoom.name}
+          </div>
+          <p
+            className="mt-1 line-clamp-3 flex-1 leading-snug text-ink-secondary"
+            style={{ fontSize: Math.max(11, Math.round(w * 0.072)) }}
+          >
+            {zoom.desc}
+          </p>
+          <div
+            className="mt-1.5 font-mono tracking-wider text-ink-muted"
+            style={{ fontSize: Math.max(10, Math.round(w * 0.062)) }}
+          >
+            OPEN →
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const TITLE_TEXT = 'DEVTOOLSKIT'
 const TYPE_INTERVAL_MS = 85
 const PROMPT_DELAY_MS = 150
@@ -221,6 +330,36 @@ export default function HomePage() {
     [theme, lang]
   )
 
+  // Card zoom-then-navigate (click or Enter on a searched card)
+  const [zoom, setZoom] = useState<ZoomState | null>(null)
+  const activateCard = useCallback(
+    (href: string, el: HTMLAnchorElement) => {
+      const tool = orbitTools.find((t) => t.href === href)
+      if (!tool) {
+        router.push(href)
+        return
+      }
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        router.push(href)
+        return
+      }
+      setZoom({
+        href,
+        rect: el.getBoundingClientRect(),
+        cardW: el.offsetWidth,
+        cardH: el.offsetHeight,
+        icon: tool.icon,
+        name: tool.name,
+        desc: tool.desc,
+        accent: tool.accent,
+      })
+      // hide the real card so the overlay reads as the detached original
+      el.style.opacity = '0'
+      window.setTimeout(() => router.push(href), ZOOM_MS + 40)
+    },
+    [orbitTools, router]
+  )
+
   const [query, setQuery] = useState('')
   const [focusIndex, setFocusIndex] = useState<number | null>(null)
 
@@ -269,7 +408,14 @@ export default function HomePage() {
   const onQueryKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && focusIndex !== null && orbitTools[focusIndex]) {
       e.preventDefault()
-      router.push(orbitTools[focusIndex].href)
+      // Enter simply replaces the click — synthesize a click on the focused
+      // card so it goes through the exact same zoom-then-navigate path.
+      // (trailingSlash:true rewrites Link hrefs, so match without the slash)
+      const tool = orbitTools[focusIndex]
+      const normalize = (h: string) => h.replace(/\/+$/, '')
+      ;[...document.querySelectorAll<HTMLAnchorElement>('.orbit-stage a')]
+        .find((a) => normalize(a.getAttribute('href') || '') === tool.href)
+        ?.click()
     }
     if (e.key === 'Escape') {
       onQueryBlur()
@@ -299,6 +445,7 @@ export default function HomePage() {
           onClose={handlePasteClose}
         />
       )}
+      {zoom && <CardZoomOverlay zoom={zoom} />}
 
       {/* Hero + 3D orbit — flex-1 so footer stays on the bottom */}
       {/* overflow-x-hidden only: overflow-y-hidden clips 3D perspective */}
@@ -331,6 +478,8 @@ export default function HomePage() {
             tools={orbitTools}
             autoRotateSpeed={0.18}
             focusIndex={focusIndex}
+            onCardActivate={activateCard}
+            frozen={zoom !== null}
           />
         </div>
 
