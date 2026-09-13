@@ -17,26 +17,40 @@ export default function QRCodeGeneratorPage() {
 
   useTransferData(setText)
 
+  // 预览卡片 p-4 的边框留白宽度，导出图与预览保持一致
+  const PLATE_PAD = 16
+
+  // 把二维码 SVG 包进带背景色边框的完整 plate（与预览一致）
+  const buildPlateSvg = (svg: SVGSVGElement): string => {
+    const inner = new XMLSerializer().serializeToString(svg)
+    const total = size + PLATE_PAD * 2
+    const withPos = inner.replace('<svg', `<svg x="${PLATE_PAD}" y="${PLATE_PAD}"`)
+    return (
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${total}" height="${total}" viewBox="0 0 ${total} ${total}">` +
+      `<rect width="${total}" height="${total}" fill="${bgColor}"/>` +
+      withPos +
+      `</svg>`
+    )
+  }
+
   // 下载QR码
   const downloadQRCode = () => {
-    // @ts-ignore
-    const svg = document.getElementById('qrcode-svg') as SVGElement
+    const svg = document.querySelector<SVGSVGElement>('#qrcode-svg')
     if (!svg) return
 
-    // 将 SVG 转换为 Canvas
+    // 将 plate SVG 转换为 Canvas
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
     const img = new Image()
-    // @ts-ignore
-    const svgData = new XMLSerializer().serializeToString(svg)
-    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' })
+    const svgBlob = new Blob([buildPlateSvg(svg)], { type: 'image/svg+xml;charset=utf-8' })
     const url = URL.createObjectURL(svgBlob)
 
     img.onload = () => {
-      canvas.width = size
-      canvas.height = size
+      const total = size + PLATE_PAD * 2
+      canvas.width = total
+      canvas.height = total
       ctx?.drawImage(img, 0, 0)
       const pngUrl = canvas.toDataURL('image/png')
       const link = document.createElement('a')
@@ -50,13 +64,10 @@ export default function QRCodeGeneratorPage() {
 
   // 复制Base64
   const copyBase64 = () => {
-    // @ts-ignore
-    const svg = document.getElementById('qrcode-svg') as SVGElement
+    const svg = document.querySelector<SVGSVGElement>('#qrcode-svg')
     if (!svg) return
 
-    // @ts-ignore
-    const svgData = new XMLSerializer().serializeToString(svg)
-    const base64 = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svgData)))}`
+    const base64 = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(buildPlateSvg(svg))))}`
     navigator.clipboard.writeText(base64)
   }
 
@@ -219,7 +230,10 @@ export default function QRCodeGeneratorPage() {
             </div>
             <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-5 p-6">
               {/* QR Code — white plate kept for scannability */}
-              <div className="rounded-lg border border-border-glow bg-white p-4 shadow-panel">
+              <div
+              className="rounded-lg border border-border-glow p-4 shadow-panel"
+              style={{ backgroundColor: bgColor }}
+            >
                 <QRCodeSVG
                   id="qrcode-svg"
                   value={text}
