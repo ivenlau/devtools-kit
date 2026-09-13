@@ -410,11 +410,12 @@ export default function HomePage() {
       e.preventDefault()
       // Enter simply replaces the click — synthesize a click on the focused
       // card so it goes through the exact same zoom-then-navigate path.
-      // (trailingSlash:true rewrites Link hrefs, so match without the slash)
+      // Match by suffix: trailingSlash:true appends '/', and GitHub Pages
+      // builds prepend the basePath, so equality never matches there.
       const tool = orbitTools[focusIndex]
-      const normalize = (h: string) => h.replace(/\/+$/, '')
+      const normalize = (h: string) => (h || '').replace(/\/+$/, '')
       ;[...document.querySelectorAll<HTMLAnchorElement>('.orbit-stage a')]
-        .find((a) => normalize(a.getAttribute('href') || '') === tool.href)
+        .find((a) => normalize(a.getAttribute('href') || '').endsWith(tool.href))
         ?.click()
     }
     if (e.key === 'Escape') {
