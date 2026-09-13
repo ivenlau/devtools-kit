@@ -21,6 +21,7 @@
     --c-purple: 168 85 247;     /* #A855F7 */
     --c-amber: 255 176 32;      /* #FFB020 */
     --c-red: 255 71 87;         /* #FF4757 */
+    --c-pink: 255 121 198;      /* #FF79C6 */
 
     /* Semantic tokens derived per theme */
     --shadow-card: 0 10px 28px rgba(0, 0, 0, 0.45);
@@ -75,6 +76,7 @@
     --c-purple: 124 58 237;     /* #7C3AED */
     --c-amber: 161 106 0;       /* #A16A00 */
     --c-red: 214 48 64;         /* #D63040 */
+    --c-pink: 214 51 132;       /* #D63384 */
 
     --shadow-card: 0 10px 24px rgba(23, 32, 54, 0.1);
     --shadow-panel: 0 8px 24px rgba(23, 32, 54, 0.12);

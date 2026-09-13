@@ -20,6 +20,14 @@ interface ToolOrbitProps {
   autoRotateSpeed?: number
   /** When set, spin this card to front, pause, and highlight (same as hover). */
   focusIndex?: number | null
+  /**
+   * Called on plain card clicks (drags stay suppressed) instead of the
+   * default Link navigation — lets the parent play a zoom animation and
+   * navigate itself.
+   */
+  onCardActivate?: (href: string, el: HTMLAnchorElement) => void
+  /** Freeze auto-rotation entirely (zoom flight in progress). */
+  frozen?: boolean
 }
 
 const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v))
@@ -36,6 +44,8 @@ export function ToolOrbit({
   tools,
   autoRotateSpeed = 0.12,
   focusIndex = null,
+  onCardActivate,
+  frozen = false,
 }: ToolOrbitProps) {
   const n = tools.length
   const step = 360 / n
@@ -102,7 +112,7 @@ export function ToolOrbit({
   }, [])
 
   // Auto-rotate — pause while dragging, hovering, or focused via search
-  const locked = dragging || hoveredIndex !== null || focusIndex !== null
+  const locked = frozen || dragging || hoveredIndex !== null || focusIndex !== null
   useEffect(() => {
     if (locked || !ready) return
     let raf = 0
@@ -173,13 +183,7 @@ export function ToolOrbit({
     }
   }, [])
 
-  const handleClick = useCallback((e: React.MouseEvent) => {
-    if (drag.current.moved > 8) {
-      e.preventDefault()
-      e.stopPropagation()
-      drag.current.moved = 0
-    }
-  }, [])
+
 
   // Geometry: scale hard with both axes so large windows get large cards
   // Keep cards large even with 21 tools — only mild density taper
@@ -274,7 +278,18 @@ export function ToolOrbit({
               <Link
                 key={tool.href}
                 href={tool.href}
-                onClick={handleClick}
+                onClick={(e) => {
+                  if (drag.current.moved > 8) {
+                    // It was a drag — swallow the click.
+                    e.preventDefault()
+                    drag.current.moved = 0
+                    return
+                  }
+                  if (onCardActivate) {
+                    e.preventDefault()
+                    onCardActivate(tool.href, e.currentTarget)
+                  }
+                }}
                 onMouseEnter={() => setHoveredIndex(i)}
                 onMouseLeave={() => setHoveredIndex((cur) => (cur === i ? null : cur))}
                 className="orbit-card group absolute block"

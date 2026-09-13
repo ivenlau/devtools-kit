@@ -93,7 +93,6 @@ export default function SQLFormatterPage() {
       description={t('美化和格式化 SQL 语句')}
       path="/tools/sql"
       icon={Database}
-      accent="cyan"
       actions={
         <>
           <select

@@ -139,7 +139,6 @@ export default function JsonToolPage() {
       description={t('格式化、压缩、验证 JSON 数据')}
       path="/tools/json"
       icon={Braces}
-      accent="cyan"
       actions={
         <>
           <select

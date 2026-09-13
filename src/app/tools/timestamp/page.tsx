@@ -85,7 +85,6 @@ export default function TimestampToolPage() {
       description={t('Unix 时间戳与日期时间互转，支持毫秒级精度')}
       path="/tools/timestamp"
       icon={Clock}
-      accent="purple"
     >
       <div className="flex min-h-0 flex-1 flex-col gap-3">
         {/* Live clock hero */}

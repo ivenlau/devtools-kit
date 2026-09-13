@@ -107,7 +107,6 @@ export default function UrlEncoderPage() {
       description={t('URL 编码、解码与解析')}
       path="/tools/url"
       icon={Link2}
-      accent="cyan"
       actions={
         <>
           <button

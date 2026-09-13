@@ -141,7 +141,6 @@ export default function JWTDecoderPage() {
       description={t('解码和验证 JSON Web Token')}
       path="/tools/jwt"
       icon={Shield}
-      accent="amber"
       actions={
         <>
           <button

@@ -357,7 +357,6 @@ export default function MarkdownEditorPage() {
         description={t('实时预览，支持 GFM 语法')}
         path="/tools/markdown"
         icon={FileText}
-        accent="magenta"
         actions={
           !isPreviewMode ? (
             <>

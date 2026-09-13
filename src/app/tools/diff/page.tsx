@@ -128,7 +128,6 @@ export default function DiffToolPage() {
       description={t('对比两段文本的差异，支持并排和统一视图')}
       path="/tools/diff"
       icon={ArrowLeftRight}
-      accent="magenta"
       actions={
         <>
           {diff.length > 0 && (

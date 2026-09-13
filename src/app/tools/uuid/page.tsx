@@ -106,7 +106,6 @@ export default function HashGeneratorPage() {
       description={t('MD5/SHA 哈希生成、UUID v4 生成')}
       path="/tools/uuid"
       icon={Hash}
-      accent="amber"
       actions={
         <>
           <button
