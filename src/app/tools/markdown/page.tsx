@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { FileText, Copy, Trash2, Upload, ArrowLeft, Eye, ChevronUp, Download, Check } from 'lucide-react'
 import { marked } from 'marked'
+import { FoldHorizontal, UnfoldHorizontal } from 'lucide-react'
 import { useTransferStore } from '@/stores/transferStore'
 import { ToolShell } from '@/components/ToolShell'
 import { useI18n } from '@/components/I18nProvider'
@@ -12,6 +13,13 @@ marked.setOptions({
   breaks: true,
   gfm: true,
 })
+
+// 预览最大宽度（px）— 持久化到 localStorage
+const PREVIEW_WIDTH_KEY = 'markdown-preview-width'
+const DEFAULT_PREVIEW_WIDTH = 1280
+const MIN_PREVIEW_WIDTH = 640
+const MAX_PREVIEW_WIDTH = 1920
+const PREVIEW_WIDTH_STEP = 80
 
 const ZH_SAMPLE = `# 欢迎使用 Markdown 编辑器
 
@@ -122,7 +130,25 @@ export default function MarkdownEditorPage() {
   const [localFileName, setLocalFileName] = useState('')
   const [isPreviewMode, setIsPreviewMode] = useState(false)
   const [showBackToTop, setShowBackToTop] = useState(false)
+  const [previewWidth, setPreviewWidth] = useState(DEFAULT_PREVIEW_WIDTH)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  // 加载保存的预览宽度
+  useEffect(() => {
+    const saved = Number(localStorage.getItem(PREVIEW_WIDTH_KEY))
+    if (saved >= MIN_PREVIEW_WIDTH && saved <= MAX_PREVIEW_WIDTH) {
+      setPreviewWidth(saved)
+    }
+  }, [])
+
+  // 调整预览宽度并持久化
+  const changePreviewWidth = (delta: number) => {
+    setPreviewWidth((w) => {
+      const next = Math.min(MAX_PREVIEW_WIDTH, Math.max(MIN_PREVIEW_WIDTH, w + delta))
+      localStorage.setItem(PREVIEW_WIDTH_KEY, String(next))
+      return next
+    })
+  }
 
   // In EN mode, present the English sample until the user edits the content
   const displayMarkdown = lang === 'en' && markdown === ZH_SAMPLE ? EN_SAMPLE : markdown
@@ -409,6 +435,24 @@ export default function MarkdownEditorPage() {
                 <Download className="h-3.5 w-3.5" />
                 PDF
               </button>
+              <button
+                onClick={() => changePreviewWidth(-PREVIEW_WIDTH_STEP)}
+                disabled={previewWidth <= MIN_PREVIEW_WIDTH}
+                className="tool-btn tool-btn-icon"
+                title={t('减少预览宽度')}
+                aria-label={t('减少预览宽度')}
+              >
+                <FoldHorizontal className="h-3.5 w-3.5" />
+              </button>
+              <button
+                onClick={() => changePreviewWidth(PREVIEW_WIDTH_STEP)}
+                disabled={previewWidth >= MAX_PREVIEW_WIDTH}
+                className="tool-btn tool-btn-icon"
+                title={t('增加预览宽度')}
+                aria-label={t('增加预览宽度')}
+              >
+                <UnfoldHorizontal className="h-3.5 w-3.5" />
+              </button>
             </>
           )
         }
@@ -461,7 +505,8 @@ export default function MarkdownEditorPage() {
               </div>
               <div className="min-h-0 flex-1 overflow-auto px-8 py-6">
                 <div
-                  className="markdown-preview mx-auto max-w-3xl"
+                  className="markdown-preview mx-auto"
+                  style={{ maxWidth: `${previewWidth}px` }}
                   dangerouslySetInnerHTML={{ __html: html }}
                 />
               </div>

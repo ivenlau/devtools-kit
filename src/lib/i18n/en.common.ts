@@ -20,6 +20,8 @@ const common: Record<string, string> = {
   '打开': 'Open',
   '编辑': 'Edit',
   '预览': 'Preview',
+  '增加预览宽度': 'Wider preview',
+  '减少预览宽度': 'Narrower preview',
   '重新压缩': 'Re-compress',
   '换图': 'Replace',
   '选择图片': 'Choose image',
