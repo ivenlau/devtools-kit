@@ -21,13 +21,13 @@ const FILE_EXTENSION_MAP: Record<string, DetectedTool> = {
   '.yml':      { path: '/tools/convert',       name: '数据格式转换',    confidence: 'high' },
   '.xml':      { path: '/tools/convert',       name: '数据格式转换',    confidence: 'high' },
   '.toml':     { path: '/tools/convert',       name: '数据格式转换',    confidence: 'high' },
-  '.jpg':      { path: '/tools/image-compress', name: '图片压缩',       confidence: 'high' },
-  '.jpeg':     { path: '/tools/image-compress', name: '图片压缩',       confidence: 'high' },
-  '.png':      { path: '/tools/image-compress', name: '图片压缩',       confidence: 'high' },
-  '.webp':     { path: '/tools/image-compress', name: '图片压缩',       confidence: 'high' },
-  '.gif':      { path: '/tools/image-compress', name: '图片压缩',       confidence: 'high' },
-  '.svg':      { path: '/tools/image-compress', name: '图片压缩',       confidence: 'high' },
-  '.bmp':      { path: '/tools/image-compress', name: '图片压缩',       confidence: 'high' },
+  '.jpg':      { path: '/tools/image-studio', name: '图像',            confidence: 'high' },
+  '.jpeg':     { path: '/tools/image-studio', name: '图像',            confidence: 'high' },
+  '.png':      { path: '/tools/image-studio', name: '图像',            confidence: 'high' },
+  '.webp':     { path: '/tools/image-studio', name: '图像',            confidence: 'high' },
+  '.gif':      { path: '/tools/image-studio', name: '图像',            confidence: 'high' },
+  '.svg':      { path: '/tools/image-studio', name: '图像',            confidence: 'high' },
+  '.bmp':      { path: '/tools/image-studio', name: '图像',            confidence: 'high' },
 }
 
 const IMAGE_MIME_PREFIX = 'image/'
@@ -41,7 +41,7 @@ export function detectByFile(fileName: string, mimeType?: string): DetectedTool 
     return FILE_EXTENSION_MAP[ext]
   }
   if (mimeType?.startsWith(IMAGE_MIME_PREFIX)) {
-    return { path: '/tools/image-compress', name: '图片压缩', confidence: 'high' }
+    return { path: '/tools/image-studio', name: '图像', confidence: 'high' }
   }
   return null
 }

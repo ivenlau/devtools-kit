@@ -6,7 +6,7 @@ import {
   Wrench, Search, X,
   Braces, FileCode, Clock, Regex, Hash, Link2, FileText, Palette,
   QrCode, ArrowLeftRight, Terminal, Globe, Shield, Database, RefreshCw,
-  Image, Minimize2, Code2, Monitor,
+  Image, Minimize2, Code2, Monitor, WandSparkles,
 } from 'lucide-react'
 import { tools } from '@/lib/constants/tools'
 import { accentsFor } from '@/lib/constants/accents'
@@ -17,7 +17,7 @@ import { useI18n } from '@/components/I18nProvider'
 const iconMap: Record<string, any> = {
   Braces, FileCode, Clock, Regex, Hash, Link2, FileText, Palette,
   QrCode, ArrowLeftRight, Terminal, Globe, Shield, Database, RefreshCw,
-  Image, Minimize2, Code2, Monitor,
+  Image, Minimize2, Code2, Monitor, WandSparkles,
 }
 
 export default function ToolsPage() {

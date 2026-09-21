@@ -260,7 +260,7 @@ export default function HomePage() {
   const handleFileDrop = useCallback((file: File) => {
     const detected = detectByFile(file.name, file.type)
 
-    if (detected?.path === '/tools/image-compress') {
+    if (detected?.path === '/tools/image-studio') {
       const reader = new FileReader()
       reader.onload = () => {
         setPendingData({
