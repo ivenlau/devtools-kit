@@ -180,7 +180,7 @@ export default function JsonToolPage() {
     >
       <div className="flex min-h-0 flex-1 flex-col">
         {/* Workspace */}
-        <div className="grid flex-1 grid-cols-1 gap-3 lg:grid-cols-2 lg:h-[calc(100dvh-8rem)] lg:grid-rows-[minmax(0,1fr)]">
+        <div className="grid flex-1 grid-cols-1 gap-3 lg:grid-cols-2 lg:h-[calc(100dvh-var(--header-total)-4.5rem)] lg:grid-rows-[minmax(0,1fr)]">
           {/* Input */}
           <div className="tool-panel h-full min-h-[400px]">
             <div className="tool-panel-head">

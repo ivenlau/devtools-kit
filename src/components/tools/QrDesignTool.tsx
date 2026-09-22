@@ -575,7 +575,7 @@ export default function QRCodeStudioPage() {
       }
     >
       <div className="flex min-h-0 flex-1 flex-col gap-3">
-        <div className="grid grid-cols-1 gap-3 lg:h-[calc(100dvh-8rem)] lg:grid-cols-2 lg:grid-rows-[minmax(0,1fr)]">
+        <div className="grid grid-cols-1 gap-3 lg:h-[calc(100dvh-var(--header-total)-4.5rem)] lg:grid-cols-2 lg:grid-rows-[minmax(0,1fr)]">
         {/* ============ Left: settings ============ */}
         <div className="tool-panel min-h-[400px] lg:h-full">
           <div className="tool-panel-head">

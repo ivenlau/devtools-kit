@@ -2,23 +2,13 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import {
-  Wrench, Search, X,
-  Braces, FileCode, Clock, Regex, Hash, Link2, FileText, Palette,
-  QrCode, ArrowLeftRight, Terminal, Globe, Shield, Database, RefreshCw,
-  Image, Minimize2, Code2, Monitor, WandSparkles,
-} from 'lucide-react'
+import { Wrench, Search, X } from 'lucide-react'
 import { tools } from '@/lib/constants/tools'
 import { accentsFor } from '@/lib/constants/accents'
 import { ToolShell } from '@/components/ToolShell'
 import { useTheme } from '@/components/ThemeProvider'
 import { useI18n } from '@/components/I18nProvider'
-
-const iconMap: Record<string, any> = {
-  Braces, FileCode, Clock, Regex, Hash, Link2, FileText, Palette,
-  QrCode, ArrowLeftRight, Terminal, Globe, Shield, Database, RefreshCw,
-  Image, Minimize2, Code2, Monitor, WandSparkles,
-}
+import { ToolIcon } from '@/components/ToolIcon'
 
 export default function ToolsPage() {
   const [query, setQuery] = useState('')
@@ -68,7 +58,6 @@ export default function ToolsPage() {
         {filtered.length > 0 ? (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filtered.map((tool, i) => {
-              const Icon = iconMap[tool.icon] || Hash
               const accents = accentsFor(theme)
               const accent = accents[i % accents.length]
               const name = lang === 'en' ? tool.nameEn : tool.name
@@ -88,7 +77,7 @@ export default function ToolsPage() {
                         boxShadow: `0 0 12px ${accent}33`,
                       }}
                     >
-                      <Icon className="h-5 w-5" />
+                      <ToolIcon name={tool.icon} className="h-5 w-5" />
                     </div>
                     <h3 className="font-display text-base font-semibold text-ink-primary">
                       {name}

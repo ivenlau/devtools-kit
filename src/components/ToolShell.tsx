@@ -1,10 +1,8 @@
 'use client'
 
-import Link from 'next/link'
 import type { LucideIcon } from 'lucide-react'
 import { useTheme } from '@/components/ThemeProvider'
 import { tools } from '@/lib/constants/tools'
-import { useI18n } from '@/components/I18nProvider'
 
 interface ToolShellProps {
   title: string
@@ -66,7 +64,6 @@ export function ToolShell({
   children,
 }: ToolShellProps) {
   const { theme } = useTheme()
-  const { t } = useI18n()
   // The card color on the home orbit is the source of truth — derive the
   // page accent from the tool registry so navigation between card and page
   // keeps the same hue (explicit prop is only a fallback).
@@ -75,20 +72,13 @@ export function ToolShell({
 
   return (
     <div
-      className="flex min-h-[calc(100dvh-3.5rem)] w-full flex-col bg-void"
+      className="flex min-h-[calc(100dvh-var(--header-total))] w-full flex-col bg-void"
       style={{ '--accent': theme === 'light' ? a.light : a.dark } as React.CSSProperties}
     >
-      {/* Single compact strip: back · path · icon · title · description · actions */}
+      {/* Single compact strip: path · icon · title · description · actions */}
       <div className="relative w-full border-b border-border-dim bg-void-100">
         <div className="flex min-h-11 w-full flex-wrap items-center gap-x-2.5 gap-y-1.5 px-4 py-2 sm:px-6 lg:px-8">
-          <Link
-            href="/"
-            aria-label={t('返回主页')}
-            className="font-mono text-[11px] text-ink-muted transition-colors hover:text-neon-cyan"
-          >
-            ←
-          </Link>
-          <Icon className={`ml-1 h-4 w-4 shrink-0 ${a.box}`} />
+          <Icon className={`h-4 w-4 shrink-0 ${a.box}`} />
           <h1
             className="font-display text-base font-bold tracking-tight text-ink-primary"
             title={description}

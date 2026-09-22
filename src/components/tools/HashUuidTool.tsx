@@ -142,7 +142,7 @@ export default function HashGeneratorPage() {
       <div className="flex min-h-0 flex-1 flex-col gap-3">
         {/* UUID Generator */}
         {activeTab === 'uuid' && (
-          <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 lg:h-[calc(100dvh-8rem)] lg:grid-rows-[minmax(0,1fr)]">
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 lg:h-[calc(100dvh-var(--header-total)-4.5rem)] lg:grid-rows-[minmax(0,1fr)]">
             {/* Single UUID */}
             <div className="tool-panel h-full min-h-[400px]">
               <div className="tool-panel-head">
@@ -222,7 +222,7 @@ export default function HashGeneratorPage() {
 
         {/* Hash Generator */}
         {activeTab === 'hash' && (
-          <div className="tool-panel min-h-[400px] lg:h-[calc(100dvh-8rem)]">
+          <div className="tool-panel min-h-[400px] lg:h-[calc(100dvh-var(--header-total)-4.5rem)]">
             <div className="tool-panel-head">
               <span className="text-neon-amber">&gt;_</span>
               <span>HASH.MD5·SHA1·SHA256·SHA512</span>

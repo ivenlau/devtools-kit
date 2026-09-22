@@ -4,6 +4,7 @@ import './globals.css'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import { I18nProvider } from '@/components/I18nProvider'
 import { Header } from '@/components/Header'
+import { ToolWorkspace } from '@/components/workspace/ToolWorkspace'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -46,12 +47,15 @@ export default function RootLayout({
               "try{if(localStorage.getItem('theme')==='light')document.documentElement.classList.add('light');if(localStorage.getItem('lang')==='en')document.documentElement.lang='en'}catch(e){}",
           }}
         />
-        <I18nProvider>
-          <ThemeProvider>
-            <Header />
-            {children}
-          </ThemeProvider>
-        </I18nProvider>
+          <I18nProvider>
+            <ThemeProvider>
+              <Header />
+              {children}
+              {/* keeps opened tools alive across route changes; tool routes
+                  themselves render only a bootstrap shell */}
+              <ToolWorkspace />
+            </ThemeProvider>
+          </I18nProvider>
       </body>
     </html>
   )

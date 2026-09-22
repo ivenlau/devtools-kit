@@ -587,7 +587,7 @@ export default function ImageStudioPage() {
                     ))}
                   </div>
 
-                  <div className="min-h-0 flex-1 space-y-5 overflow-y-auto p-4" style={{ maxHeight: 'calc(100dvh - 24rem)' }}>
+                  <div className="min-h-0 flex-1 space-y-5 overflow-y-auto p-4" style={{ maxHeight: 'calc(100dvh - var(--header-total) - 20.5rem)' }}>
                     {/* ================= SIZE ================= */}
                     {tab === 'size' && (
                       <>

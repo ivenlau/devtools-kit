@@ -437,7 +437,7 @@ export default function HomePage() {
   }, [])
 
   return (
-    <div className="flex min-h-[calc(100dvh-3.5rem)] flex-col bg-void">
+    <div className="flex min-h-[calc(100dvh-var(--header-total))] flex-col bg-void">
       <DropZone onFileDrop={handleFileDrop} />
       {pasteCandidates && (
         <PasteHint

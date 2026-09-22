@@ -14,8 +14,9 @@ const nextConfig = {
     unoptimized: true,
   },
 
-  // 输出配置
-  output: 'export',
+  // 输出配置 — 静态导出只在生产构建时启用；next dev 下 Next 不生成
+  // prerender manifest，export 校验会误判动态路由缺少 generateStaticParams
+  output: process.env.NODE_ENV === 'production' ? 'export' : undefined,
   trailingSlash: true,
 
   // GitHub Pages 部署配置

@@ -106,6 +106,12 @@
     color-scheme: light;
   }
 
+  /* Header height — tools size their full-height layouts against this.
+     The dynamic tool tabs live inside the h-14 row, so this is constant. */
+  :root {
+    --header-total: 3.5rem;
+  }
+
   body {
     @apply bg-void text-ink-primary antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
