@@ -2,7 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { Github, Languages, LayoutGrid, Moon, Sun, X } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { ChevronLeft, ChevronRight, Github, Languages, LayoutGrid, Moon, Sun, X } from 'lucide-react'
 import { useTheme } from '@/components/ThemeProvider'
 import { useI18n } from '@/components/I18nProvider'
 import { ToolIcon } from '@/components/ToolIcon'
@@ -20,9 +21,41 @@ function TabStrip() {
   const clearSwitchIntent = useTabStore((s) => s.clearSwitchIntent)
   const closeTab = useTabStore((s) => s.closeTab)
 
-  if (!tabs.length) return null
-
   const cleanPath = pathname?.replace(/\/+$/, '') ?? ''
+  // a tab reads as active only while its page is actually on screen —
+  // navigating home / to the toolbox index must clear the highlight
+  const effectiveActiveId =
+    tabs.find((tl) => tl.id === activeId && tl.path === cleanPath)?.id ?? null
+
+  // native scrollbar is hidden; edge arrows appear only when tabs overflow
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const [canScrollLeft, setCanScrollLeft] = useState(false)
+  const [canScrollRight, setCanScrollRight] = useState(false)
+
+  const updateArrows = useCallback(() => {
+    const el = scrollRef.current
+    if (!el) return
+    setCanScrollLeft(el.scrollLeft > 1)
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1)
+  }, [])
+
+  useEffect(() => {
+    updateArrows()
+    const el = scrollRef.current
+    if (!el) return
+    el.addEventListener('scroll', updateArrows, { passive: true })
+    return () => el.removeEventListener('scroll', updateArrows)
+  }, [updateArrows, tabs.length])
+
+  // browser-style: bring the highlighted tab into view when it changes
+  useEffect(() => {
+    if (!effectiveActiveId) return
+    scrollRef.current
+      ?.querySelector(`[data-tab-id="${effectiveActiveId}"]`)
+      ?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
+  }, [effectiveActiveId])
+
+  if (!tabs.length) return null
 
   const close = (id: string) => {
     const closed = tabs.find((tl) => tl.id === id)
@@ -45,49 +78,76 @@ function TabStrip() {
 
   return (
     <div
-      className="ml-4 flex min-w-0 flex-1 items-stretch self-stretch overflow-x-auto overflow-y-clip"
+      className="relative ml-4 flex min-w-0 flex-1 items-stretch self-stretch"
       aria-label={t('已打开的工具')}
     >
-      {tabs.map((tab) => {
-        const tool = tools.find((tl) => tl.path === tab.path)
-        if (!tool) return null
-        const active = tab.id === activeId
-        const name = t(tool.name)
-        return (
-          <div
-            key={tab.id}
-            className={`group/tab relative flex shrink-0 items-center gap-0.5 px-2 transition-colors ${
-              active ? 'text-neon-cyan' : 'text-ink-secondary hover:text-ink-primary'
-            }`}
-          >
-            {active && <span aria-hidden className="absolute inset-x-2 bottom-0 h-0.5 bg-neon-cyan" />}
-            <button
-              onClick={() => {
-                beginSwitch(tab.id)
-                if (tab.path !== cleanPath) router.replace(tab.path)
-                else clearSwitchIntent() // same URL: no route effect will consume it
-              }}
-              title={name}
-              aria-label={name}
-              aria-current={active ? 'page' : undefined}
-              className="flex h-full cursor-pointer items-center gap-1.5"
-            >
-              <ToolIcon name={tool.icon} className="h-3.5 w-3.5" />
-              <span className="whitespace-nowrap font-mono text-[11px] tracking-[0.12em]">{name}</span>
-            </button>
-            <button
-              onClick={() => close(tab.id)}
-              title={t('关闭')}
-              aria-label={`${t('关闭')} ${name}`}
-              className={`flex cursor-pointer items-center transition-opacity hover:text-neon-magenta ${
-                active ? 'opacity-100' : 'opacity-0 group-hover/tab:opacity-100 focus-visible:opacity-100'
+      {canScrollLeft && (
+        <button
+          onClick={() => scrollRef.current?.scrollBy({ left: -200, behavior: 'smooth' })}
+          aria-label={t('向左滚动')}
+          title={t('向左滚动')}
+          className="absolute left-0 top-1/2 z-10 flex h-6 w-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md border border-border-dim bg-void-200/95 text-ink-secondary transition-colors hover:border-neon-cyan hover:text-neon-cyan"
+        >
+          <ChevronLeft className="h-3.5 w-3.5" />
+        </button>
+      )}
+      <div
+        ref={scrollRef}
+        onScroll={updateArrows}
+        className="flex min-w-0 flex-1 items-stretch overflow-x-auto overflow-y-clip [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {tabs.map((tab) => {
+          const tool = tools.find((tl) => tl.path === tab.path)
+          if (!tool) return null
+          const active = tab.id === effectiveActiveId
+          const name = t(tool.name)
+          return (
+            <div
+              key={tab.id}
+              data-tab-id={tab.id}
+              className={`group/tab relative flex shrink-0 items-center gap-0.5 px-2 transition-colors ${
+                active ? 'text-neon-cyan' : 'text-ink-secondary hover:text-ink-primary'
               }`}
             >
-              <X className="h-3 w-3" />
-            </button>
-          </div>
-        )
-      })}
+              {active && <span aria-hidden className="absolute inset-x-2 bottom-0 h-0.5 bg-neon-cyan" />}
+              <button
+                onClick={() => {
+                  beginSwitch(tab.id)
+                  if (tab.path !== cleanPath) router.replace(tab.path)
+                  else clearSwitchIntent() // same URL: no route effect will consume it
+                }}
+                title={name}
+                aria-label={name}
+                aria-current={active ? 'page' : undefined}
+                className="flex h-full cursor-pointer items-center gap-1.5"
+              >
+                <ToolIcon name={tool.icon} className="h-3.5 w-3.5" />
+                <span className="whitespace-nowrap font-mono text-[11px] tracking-[0.12em]">{name}</span>
+              </button>
+              <button
+                onClick={() => close(tab.id)}
+                title={t('关闭')}
+                aria-label={`${t('关闭')} ${name}`}
+                className={`flex cursor-pointer items-center transition-opacity hover:text-neon-magenta ${
+                  active ? 'opacity-100' : 'opacity-0 group-hover/tab:opacity-100 focus-visible:opacity-100'
+                }`}
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+          )
+        })}
+      </div>
+      {canScrollRight && (
+        <button
+          onClick={() => scrollRef.current?.scrollBy({ left: 200, behavior: 'smooth' })}
+          aria-label={t('向右滚动')}
+          title={t('向右滚动')}
+          className="absolute right-0 top-1/2 z-10 flex h-6 w-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md border border-border-dim bg-void-200/95 text-ink-secondary transition-colors hover:border-neon-cyan hover:text-neon-cyan"
+        >
+          <ChevronRight className="h-3.5 w-3.5" />
+        </button>
+      )}
     </div>
   )
 }

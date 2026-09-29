@@ -7,6 +7,8 @@ const common: Record<string, string> = {
   // Actions
   '关闭': 'Close',
   '已打开的工具': 'Opened tools',
+  '向左滚动': 'Scroll left',
+  '向右滚动': 'Scroll right',
   '格式化': 'Format',
   '压缩': 'Minify',
   '复制': 'Copy',
