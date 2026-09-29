@@ -3,6 +3,7 @@
 import type { LucideIcon } from 'lucide-react'
 import { useTheme } from '@/components/ThemeProvider'
 import { tools } from '@/lib/constants/tools'
+import { ACCENT_MAP } from '@/lib/constants/accents'
 
 interface ToolShellProps {
   title: string
@@ -13,45 +14,6 @@ interface ToolShellProps {
   /** Compact action buttons rendered at the right edge of the header row. */
   actions?: React.ReactNode
   children: React.ReactNode
-}
-
-const accentMap: Record<string, { box: string; line: string; dark: string; light: string }> = {
-  pink: {
-    box: 'text-neon-pink',
-    line: 'via-neon-pink/60',
-    dark: '#FF79C6',
-    light: '#B0308C',
-  },
-  cyan: {
-    box: 'text-neon-cyan',
-    line: 'via-neon-cyan/60',
-    dark: '#00E5FF',
-    light: '#0084AD',
-  },
-  magenta: {
-    box: 'text-neon-magenta',
-    line: 'via-neon-magenta/60',
-    dark: '#FF2D95',
-    light: '#C81E6E',
-  },
-  lime: {
-    box: 'text-neon-lime',
-    line: 'via-neon-lime/60',
-    dark: '#B8FF3C',
-    light: '#549000',
-  },
-  purple: {
-    box: 'text-neon-purple',
-    line: 'via-neon-purple/60',
-    dark: '#A855F7',
-    light: '#7C3AED',
-  },
-  amber: {
-    box: 'text-neon-amber',
-    line: 'via-neon-amber/60',
-    dark: '#FFB020',
-    light: '#A16A00',
-  },
 }
 
 export function ToolShell({
@@ -68,7 +30,7 @@ export function ToolShell({
   // page accent from the tool registry so navigation between card and page
   // keeps the same hue (explicit prop is only a fallback).
   const accentName = tools.find((tool) => tool.path === path)?.accent ?? accent
-  const a = accentMap[accentName] ?? accentMap.cyan
+  const a = ACCENT_MAP[accentName] ?? ACCENT_MAP.cyan
 
   return (
     <div

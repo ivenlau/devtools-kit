@@ -8,6 +8,7 @@ import { useTheme } from '@/components/ThemeProvider'
 import { useI18n } from '@/components/I18nProvider'
 import { ToolIcon } from '@/components/ToolIcon'
 import { tools } from '@/lib/constants/tools'
+import { ACCENT_MAP } from '@/lib/constants/accents'
 import { useTabStore } from '@/stores/tabStore'
 
 /** Dynamic tool tabs — live in the header next to the logo, cyan theme. */
@@ -101,15 +102,20 @@ function TabStrip() {
           if (!tool) return null
           const active = tab.id === effectiveActiveId
           const name = t(tool.name)
+          // active tab picks up the tool's own accent hue (text + underline),
+          // echoing the gradient hairline inside the tool page
+          const accent = active ? (ACCENT_MAP[tool.accent] ?? ACCENT_MAP.cyan) : null
           return (
             <div
               key={tab.id}
               data-tab-id={tab.id}
               className={`group/tab relative flex shrink-0 items-center gap-0.5 px-2 transition-colors ${
-                active ? 'text-neon-cyan' : 'text-ink-secondary hover:text-ink-primary'
+                accent ? accent.box : 'text-ink-secondary hover:text-ink-primary'
               }`}
             >
-              {active && <span aria-hidden className="absolute inset-x-2 bottom-0 h-0.5 bg-neon-cyan" />}
+              {accent && (
+                <span aria-hidden className={`absolute inset-x-2 bottom-0 h-0.5 ${accent.tab}`} />
+              )}
               <button
                 onClick={() => {
                   beginSwitch(tab.id)
