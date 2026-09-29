@@ -71,6 +71,8 @@ interface TabState {
   activateExisting: (path: string) => boolean
   /** remove a tab; returns the surviving tabs */
   closeTab: (id: string) => ToolTab[]
+  /** reorder tabs (drag & drop): move id to index toIndex; no-op if unchanged */
+  moveTab: (id: string, toIndex: number) => void
 }
 
 export const useTabStore = create<TabState>((set, get) => {
@@ -147,6 +149,20 @@ export const useTabStore = create<TabState>((set, get) => {
       // closing a tab discards its persisted drafts, matching browser tab semantics
       removeTabKeys(id)
       return next
+    },
+
+    moveTab: (id, toIndex) => {
+      ensureHydrated()
+      const tabs = [...get().tabs]
+      const from = tabs.findIndex((t) => t.id === id)
+      if (from === -1) return
+      const to = Math.max(0, Math.min(tabs.length - 1, toIndex))
+      if (to === from) return
+      const [moved] = tabs.splice(from, 1)
+      tabs.splice(to, 0, moved)
+      // reordering never changes which tab is active
+      set({ tabs })
+      persist({ tabs, activeId: get().activeId })
     },
   }
 })

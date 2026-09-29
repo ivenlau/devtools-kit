@@ -21,6 +21,7 @@ function TabStrip() {
   const beginSwitch = useTabStore((s) => s.beginSwitch)
   const clearSwitchIntent = useTabStore((s) => s.clearSwitchIntent)
   const closeTab = useTabStore((s) => s.closeTab)
+  const moveTab = useTabStore((s) => s.moveTab)
 
   const cleanPath = pathname?.replace(/\/+$/, '') ?? ''
   // a tab reads as active only while its page is actually on screen —
@@ -55,6 +56,11 @@ function TabStrip() {
       ?.querySelector(`[data-tab-id="${effectiveActiveId}"]`)
       ?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
   }, [effectiveActiveId])
+
+  // drag & drop reordering — tabs shift live as the pointer crosses a tab's
+  // midpoint (the same threshold rule browsers use, keeps it flicker-free)
+  const [draggingId, setDraggingId] = useState<string | null>(null)
+  const dragIdRef = useRef<string | null>(null)
 
   if (!tabs.length) return null
 
@@ -109,9 +115,35 @@ function TabStrip() {
             <div
               key={tab.id}
               data-tab-id={tab.id}
-              className={`group/tab relative flex shrink-0 items-center gap-0.5 px-2 transition-colors ${
+              draggable
+              onDragStart={(e) => {
+                dragIdRef.current = tab.id
+                setDraggingId(tab.id)
+                e.dataTransfer.effectAllowed = 'move'
+                e.dataTransfer.setData('text/plain', tab.id)
+              }}
+              onDragEnd={() => {
+                dragIdRef.current = null
+                setDraggingId(null)
+              }}
+              onDragOver={(e) => {
+                const dragId = dragIdRef.current
+                if (!dragId || dragId === tab.id) return
+                e.preventDefault()
+                e.dataTransfer.dropEffect = 'move'
+                // only swap once the pointer crosses this tab's midpoint
+                const rect = e.currentTarget.getBoundingClientRect()
+                const after = e.clientX > rect.left + rect.width / 2
+                const ids = tabs.map((tl) => tl.id)
+                const from = ids.indexOf(dragId)
+                let to = ids.indexOf(tab.id) + (after ? 1 : 0)
+                if (from < to) to -= 1
+                if (to !== from) moveTab(dragId, to)
+              }}
+              onDrop={(e) => e.preventDefault()}
+              className={`group/tab relative flex shrink-0 cursor-grab items-center gap-0.5 px-2 transition-colors active:cursor-grabbing ${
                 accent ? accent.box : 'text-ink-secondary hover:text-ink-primary'
-              }`}
+              } ${draggingId === tab.id ? 'opacity-40' : ''}`}
             >
               {accent && (
                 <span aria-hidden className={`absolute inset-x-2 bottom-0 h-0.5 ${accent.tab}`} />
