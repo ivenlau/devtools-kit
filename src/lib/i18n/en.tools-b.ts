@@ -121,6 +121,7 @@ const strings: Record<string, string> = {
   'Logo 会嵌入图片并保持纵横比；建议使用 H 级纠错以保证可扫描性。':
     'The logo is embedded keeping its aspect ratio; use H error correction to stay scannable.',
   '无边框': 'None',
+  '边框样式': 'Frame style',
   '卡片': 'Card',
   '标签': 'Banner',
   '说明文字': 'Caption',

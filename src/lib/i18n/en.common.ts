@@ -218,15 +218,18 @@ const common: Record<string, string> = {
   '工具箱': 'Tools',
   '搜索工具': 'Search tools',
   '搜索工具…': 'search tools…',
+  '清空搜索': 'Clear search',
   '检测到多种可能，请选择目标工具：': 'Multiple tools detected — pick a destination:',
 
-  // Tool names (paste/drop auto-route candidates)
+  // Tool names (paste/drop auto-route candidates) — every tools.ts name must
+  // be covered here or its tab stays Chinese in EN mode
   'JSON 格式化': 'JSON Formatter',
   'SQL 格式化': 'SQL Formatter',
   'Markdown 编辑器': 'Markdown Editor',
   '数据格式转换': 'Data Converter',
   '代码压缩': 'Code Minifier',
   '图片压缩': 'Image Compressor',
+  '图像': 'Image',
   'Base64 编解码': 'Base64 Codec',
   'URL 编解码': 'URL Codec',
   '时间戳转换': 'Timestamp Converter',
@@ -235,6 +238,13 @@ const common: Record<string, string> = {
   'Diff 文本对比': 'Text Diff',
   'IP 地址查询': 'IP Lookup',
   'Cron 表达式生成': 'Cron Builder',
+  '正则表达式测试': 'Regex Tester',
+  '哈希 & UUID 生成': 'Hash & UUID',
+  '进制转换器': 'Radix Converter',
+  '二维码设计': 'QR Design',
+  'cURL 命令生成': 'cURL Generator',
+  'HTML 实体编解码': 'HTML Entity',
+  'User-Agent 解析': 'User-Agent Parser',
 
   // Color tool labels
   '颜色值': 'Color value',
