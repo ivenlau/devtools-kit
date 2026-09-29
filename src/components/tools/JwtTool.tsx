@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Shield, Copy, Trash2, Eye, EyeOff, FileText } from 'lucide-react'
 import { jwtDecode } from 'jwt-decode'
 import { useTransferData } from '@/lib/useTransferData'
+import { useTabState } from '@/lib/hooks/useTabState'
 import { ToolShell } from '@/components/ToolShell'
 import { useI18n } from '@/components/I18nProvider'
 
@@ -29,9 +30,9 @@ interface DecodedToken {
 const EXAMPLE_TOKEN =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
 
-export default function JWTDecoderPage() {
+export default function JWTDecoderPage({ tabId }: { tabId: string }) {
   const { t, lang } = useI18n()
-  const [input, setInput] = useState('')
+  const [input, setInput] = useTabState(tabId, 'input', '')
   const [decoded, setDecoded] = useState<DecodedToken | null>(null)
   const [showHeader, setShowHeader] = useState(true)
   const [showPayload, setShowPayload] = useState(true)

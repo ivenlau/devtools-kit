@@ -12,14 +12,21 @@ function ToolViewSkeleton() {
   )
 }
 
-const lazyTool = (loader: () => Promise<{ default: ComponentType }>): ComponentType =>
-  dynamic(loader, { ssr: false, loading: ToolViewSkeleton })
+/** Props every tool view receives from its workspace tab instance. */
+export interface ToolViewProps {
+  /** instance id of the hosting tab — scopes per-tab persisted state */
+  tabId: string
+}
+
+const lazyTool = (
+  loader: () => Promise<{ default: ComponentType<ToolViewProps> }>,
+): ComponentType<ToolViewProps> => dynamic(loader, { ssr: false, loading: ToolViewSkeleton })
 
 /**
  * Tool path → mounted view. Every entry is a lazy chunk: a tool's code only
  * loads the first time its tab opens, then stays alive for the session.
  */
-export const TOOL_VIEWS: Record<string, ComponentType> = {
+export const TOOL_VIEWS: Record<string, ComponentType<ToolViewProps>> = {
   '/tools/json': lazyTool(() => import('@/components/tools/JsonTool')),
   '/tools/base64': lazyTool(() => import('@/components/tools/Base64Tool')),
   '/tools/timestamp': lazyTool(() => import('@/components/tools/TimestampTool')),

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { ArrowLeftRight, Copy, Trash2, ListOrdered } from 'lucide-react'
 import { diffLines } from 'diff'
 import { useTransferData } from '@/lib/useTransferData'
+import { useTabState } from '@/lib/hooks/useTabState'
 import { ToolShell } from '@/components/ToolShell'
 import { useI18n } from '@/components/I18nProvider'
 
@@ -15,12 +16,12 @@ interface DiffResult {
   newLineNumber?: number
 }
 
-export default function DiffToolPage() {
+export default function DiffToolPage({ tabId }: { tabId: string }) {
   const { t } = useI18n()
-  const [oldText, setOldText] = useState('')
-  const [newText, setNewText] = useState('')
+  const [oldText, setOldText] = useTabState(tabId, 'oldText', '')
+  const [newText, setNewText] = useTabState(tabId, 'newText', '')
   const [diff, setDiff] = useState<DiffResult[]>([])
-  const [lineMode, setLineMode] = useState(false)
+  const [lineMode, setLineMode] = useTabState(tabId, 'lineMode', false)
 
   useTransferData(setOldText)
 

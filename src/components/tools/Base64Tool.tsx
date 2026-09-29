@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { FileCode, Copy, Trash2, ArrowRight, ArrowLeft } from 'lucide-react'
 import { useTransferData } from '@/lib/useTransferData'
+import { useTabState } from '@/lib/hooks/useTabState'
 import { ToolShell } from '@/components/ToolShell'
 import { useI18n } from '@/components/I18nProvider'
 
@@ -37,10 +38,10 @@ const base64Decode = (base64: string): string => {
   }
 }
 
-export default function Base64ToolPage() {
+export default function Base64ToolPage({ tabId }: { tabId: string }) {
   const { t } = useI18n()
-  const [mode, setMode] = useState<'encode' | 'decode'>('encode')
-  const [input, setInput] = useState('')
+  const [mode, setMode] = useTabState<'encode' | 'decode'>(tabId, 'mode', 'encode')
+  const [input, setInput] = useTabState(tabId, 'input', '')
   const [output, setOutput] = useState('')
   const [error, setError] = useState<string | null>(null)
 

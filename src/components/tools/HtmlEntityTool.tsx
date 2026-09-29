@@ -3,16 +3,17 @@
 import { useState, useEffect } from 'react'
 import { Code2, Copy, Trash2, ArrowLeftRight, Sparkles } from 'lucide-react'
 import { useTransferData } from '@/lib/useTransferData'
+import { useTabState } from '@/lib/hooks/useTabState'
 import { ToolShell } from '@/components/ToolShell'
 import { useI18n } from '@/components/I18nProvider'
 
 type ModeType = 'encode' | 'decode'
 
-export default function HTMLEntityPage() {
+export default function HTMLEntityPage({ tabId }: { tabId: string }) {
   const { t } = useI18n()
-  const [input, setInput] = useState('')
+  const [input, setInput] = useTabState(tabId, 'input', '')
   const [output, setOutput] = useState('')
-  const [mode, setMode] = useState<ModeType>('encode')
+  const [mode, setMode] = useTabState<ModeType>(tabId, 'mode', 'encode')
 
   useTransferData(setInput)
 

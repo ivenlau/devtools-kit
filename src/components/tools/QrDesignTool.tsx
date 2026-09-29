@@ -9,6 +9,7 @@ import {
   RotateCcw, ImagePlus, X,
 } from 'lucide-react'
 import { useTransferData } from '@/lib/useTransferData'
+import { useTabState, tabFieldKey } from '@/lib/hooks/useTabState'
 import { ToolShell } from '@/components/ToolShell'
 import { useI18n } from '@/components/I18nProvider'
 import { buildPayload, byteLength, type ContentType } from '@/lib/qr/payloads'
@@ -129,20 +130,34 @@ const EXPORT_SIZES = [512, 1024, 1536, 2048]
 const REF_SIZE = 512
 const PREVIEW_MIN = 288
 const PREVIEW_MAX = 720
-const STORAGE_KEY = 'devtools-kit:qr-design'
+/** pre-per-tab key; migrated once by the first tab that mounts */
+const LEGACY_STORAGE_KEY = 'devtools-kit:qr-design'
 
-/** Restore the last session's config from localStorage (best effort) */
-function loadStoredConfig(): QrConfig {
+/** Restore this tab's config from localStorage (best effort), migrating the legacy per-tool key */
+function loadStoredConfig(perTabKey: string): QrConfig {
   if (typeof window === 'undefined') return DEFAULT_CONFIG
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return DEFAULT_CONFIG
-    const parsed = JSON.parse(raw)
-    if (parsed?.app === 'devtools-kit-qr' && parsed.config) {
-      return { ...DEFAULT_CONFIG, ...parsed.config }
+    const raw = localStorage.getItem(perTabKey)
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      if (parsed?.app === 'devtools-kit-qr' && parsed.config) {
+        return { ...DEFAULT_CONFIG, ...parsed.config }
+      }
     }
   } catch {
-    /* corrupted storage — fall back to defaults */
+    /* corrupted storage — fall back to the legacy key / defaults */
+  }
+  try {
+    const legacy = localStorage.getItem(LEGACY_STORAGE_KEY)
+    if (legacy) {
+      const parsed = JSON.parse(legacy)
+      if (parsed?.app === 'devtools-kit-qr' && parsed.config) {
+        localStorage.removeItem(LEGACY_STORAGE_KEY)
+        return { ...DEFAULT_CONFIG, ...parsed.config }
+      }
+    }
+  } catch {
+    /* corrupted legacy storage — fall back to defaults */
   }
   return DEFAULT_CONFIG
 }
@@ -209,13 +224,15 @@ function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
   ctx.closePath()
 }
 
-export default function QRCodeStudioPage() {
+export default function QRCodeStudioPage({ tabId }: { tabId: string }) {
   const { t } = useI18n()
+  // each QR tab instance keeps its own design draft
+  const storageKey = tabFieldKey(tabId, 'qr-config')
   // Start from defaults so SSR markup matches, then adopt the stored session
   // after mount (avoids a hydration mismatch when localStorage differs).
   const [cfg, setCfg] = useState<QrConfig>(DEFAULT_CONFIG)
   const [restored, setRestored] = useState(false)
-  const [tab, setTab] = useState<'content' | 'design' | 'logo' | 'frame' | 'export'>('content')
+  const [tab, setTab] = useTabState<'content' | 'design' | 'logo' | 'frame' | 'export'>(tabId, 'panel', 'content')
   const [qrError, setQrError] = useState<string | null>(null)
   const [scanState, setScanState] = useState<'idle' | 'checking' | 'pass' | 'fail'>('idle')
   const [testResult, setTestResult] = useState<string | null>(null)
@@ -230,20 +247,20 @@ export default function QRCodeStudioPage() {
 
   // Restore the last session after mount, then keep auto-saving changes
   useEffect(() => {
-    setCfg(loadStoredConfig())
+    setCfg(loadStoredConfig(storageKey))
     setRestored(true)
-  }, [])
+  }, [storageKey])
   useEffect(() => {
     if (!restored) return
     const timer = setTimeout(() => {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ app: 'devtools-kit-qr', version: 1, config: cfg }))
+        localStorage.setItem(storageKey, JSON.stringify({ app: 'devtools-kit-qr', version: 1, config: cfg }))
       } catch {
         /* storage quota (e.g. large logo) — keep working without persistence */
       }
     }, 400)
     return () => clearTimeout(timer)
-  }, [cfg, restored])
+  }, [cfg, restored, storageKey])
 
   // Paste from the home screen routes into the URL field
   useTransferData(
@@ -547,7 +564,7 @@ export default function QRCodeStudioPage() {
 
   const resetAll = () => {
     try {
-      localStorage.removeItem(STORAGE_KEY)
+      localStorage.removeItem(storageKey)
     } catch {
       /* ignore */
     }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useI18n } from '@/components/I18nProvider'
 import { tools } from '@/lib/constants/tools'
@@ -38,9 +38,19 @@ export function ToolWorkspace() {
   const cleanPath = pathname?.replace(/\/+$/, '') ?? ''
   const isToolRoute = !!TOOL_VIEWS[cleanPath]
 
+  // StrictMode double-invokes effects in dev; without this guard the second
+  // run of the route effect always takes the createTab branch (sessionStarted
+  // is already true by then) and duplicates the tab on every page load.
+  const routeHandledFor = useRef<string | null>(null)
+
   // Route-entry resolution
   useEffect(() => {
-    if (!isToolRoute) return
+    if (!isToolRoute) {
+      routeHandledFor.current = null
+      return
+    }
+    if (routeHandledFor.current === cleanPath) return
+    routeHandledFor.current = cleanPath
     const st = useTabStore.getState()
     if (!st.hydrated) st.hydrate()
 
@@ -102,7 +112,7 @@ export function ToolWorkspace() {
         const visible = tab.id === activeId
         return (
           <div key={tab.id} style={{ display: visible ? 'block' : 'none' }}>
-            <View />
+            <View tabId={tab.id} />
           </div>
         )
       })}

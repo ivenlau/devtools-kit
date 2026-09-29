@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Link2, Copy, Trash2, ArrowRight, ArrowLeft, ScanSearch } from 'lucide-react'
 import { useTransferData } from '@/lib/useTransferData'
+import { useTabState } from '@/lib/hooks/useTabState'
 import { ToolShell } from '@/components/ToolShell'
 import { useI18n } from '@/components/I18nProvider'
 
@@ -48,10 +49,10 @@ const parseUrl = (urlString: string) => {
   }
 }
 
-export default function UrlEncoderPage() {
+export default function UrlEncoderPage({ tabId }: { tabId: string }) {
   const { t } = useI18n()
-  const [mode, setMode] = useState<'encode' | 'decode' | 'parse'>('encode')
-  const [input, setInput] = useState('')
+  const [mode, setMode] = useTabState<'encode' | 'decode' | 'parse'>(tabId, 'mode', 'encode')
+  const [input, setInput] = useTabState(tabId, 'input', '')
   const [output, setOutput] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [urlData, setUrlData] = useState<any>(null)

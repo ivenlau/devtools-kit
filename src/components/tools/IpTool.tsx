@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Globe, MapPin, Copy, Info, Search } from 'lucide-react'
 import ipaddr from 'ipaddr.js'
 import { useTransferData } from '@/lib/useTransferData'
+import { useTabState } from '@/lib/hooks/useTabState'
 import { ToolShell } from '@/components/ToolShell'
 import { useI18n } from '@/components/I18nProvider'
 
@@ -31,9 +32,9 @@ interface GeoLocation {
   lon?: number
 }
 
-export default function IPQueryPage() {
+export default function IPQueryPage({ tabId }: { tabId: string }) {
   const { t, lang } = useI18n()
-  const [input, setInput] = useState('')
+  const [input, setInput] = useTabState(tabId, 'input', '')
   const [ipInfo, setIpInfo] = useState<IPInfo | null>(null)
   const [geoLocation, setGeoLocation] = useState<GeoLocation | null>(null)
   const [loading, setLoading] = useState(false)

@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { tools } from '@/lib/constants/tools'
+import { removeTabKeys, sweepOrphanTabKeys } from '@/lib/hooks/useTabState'
 
 const STORAGE_KEY = 'devtools-kit:tool-tabs'
 const VALID_PATHS = new Set(tools.map((t) => t.path))
@@ -29,6 +30,8 @@ function loadPersisted(): PersistedTabs {
       tabs = (tabs as unknown as string[]).map((p) => ({ id: newTabId(), path: p }))
     }
     tabs = tabs.filter((t) => t && typeof t.id === 'string' && VALID_PATHS.has(t.path))
+    // per-tab drafts whose tab instance is gone (lost/corrupted tab list) are garbage
+    sweepOrphanTabKeys(new Set(tabs.map((t) => t.id)))
     const activeId = parsed.activeId && tabs.some((t) => t.id === parsed.activeId) ? parsed.activeId : tabs[0]?.id ?? null
     return { tabs, activeId }
   } catch {
@@ -141,6 +144,8 @@ export const useTabStore = create<TabState>((set, get) => {
       const nextActive = activeId === id ? (next[Math.min(idx, next.length - 1)]?.id ?? null) : activeId
       set({ tabs: next, activeId: nextActive })
       persist({ tabs: next, activeId: nextActive })
+      // closing a tab discards its persisted drafts, matching browser tab semantics
+      removeTabKeys(id)
       return next
     },
   }

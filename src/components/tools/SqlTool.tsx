@@ -4,16 +4,17 @@ import { useState, useEffect } from 'react'
 import { Database, Copy, Trash2, Sparkles, CaseSensitive } from 'lucide-react'
 import { format } from 'sql-formatter'
 import { useTransferData } from '@/lib/useTransferData'
+import { useTabState } from '@/lib/hooks/useTabState'
 import { ToolShell } from '@/components/ToolShell'
 import { useI18n } from '@/components/I18nProvider'
 
-export default function SQLFormatterPage() {
+export default function SQLFormatterPage({ tabId }: { tabId: string }) {
   const { t } = useI18n()
-  const [input, setInput] = useState('')
+  const [input, setInput] = useTabState(tabId, 'input', '')
   const [output, setOutput] = useState('')
-  const [language, setLanguage] = useState('sql')
-  const [indent, setIndent] = useState('  ')
-  const [uppercase, setUppercase] = useState(true)
+  const [language, setLanguage] = useTabState(tabId, 'language', 'sql')
+  const [indent, setIndent] = useTabState(tabId, 'indent', '  ')
+  const [uppercase, setUppercase] = useTabState(tabId, 'uppercase', true)
 
   useTransferData(setInput)
 

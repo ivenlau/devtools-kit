@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Regex, Copy, Trash2 } from 'lucide-react'
 import { useTransferData } from '@/lib/useTransferData'
+import { useTabState } from '@/lib/hooks/useTabState'
 import { ToolShell } from '@/components/ToolShell'
 import { useI18n } from '@/components/I18nProvider'
 
@@ -26,14 +27,14 @@ const flagOptions = [
   { flag: 's', label: '点匹配换行' },
 ]
 
-export default function RegexTesterPage() {
+export default function RegexTesterPage({ tabId }: { tabId: string }) {
   const { t, lang } = useI18n()
-  const [regex, setRegex] = useState('')
-  const [flags, setFlags] = useState('gm')
-  const [testString, setTestString] = useState('')
+  const [regex, setRegex] = useTabState(tabId, 'regex', '')
+  const [flags, setFlags] = useTabState(tabId, 'flags', 'gm')
+  const [testString, setTestString] = useTabState(tabId, 'testString', '')
   const [matches, setMatches] = useState<RegExpMatchArray[]>([])
   const [error, setError] = useState<string | null>(null)
-  const [selectedPreset, setSelectedPreset] = useState<number | null>(null)
+  const [selectedPreset, setSelectedPreset] = useTabState<number | null>(tabId, 'selectedPreset', null)
 
   useTransferData(setTestString)
 
@@ -80,7 +81,7 @@ export default function RegexTesterPage() {
   }
 
   // 替换功能
-  const [replacePattern, setReplacePattern] = useState('')
+  const [replacePattern, setReplacePattern] = useTabState(tabId, 'replacePattern', '')
   const [replaceResult, setReplaceResult] = useState('')
 
   useEffect(() => {

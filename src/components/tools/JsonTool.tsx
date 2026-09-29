@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Braces, Copy, Trash2, Wand2, Minimize2, ArrowDownAZ } from 'lucide-react'
 import { formatJson, minifyJson } from '@/lib/parsers/json'
 import { useTransferData } from '@/lib/useTransferData'
+import { useTabState } from '@/lib/hooks/useTabState'
 import Editor, { type Monaco } from '@monaco-editor/react'
 import { ToolShell } from '@/components/ToolShell'
 import { useTheme } from '@/components/ThemeProvider'
@@ -67,12 +68,12 @@ function defineEditorTheme(monaco: Monaco) {
   })
 }
 
-export default function JsonToolPage() {
-  const [input, setInput] = useState('')
+export default function JsonToolPage({ tabId }: { tabId: string }) {
+  const [input, setInput] = useTabState(tabId, 'input', '')
   const [output, setOutput] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const [indent, setIndent] = useState(2)
-  const [sortKeys, setSortKeys] = useState(false)
+  const [indent, setIndent] = useTabState(tabId, 'indent', 2)
+  const [sortKeys, setSortKeys] = useTabState(tabId, 'sortKeys', false)
   const { theme } = useTheme()
   const { t, lang } = useI18n()
 

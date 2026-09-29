@@ -4,26 +4,28 @@ import { useState, useEffect } from 'react'
 import { Clock, Copy, Calendar, PencilLine } from 'lucide-react'
 import cronstrue from 'cronstrue/i18n'
 import { useTransferData } from '@/lib/useTransferData'
+import { useTabState } from '@/lib/hooks/useTabState'
 import { ToolShell } from '@/components/ToolShell'
 import { useI18n } from '@/components/I18nProvider'
 
 import { CronExpressionParser } from 'cron-parser'
 
-export default function CronGeneratorPage() {
+export default function CronGeneratorPage({ tabId }: { tabId: string }) {
   const { t, lang } = useI18n()
   const defaultCron = '0 0 * * *'
-  const [cron, setCron] = useState(defaultCron)
+  const [cron, setCron] = useTabState(tabId, 'cron', defaultCron)
   const [description, setDescription] = useState('每天 0 点执行')
   const [nextRuns, setNextRuns] = useState<string[]>([])
-  const [manualMode, setManualMode] = useState(false)
+  const [manualMode, setManualMode] = useTabState(tabId, 'manualMode', false)
   const [error, setError] = useState('')
 
-  // Manual cron parts - match the default cron
-  const [minute, setMinute] = useState('0')
-  const [hour, setHour] = useState('0')
-  const [day, setDay] = useState('*')
-  const [month, setMonth] = useState('*')
-  const [weekday, setWeekday] = useState('*')
+  // Manual cron parts - match the default cron; persisted together with `cron`
+  // so the manual-mode rebuild effect below always sees a self-consistent set
+  const [minute, setMinute] = useTabState(tabId, 'minute', '0')
+  const [hour, setHour] = useTabState(tabId, 'hour', '0')
+  const [day, setDay] = useTabState(tabId, 'day', '*')
+  const [month, setMonth] = useTabState(tabId, 'month', '*')
+  const [weekday, setWeekday] = useTabState(tabId, 'weekday', '*')
 
   useTransferData(setCron)
 

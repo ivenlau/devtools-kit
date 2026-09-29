@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Palette, Copy } from 'lucide-react'
 import { useTransferData } from '@/lib/useTransferData'
+import { useTabState } from '@/lib/hooks/useTabState'
 import { ToolShell } from '@/components/ToolShell'
 import { useI18n } from '@/components/I18nProvider'
 
@@ -110,9 +111,9 @@ const hslToRgb = (h: number, s: number, l: number) => {
   }
 }
 
-export default function ColorConverterPage() {
+export default function ColorConverterPage({ tabId }: { tabId: string }) {
   const { t } = useI18n()
-  const [hex, setHex] = useState('#1E84FF')
+  const [hex, setHex] = useTabState(tabId, 'hex', '#1E84FF')
   const [rgb, setRgb] = useState({ r: 30, g: 132, b: 255 })
   const [hsl, setHsl] = useState({ h: 217, s: 100, l: 56 })
   const [rgba, setRgba] = useState('rgba(30, 132, 255, 1)')

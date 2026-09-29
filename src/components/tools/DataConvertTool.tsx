@@ -5,6 +5,7 @@ import { RefreshCw, Copy, Trash2, Sparkles } from 'lucide-react'
 import yaml from 'js-yaml'
 import xmlFormat from 'xml-formatter'
 import { useTransferData } from '@/lib/useTransferData'
+import { useTabState } from '@/lib/hooks/useTabState'
 import { ToolShell } from '@/components/ToolShell'
 import { useI18n } from '@/components/I18nProvider'
 // @ts-ignore
@@ -12,11 +13,11 @@ const TOML = require('toml')
 
 type FormatType = 'json' | 'xml' | 'yaml' | 'toml'
 
-export default function DataConverterPage() {
+export default function DataConverterPage({ tabId }: { tabId: string }) {
   const { t, lang } = useI18n()
-  const [input, setInput] = useState('')
-  const [inputFormat, setInputFormat] = useState<FormatType>('json')
-  const [outputFormat, setOutputFormat] = useState<FormatType>('yaml')
+  const [input, setInput] = useTabState(tabId, 'input', '')
+  const [inputFormat, setInputFormat] = useTabState<FormatType>(tabId, 'inputFormat', 'json')
+  const [outputFormat, setOutputFormat] = useTabState<FormatType>(tabId, 'outputFormat', 'yaml')
   const [output, setOutput] = useState('')
   const [error, setError] = useState('')
 

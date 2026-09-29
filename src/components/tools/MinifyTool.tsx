@@ -3,16 +3,17 @@
 import { useState, useEffect } from 'react'
 import { Minimize2, Copy, Trash2, Sparkles } from 'lucide-react'
 import { useTransferData } from '@/lib/useTransferData'
+import { useTabState } from '@/lib/hooks/useTabState'
 import { ToolShell } from '@/components/ToolShell'
 import { useI18n } from '@/components/I18nProvider'
 
 type CodeType = 'javascript' | 'css' | 'html'
 
-export default function CodeMinifyPage() {
+export default function CodeMinifyPage({ tabId }: { tabId: string }) {
   const { t, lang } = useI18n()
-  const [input, setInput] = useState('')
+  const [input, setInput] = useTabState(tabId, 'input', '')
   const [output, setOutput] = useState('')
-  const [codeType, setCodeType] = useState<CodeType>('javascript')
+  const [codeType, setCodeType] = useTabState<CodeType>(tabId, 'codeType', 'javascript')
   const [error, setError] = useState('')
 
   useTransferData(setInput)

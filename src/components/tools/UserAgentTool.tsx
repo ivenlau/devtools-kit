@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Monitor, Copy, Smartphone, Tablet, Globe } from 'lucide-react'
 import { UAParser } from 'ua-parser-js'
 import { useTransferData } from '@/lib/useTransferData'
+import { useTabState } from '@/lib/hooks/useTabState'
 import { ToolShell } from '@/components/ToolShell'
 import { useI18n } from '@/components/I18nProvider'
 
@@ -14,9 +15,9 @@ interface ParsedUA {
   engine: { name: string; version: string }
 }
 
-export default function UserAgentPage() {
+export default function UserAgentPage({ tabId }: { tabId: string }) {
   const { t, lang } = useI18n()
-  const [input, setInput] = useState('')
+  const [input, setInput] = useTabState(tabId, 'input', '')
   const [parsed, setParsed] = useState<ParsedUA | null>(null)
   const [myUA, setMyUA] = useState('')
 

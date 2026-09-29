@@ -5,6 +5,7 @@ import { FileText, Copy, Trash2, Upload, ArrowLeft, Eye, ChevronUp, Download, Ch
 import { marked } from 'marked'
 import { FoldHorizontal, UnfoldHorizontal } from 'lucide-react'
 import { useTransferStore } from '@/stores/transferStore'
+import { useTabState } from '@/lib/hooks/useTabState'
 import { ToolShell } from '@/components/ToolShell'
 import { useI18n } from '@/components/I18nProvider'
 
@@ -121,9 +122,13 @@ function hello() {
 Start editing! ✨
 `
 
-export default function MarkdownEditorPage() {
+export default function MarkdownEditorPage({ tabId }: { tabId: string }) {
   const { t, lang } = useI18n()
-  const [markdown, setMarkdown] = useState(ZH_SAMPLE)
+  // content is scoped to this tab instance; migrates the pre-per-tab
+  // 'markdown-editor-content' draft on first mount
+  const [markdown, setMarkdown] = useTabState(tabId, 'content', ZH_SAMPLE, {
+    legacyRawKey: 'markdown-editor-content',
+  })
   const [html, setHtml] = useState('')
   const [copySuccess, setCopySuccess] = useState(false)
   const [dragActive, setDragActive] = useState(false)
@@ -153,40 +158,24 @@ export default function MarkdownEditorPage() {
   // In EN mode, present the English sample until the user edits the content
   const displayMarkdown = lang === 'en' && markdown === ZH_SAMPLE ? EN_SAMPLE : markdown
 
-  // 接收传输数据（优先于 localStorage）
-  const transferredRef = useRef(false)
+  // 接收传输数据（优先于 per-tab 存档；hook 恢复 effect 先于本 effect 执行）
   useEffect(() => {
     const { pendingData, clearPendingData } = useTransferStore.getState()
     if (pendingData?.content) {
       setMarkdown(pendingData.content)
       clearPendingData()
-      transferredRef.current = true
       setIsPreviewMode(true)
     }
   }, [])
 
-  // 加载保存的内容（有传输数据时跳过）
-  useEffect(() => {
-    if (transferredRef.current) return
-    const saved = localStorage.getItem('markdown-editor-content')
-    if (saved) {
-      setMarkdown(saved)
-    }
-  }, [])
-
-  // 实时转换Markdown到HTML
+  // 实时转换Markdown到HTML（内容持久化由 useTabState 负责）
   useEffect(() => {
     const convert = async () => {
       const convertedHtml = await marked(displayMarkdown)
       setHtml(convertedHtml)
     }
     convert()
-
-    // 只在编辑模式下保存到本地存储
-    if (!localFileName) {
-      localStorage.setItem('markdown-editor-content', markdown)
-    }
-  }, [displayMarkdown, markdown, localFileName])
+  }, [displayMarkdown])
 
   // 清空内容
   const handleClear = () => {

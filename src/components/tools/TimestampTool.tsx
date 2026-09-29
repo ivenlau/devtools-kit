@@ -10,6 +10,7 @@ import {
   parseTimestampInput,
 } from '@/lib/timestamp'
 import { useTransferData } from '@/lib/useTransferData'
+import { useTabState } from '@/lib/hooks/useTabState'
 import { ToolShell } from '@/components/ToolShell'
 import { useI18n } from '@/components/I18nProvider'
 
@@ -18,12 +19,12 @@ interface TimestampOutput {
   milliseconds: string
 }
 
-export default function TimestampToolPage() {
+export default function TimestampToolPage({ tabId }: { tabId: string }) {
   const { t } = useI18n()
   const [currentTimeMs, setCurrentTimeMs] = useState(0)
-  const [inputTimestamp, setInputTimestamp] = useState('')
+  const [inputTimestamp, setInputTimestamp] = useTabState(tabId, 'inputTimestamp', '')
   const [outputDate, setOutputDate] = useState('')
-  const [inputDate, setInputDate] = useState('')
+  const [inputDate, setInputDate] = useTabState(tabId, 'inputDate', '')
   const [outputTimestamp, setOutputTimestamp] = useState<TimestampOutput | null>(null)
   const [timestampError, setTimestampError] = useState('')
   const [dateError, setDateError] = useState('')

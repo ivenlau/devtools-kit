@@ -3,15 +3,18 @@
 import { useState, useEffect } from 'react'
 import { Terminal, Copy, Trash2 } from 'lucide-react'
 import { useTransferData } from '@/lib/useTransferData'
+import { useTabState } from '@/lib/hooks/useTabState'
 import { ToolShell } from '@/components/ToolShell'
 import { useI18n } from '@/components/I18nProvider'
 
-export default function CurlGeneratorPage() {
+export default function CurlGeneratorPage({ tabId }: { tabId: string }) {
   const { t, lang } = useI18n()
-  const [url, setUrl] = useState('https://api.example.com/users')
-  const [method, setMethod] = useState<'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'>('GET')
-  const [headers, setHeaders] = useState([{ key: 'Content-Type', value: 'application/json' }])
-  const [body, setBody] = useState('')
+  const [url, setUrl] = useTabState(tabId, 'url', 'https://api.example.com/users')
+  const [method, setMethod] = useTabState<'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'>(tabId, 'method', 'GET')
+  const [headers, setHeaders] = useTabState<{ key: string; value: string }[]>(tabId, 'headers', [
+    { key: 'Content-Type', value: 'application/json' },
+  ])
+  const [body, setBody] = useTabState(tabId, 'body', '')
   const [curlCommand, setCurlCommand] = useState('')
 
   useTransferData(setUrl)

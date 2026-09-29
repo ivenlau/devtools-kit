@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Binary, Copy, Type } from 'lucide-react'
 import { useTransferData } from '@/lib/useTransferData'
+import { useTabState } from '@/lib/hooks/useTabState'
 import { ToolShell } from '@/components/ToolShell'
 import { useI18n } from '@/components/I18nProvider'
 
@@ -78,11 +79,11 @@ const binToString = (bin: string): string => {
   return bytes.map(byte => String.fromCharCode(parseInt(byte, 2))).join('')
 }
 
-export default function BinaryConverterPage() {
+export default function BinaryConverterPage({ tabId }: { tabId: string }) {
   const { t, lang } = useI18n()
-  const [mode, setMode] = useState<'number' | 'text'>('number')
-  const [inputType, setInputType] = useState<'dec' | 'bin' | 'hex'>('dec')
-  const [input, setInput] = useState('')
+  const [mode, setMode] = useTabState<'number' | 'text'>(tabId, 'mode', 'number')
+  const [inputType, setInputType] = useTabState<'dec' | 'bin' | 'hex'>(tabId, 'inputType', 'dec')
+  const [input, setInput] = useTabState(tabId, 'input', '')
   const [results, setResults] = useState({
     dec: '',
     bin: '',

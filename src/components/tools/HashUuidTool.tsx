@@ -5,6 +5,7 @@ import { Hash, Copy, RefreshCw, Fingerprint } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 import CryptoJS from 'crypto-js'
 import { useTransferStore } from '@/stores/transferStore'
+import { useTabState } from '@/lib/hooks/useTabState'
 import { ToolShell } from '@/components/ToolShell'
 import { useI18n } from '@/components/I18nProvider'
 
@@ -37,17 +38,17 @@ const generateHash = (text: string, algorithm: 'md5' | 'sha1' | 'sha256' | 'sha5
   }
 }
 
-export default function HashGeneratorPage() {
+export default function HashGeneratorPage({ tabId }: { tabId: string }) {
   const { t, lang } = useI18n()
-  const [activeTab, setActiveTab] = useState<'uuid' | 'hash'>('uuid')
+  const [activeTab, setActiveTab] = useTabState<'uuid' | 'hash'>(tabId, 'activeTab', 'uuid')
 
-  // UUID 状态
-  const [uuid, setUuid] = useState('')
-  const [uuidCount, setUuidCount] = useState(1)
-  const [uuidList, setUuidList] = useState<string[]>([])
+  // UUID 状态 — uuid 生成一次后随 tab 持久化，刷新不再变
+  const [uuid, setUuid] = useTabState(tabId, 'uuid', '', { initIfEmpty: generateUUID })
+  const [uuidCount, setUuidCount] = useTabState(tabId, 'uuidCount', 1)
+  const [uuidList, setUuidList] = useTabState<string[]>(tabId, 'uuidList', [])
 
   // 哈希状态
-  const [hashInput, setHashInput] = useState('')
+  const [hashInput, setHashInput] = useTabState(tabId, 'hashInput', '')
   const [hashOutput, setHashOutput] = useState<Record<string, string>>({})
   const [hashAlgorithm, setHashAlgorithm] = useState('md5')
 
@@ -59,11 +60,6 @@ export default function HashGeneratorPage() {
       setActiveTab('hash')
       clearPendingData()
     }
-  }, [])
-
-  // 初始化UUID
-  useEffect(() => {
-    generateNewUUID()
   }, [])
 
   // 生成新UUID
