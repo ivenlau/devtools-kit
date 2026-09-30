@@ -6,6 +6,7 @@ import { marked } from 'marked'
 import { FoldHorizontal, UnfoldHorizontal } from 'lucide-react'
 import { useTransferStore } from '@/stores/transferStore'
 import { useTabState } from '@/lib/hooks/useTabState'
+import { showDialog } from '@/components/DialogModal'
 import { ToolShell } from '@/components/ToolShell'
 import { useI18n } from '@/components/I18nProvider'
 
@@ -194,13 +195,15 @@ export default function MarkdownEditorPage({ tabId }: { tabId: string }) {
     navigator.clipboard.writeText(markdown)
   }
 
-  // 处理文件拖拽
+  // 处理文件拖拽 — dragleave 在子元素边界上会成对出现（遮罩挂载也会引发），
+  // relatedTarget 仍落在容器内就不是真正的离开；否则遮罩会反复挂卸导致闪屏
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
     if (e.type === 'dragenter' || e.type === 'dragover') {
       setDragActive(true)
     } else if (e.type === 'dragleave') {
+      if (e.relatedTarget && e.currentTarget.contains(e.relatedTarget as Node)) return
       setDragActive(false)
     }
   }
@@ -224,7 +227,7 @@ export default function MarkdownEditorPage({ tabId }: { tabId: string }) {
       setLocalFileName(file.name)
       setIsPreviewMode(true)
     } else {
-      alert(t('请选择 Markdown 文件 (.md)'))
+      showDialog(t('请选择 Markdown 文件 (.md)'), { tone: 'warning' })
     }
   }
 
@@ -353,7 +356,7 @@ export default function MarkdownEditorPage({ tabId }: { tabId: string }) {
       await html2pdf().set(opt).from(element).save()
     } catch (error) {
       console.error('PDF export failed:', error)
-      alert(t('PDF 导出失败，请重试'))
+      showDialog(t('PDF 导出失败，请重试'), { tone: 'danger' })
     } finally {
       document.head.removeChild(style)
     }

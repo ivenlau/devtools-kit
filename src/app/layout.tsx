@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/components/ThemeProvider'
 import { I18nProvider } from '@/components/I18nProvider'
 import { Header } from '@/components/Header'
 import { ToolWorkspace } from '@/components/workspace/ToolWorkspace'
+import { DialogHost } from '@/components/DialogModal'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -54,6 +55,8 @@ export default function RootLayout({
               {/* keeps opened tools alive across route changes; tool routes
                   themselves render only a bootstrap shell */}
               <ToolWorkspace />
+              {/* themed alert/confirm host (showDialog) */}
+              <DialogHost />
             </ThemeProvider>
           </I18nProvider>
       </body>

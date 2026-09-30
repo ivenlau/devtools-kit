@@ -5,6 +5,7 @@ import { Braces, Copy, Trash2, Wand2, Minimize2, ArrowDownAZ } from 'lucide-reac
 import { formatJson, minifyJson } from '@/lib/parsers/json'
 import { useTransferData } from '@/lib/useTransferData'
 import { useTabState } from '@/lib/hooks/useTabState'
+import { showDialog } from '@/components/DialogModal'
 import Editor, { type Monaco } from '@monaco-editor/react'
 import { ToolShell } from '@/components/ToolShell'
 import { useTheme } from '@/components/ThemeProvider'
@@ -134,7 +135,41 @@ export default function JsonToolPage({ tabId }: { tabId: string }) {
     setError(null)
   }
 
+  // 拖入 .json 文件 — enter/leave 在子元素边界成对出现，用 relatedTarget
+  // 规避遮罩闪烁（同 MarkdownTool 的处理）
+  const [dragActive, setDragActive] = useState(false)
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true)
+    } else if (e.type === 'dragleave') {
+      if (e.relatedTarget && e.currentTarget.contains(e.relatedTarget as Node)) return
+      setDragActive(false)
+    }
+  }
+
+  const handleDropFile = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setDragActive(false)
+    const file = e.dataTransfer.files?.[0]
+    if (!file) return
+    if (!/\.(json|jsonc|txt)$/i.test(file.name) && !file.type.includes('json')) {
+      showDialog(t('请选择 JSON 文件 (.json)'), { tone: 'warning' })
+      return
+    }
+    file.text().then(setInput)
+  }
+
   return (
+    <div
+      className="bg-void"
+      onDragEnter={handleDrag}
+      onDragLeave={handleDrag}
+      onDragOver={handleDrag}
+      onDrop={handleDropFile}
+    >
     <ToolShell
       title="JSON FORMAT"
       description={t('格式化、压缩、验证 JSON 数据')}
@@ -253,6 +288,19 @@ export default function JsonToolPage({ tabId }: { tabId: string }) {
           </div>
         </div>
       </div>
-    </ToolShell>
+      </ToolShell>
+
+      {dragActive && (
+        <div className="fixed inset-0 z-[150] flex items-center justify-center bg-void/80 backdrop-blur-sm">
+          <div className="panel-glow animate-fade-up flex flex-col items-center gap-4 px-12 py-10">
+            <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-neon-cyan bg-void-200 shadow-neon-cyan">
+              <Braces className="h-7 w-7 text-neon-cyan" />
+            </div>
+            <p className="font-display text-xl font-semibold text-ink-primary">DROP .JSON</p>
+            <p className="font-mono text-xs text-ink-muted">release to load into the editor</p>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
